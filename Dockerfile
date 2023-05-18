@@ -17,7 +17,7 @@ RUN pecl install mongodb && \
     docker-php-ext-enable mongodb
 
 # Copy the PHP files to the container
-COPY index.php $APACHE_DOCUMENT_ROOT/
+COPY . $APACHE_DOCUMENT_ROOT/
 
 COPY .env /var/www/html/.env
 RUN chmod +x /var/www/html/.env

@@ -145,6 +145,7 @@ echo "DB_NAME=$DB_NAME" >> .env
 echo "DB_COLLECTION=$DB_COLLECTION" >> .env
 echo "LOCAL_PORT=$LOCAL_PORT" >> .env
 
+set -x
 sudo docker-compose build
 
 # Start the Docker container

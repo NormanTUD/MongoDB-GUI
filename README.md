@@ -19,6 +19,8 @@ I'm still working on making docker work. But when it's ready you should be able 
 
 ```console
 bash run.sh $MONGO_DB_IP $MONGO_DB_PORT $MONGO_DB_DB_NAME $MONGO_DB_COLLECTION_NAME $LOCAL_PORT_FOR_THE_GUI
+
+bash run.sh $(ip addr | grep 192 | sed -e 's#.*inet\s*##' | sed -e 's#/.*##') 27017 dbname colname 1234 # connect to mongodb on localhost:27017, start gui at 1234
 ```
 
 # Caveats

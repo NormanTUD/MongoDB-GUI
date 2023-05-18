@@ -36,13 +36,8 @@ $collectionName =  read_first_line_of_file_or_die("collname");
 $mongoClient = new MongoDB\Driver\Manager("mongodb://{$mongodbHost}:{$mongodbPort}");
 $namespace = "{$databaseName}.{$collectionName}";
 
-
-
-
-
 // Function to generate JSON structure for jQuery QueryBuilder
-function generateQueryBuilderStructure()
-{
+function generateQueryBuilderStructure() {
     $fields = getAllFields();
 
     $jsonStructure = [
@@ -81,8 +76,7 @@ function generateQueryBuilderStructure()
     return json_encode($jsonStructure, JSON_PRETTY_PRINT);
 }
 
-function getFieldType($field)
-{
+function getFieldType($field) {
     global $collectionName, $mongoClient, $namespace, $databaseName;
 
     // Query the collection to retrieve the value type of the field
@@ -123,9 +117,7 @@ function getFieldType($field)
     return $fieldType;
 }
 
-
-function generateQueryBuilderFilters()
-{
+function generateQueryBuilderFilters() {
     global $collectionName, $mongoClient, $namespace, $databaseName;
 
     // Query the collection to retrieve field names
@@ -188,36 +180,6 @@ function generateQueryBuilderFilters()
     return json_encode($fields, JSON_PRETTY_PRINT);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function getAllFields() {
     global $mongoClient, $namespace;
 
@@ -241,12 +203,8 @@ function getAllFields() {
     return $fields;
 }
 
-// Function to generate JSON structure for jQuery QueryBuilder
-
-
 // Function to retrieve all entries from the collection
-function getAllEntries()
-{
+function getAllEntries() {
     global $mongoClient, $namespace;
     $query = new MongoDB\Driver\Query([]);
     $cursor = $mongoClient->executeQuery($namespace, $query);
@@ -255,8 +213,7 @@ function getAllEntries()
 }
 
 // Function to delete an entry by ID
-function deleteEntry($entryId)
-{
+function deleteEntry($entryId) {
     global $mongoClient, $namespace;
     $bulkWrite = new MongoDB\Driver\BulkWrite();
     $filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
@@ -272,8 +229,7 @@ function deleteEntry($entryId)
 }
 
 // Function to update an entry by ID
-function updateEntry($entryId, $newData)
-{
+function updateEntry($entryId, $newData) {
     global $mongoClient, $namespace;
     $bulkWrite = new MongoDB\Driver\BulkWrite();
     $filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
@@ -312,12 +268,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    $entryId = $_POST['entry_id'];
-    $newData = json_decode($_POST['json_data'], true);
+    if(isset($_POST["entry_id"])) {
+	    $entryId = $_POST['entry_id'];
+	    $newData = json_decode($_POST['json_data'], true);
 
-    $response = updateEntry($entryId, $newData);
-    echo $response;
-    exit();
+	    $response = updateEntry($entryId, $newData);
+	    echo $response;
+	    exit();
+    }
 }
 
 // Retrieve all entries
@@ -327,13 +285,9 @@ $entries = getAllEntries();
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-        #new_entry_container {
-            margin-bottom: 10px;
-        }
-    </style>
     <title>Entries</title>
     <script src="jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="style.css"/>
     <link rel="stylesheet" href="jsoneditor.min.css"/>
     <script src="jsoneditor.min.js"></script>
     <link rel="stylesheet" href="toastr.min.css"/>

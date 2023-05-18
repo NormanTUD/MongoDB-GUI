@@ -7,7 +7,7 @@ DB_NAME=$3
 DB_COLLECTION=$4
 LOCAL_PORT=$5
 
-ips=$(ip addr | grep inet | grep -v : | sed -e 's#.*inet\s*##' | sed -e 's#/.*##')
+ips=$(ip addr | grep inet | grep -v : | sed -e 's#.*inet\s*##' | sed -e 's#/.*##' | grep -v "^127.")
 # Check if DB_HOST is localhost or 127.0.0.1
 if [[ $DB_HOST == "localhost" || $DB_HOST == "127.0.0.1" ]]; then
   # Create an array of IPs

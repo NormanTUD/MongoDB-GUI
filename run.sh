@@ -7,6 +7,31 @@ DB_NAME=$3
 DB_COLLECTION=$4
 LOCAL_PORT=$5
 
+ips=$(ip addr | grep inet | grep -v : | sed -e 's#.*inet\s*##' | sed -e 's#/.*##')
+# Check if DB_HOST is localhost or 127.0.0.1
+if [[ $DB_HOST == "localhost" || $DB_HOST == "127.0.0.1" ]]; then
+  # Create an array of IPs
+  ip_array=()
+  while read -r ip; do
+    ip_array+=("$ip" "")
+  done <<< "$ips"
+
+  # Show Whiptail menu
+  selected_ip=$(whiptail --title "Local IPs" --menu "Choose a local IP:" 15 60 6 "${ip_array[@]}" 3>&1 1>&2 2>&3)
+
+  # Check if a selection was made
+  if [[ -n $selected_ip ]]; then
+    echo "Selected IP: $selected_ip"
+    # Use the selected IP for DB_HOST
+    DB_HOST="$selected_ip"
+    echo "DB_HOST set to: $DB_HOST"
+    # Add your logic here using the updated DB_HOST variable
+  else
+    echo "No IP selected. Exiting..."
+    exit 1
+  fi
+fi
+
 export DB_HOST
 export DB_PORT
 export DB_NAME

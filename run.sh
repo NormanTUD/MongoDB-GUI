@@ -2,7 +2,7 @@
 
 # Default values
 DB_HOST=""
-DB_PORT=""
+DB_PORT="27017"
 DB_NAME=""
 DB_COLLECTION=""
 LOCAL_PORT=""

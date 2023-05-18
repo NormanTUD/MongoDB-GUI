@@ -330,7 +330,7 @@ $entries = getAllEntries();
 			function initJsonEditors() {
 				<?php foreach ($entries as $entry): ?>
 				const editor_<?php echo $entry->_id; ?> = new JSONEditor(
-					document.getElementById('jsoneditor_<?php echo $entry->_id; ?>'),
+				document.getElementById('jsoneditor_<?php echo $entry->_id; ?>'),
 					{
 						mode: 'tree',
 						onBlur: function () {
@@ -342,7 +342,7 @@ $entries = getAllEntries();
 					}
 				);
 
-			    editor_<?php echo $entry->_id; ?>.set(<?php echo json_encode($entry, JSON_UNESCAPED_UNICODE); ?>);
+				    editor_<?php echo $entry->_id; ?>.set(<?php echo json_encode($entry, JSON_UNESCAPED_UNICODE); ?>);
 			    <?php endforeach; ?>
 			}
 

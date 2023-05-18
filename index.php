@@ -250,8 +250,8 @@ function getAllEntries() {
 	try {
 		$cursor = $mongoClient->executeQuery($namespace, $query);
 	} catch (\Throwable $e) { // For PHP 7
-		print "There was an error connecting to MongoDB. Are you sure you bound it to 0.0.0.0?";
-		print "Try, in /etc/mongod.conf, to change the line\n<br>bindIp: 127.0.0.1\n<br>to\n<br>bindIp: 0.0.0.0\n<br>and then try sudo service mongod restart\n<br>\n";
+		print "There was an error connecting to MongoDB. Are you sure you bound it to 0.0.0.0?<br>\n";
+		print "Try, in <code>/etc/mongod.conf</code>, to change the line\n<br><code>bindIp: 127.0.0.1</code>\n<br>to\n<br><code>bindIp: 0.0.0.0</code>\n<br>and then try sudo service mongod restart\n<br>\n<br>\n<br>\nError:<br>\n<br>\n";
 		print($e);
 	}
 	$entries = $cursor->toArray();

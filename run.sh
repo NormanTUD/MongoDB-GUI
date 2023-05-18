@@ -1,11 +1,86 @@
 #!/bin/bash
 
-# Load environment variables from shell
-DB_HOST=$1
-DB_PORT=$2
-DB_NAME=$3
-DB_COLLECTION=$4
-LOCAL_PORT=$5
+# Default values
+DB_HOST=""
+DB_PORT=""
+DB_NAME=""
+DB_COLLECTION=""
+LOCAL_PORT=""
+
+# Help message
+help_message() {
+    echo "Usage: display_mongodb_gui.sh [OPTIONS]"
+    echo "Options:"
+    echo "  --db-host          MongoDB host address"
+    echo "  --db-port          MongoDB port number"
+    echo "  --db-name          MongoDB database name"
+    echo "  --db-collection    MongoDB collection name"
+    echo "  --local-port       Local port to bind for the GUI"
+    echo "  --help             Show this help message"
+}
+
+# Parse command-line arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --db-host)
+            DB_HOST="$2"
+            shift
+            ;;
+        --db-port)
+            DB_PORT="$2"
+            shift
+            ;;
+        --db-name)
+            DB_NAME="$2"
+            shift
+            ;;
+        --db-collection)
+            DB_COLLECTION="$2"
+            shift
+            ;;
+        --local-port)
+            LOCAL_PORT="$2"
+            shift
+            ;;
+        --help)
+            help_message
+            exit 0
+            ;;
+        *)
+            echo "Error: Unknown option '$1'. Use --help for usage."
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+# Check for required parameters
+if [[ -z $DB_NAME ]]; then
+    echo "Error: Missing required parameter --db-name. Use --help for usage."
+    exit 1
+fi
+
+
+if [[ -z $DB_PORT ]]; then
+    echo "Error: Missing required parameter --db-port. Use --help for usage."
+    exit 1
+fi
+
+if [[ -z $DB_NAME ]]; then
+    echo "Error: Missing required parameter --db-name. Use --help for usage."
+    exit 1
+fi
+
+if [[ -z $DB_COLLECTION ]]; then
+    echo "Error: Missing required parameter --db-collection. Use --help for usage."
+    exit 1
+fi
+
+if [[ -z $LOCAL_PORT ]]; then
+    echo "Error: Missing required parameter --local-port. Use --help for usage."
+    exit 1
+fi
+
 
 is_package_installed() {
   dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -c "ok installed"

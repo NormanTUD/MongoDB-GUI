@@ -450,8 +450,9 @@ $entries = getAllEntries();
 	<body>
 		<!-- Display entries -->
 		<h2>Search</h2>
-		<form onchange="update_current_query(event)">
+		<form>
 			<div id="builder-basic"></div>
+			<button onclick="update_current_query(event)">Create search query</button>
 			<div id="current_query"></div>
 		</form>
 		<div id="entry_list">
@@ -491,6 +492,7 @@ $entries = getAllEntries();
 			});
 
 			function update_current_query (e) {
+				event.preventDefault();
 				e.stopPropagation();
 				var rules = $("#builder-basic").queryBuilder("getRules");
 

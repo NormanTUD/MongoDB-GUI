@@ -7,6 +7,30 @@ DB_NAME=$3
 DB_COLLECTION=$4
 LOCAL_PORT=$5
 
+is_package_installed() {
+  dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -c "ok installed"
+}
+
+# Check if Docker is installed
+if ! command -v docker &>/dev/null; then
+  echo "Docker not found. Installing Docker..."
+  # Enable non-free repository
+  sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list
+
+  # Update package lists
+  sudo apt update
+
+  # Install Docker
+  sudo apt install -y docker.io
+fi
+
+# Check if Whiptail is installed
+if ! command -v whiptail &>/dev/null; then
+  echo "Whiptail not found. Installing Whiptail..."
+  # Install Whiptail
+  sudo apt install -y whiptail
+fi
+
 ips=$(ip addr | grep inet | grep -v : | sed -e 's#.*inet\s*##' | sed -e 's#/.*##' | grep -v "^127.")
 # Check if DB_HOST is localhost or 127.0.0.1
 if [[ $DB_HOST == "localhost" || $DB_HOST == "127.0.0.1" ]]; then

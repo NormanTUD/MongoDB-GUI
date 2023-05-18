@@ -1,6 +1,6 @@
 # MongoGUI
 
-A very simple GUI for viewing and updaging MongoDB-Databases with PHP. 
+A very simple GUI for viewing, deleting, adding and updating MongoDB-Databases with PHP without needing to memorize MongoDB's kinda quirky language. 
 
 # Screenshot
 

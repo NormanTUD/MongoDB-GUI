@@ -44,9 +44,12 @@ function generateQueryBuilderRules() {
         "rules" => []
     ];
 
+    $i = 0;
     foreach ($fields as $field) {
         // Determine the data type of the field
         $fieldType = getFieldType($field);
+
+	$type = "text";
 
         // Define operators based on the data type
         $operators = [];
@@ -55,6 +58,7 @@ function generateQueryBuilderRules() {
             case 'integer':
             case 'float':
                 $operators = ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal'];
+		$type = "number";
                 break;
             case 'string':
                 $operators = ['equal', 'not_equal', 'contains', 'starts_with', 'ends_with'];
@@ -62,23 +66,29 @@ function generateQueryBuilderRules() {
             // Add additional cases for other data types if needed
         }
 
-        $jsonStructure['rules'][] = [
-            "id" => $field,
-            "field" => $field,
-            "type" => $fieldType,
-            "input" => "text",
-            "operators" => $operators,
-            "value" => ""
-        ];
+	if($i == 0) {
+		$jsonStructure['rules'][] = [
+		    "id" => $field,
+		    "field" => $field,
+		    "type" => $fieldType,
+		    "input" => $type,
+		    "operators" => $operators,
+		    "value" => ""
+		];
+	}
 
+	$i++;
+
+/*
         $jsonStructure['rules'][] = [
             "id" => $field . '.*',
             "field" => $field . '.*',
             "type" => $fieldType,
-            "input" => "text",
+            "input" => $type,
             "operators" => $operators,
             "value" => ""
         ];
+*/
     }
 
     return json_encode($jsonStructure, JSON_PRETTY_PRINT);

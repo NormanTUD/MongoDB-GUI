@@ -6,13 +6,6 @@ A very simple GUI for viewing, deleting, adding and updating MongoDB-Databases w
 
 ![Screenshot](screenshot_alpha.png?raw=true "Screenshot")
 
-# How to chose DB
-
-```console
-echo $DBNAME > dbname
-echo $COLLNAME > collname
-```
-
 # Docker
 
 ```console

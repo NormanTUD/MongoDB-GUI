@@ -137,76 +137,76 @@ function getFieldType($field) {
 
 
 function generateQueryBuilderFilters() {
-    global $collectionName, $mongoClient, $namespace, $databaseName;
+	global $collectionName, $mongoClient, $namespace, $databaseName;
 
-    // Query the collection to retrieve field names
-    $pipeline = [
-        [
-            '$project' => [
-                'fields' => ['$objectToArray' => '$$ROOT']
-            ]
-        ],
-        [
-            '$unwind' => '$fields'
-        ],
-        [
-            '$group' => [
-                '_id' => null,
-                'fields' => ['$addToSet' => '$fields.k']
-            ]
-        ]
-    ];
+	// Query the collection to retrieve field names
+	$pipeline = [
+		[
+			'$project' => [
+				'fields' => ['$objectToArray' => '$$ROOT']
+			]
+		],
+		[
+			'$unwind' => '$fields'
+		],
+		[
+			'$group' => [
+				'_id' => null,
+				'fields' => ['$addToSet' => '$fields.k']
+			]
+		]
+	];
 
-    $command = new MongoDB\Driver\Command([
-        'aggregate' => $collectionName,
-        'pipeline' => $pipeline,
-        'cursor' => new stdClass(),
-    ]);
+	$command = new MongoDB\Driver\Command([
+		'aggregate' => $collectionName,
+		'pipeline' => $pipeline,
+		'cursor' => new stdClass(),
+	]);
 
-    $cursor = $mongoClient->executeCommand($databaseName, $command);
-    $result = current($cursor->toArray());
+	$cursor = $mongoClient->executeCommand($databaseName, $command);
+	$result = current($cursor->toArray());
 
-    $fields = [];
-    if (isset($result->fields)) {
-        foreach ($result->fields as $field) {
-            $fieldType = getFieldType($field);
+	$fields = [];
+	if (isset($result->fields)) {
+		foreach ($result->fields as $field) {
+			$fieldType = getFieldType($field);
 
-            $operators = [];
-            switch ($fieldType) {
-                case 'integer':
-                case 'int':
-                case 'float':
-                    $operators = ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal'];
-                    break;
-                case 'string':
-                    $operators = ['equal', 'not_equal', 'contains', 'starts_with', 'ends_with'];
-                    break;
-                // Add additional cases for other data types if needed
-            }
+			$operators = [];
+			switch ($fieldType) {
+			case 'integer':
+			case 'int':
+			case 'float':
+				$operators = ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal'];
+				break;
+			case 'string':
+				$operators = ['equal', 'not_equal', 'contains', 'starts_with', 'ends_with'];
+				break;
+				// Add additional cases for other data types if needed
+			}
 
-            $filter = [
-                'id' => $field,
-                'label' => $field,
-                'type' => $fieldType,
-                'input' => 'text',
-                'operators' => $operators,
-            ];
+			$filter = [
+				'id' => $field,
+				'label' => $field,
+				'type' => $fieldType,
+				'input' => 'text',
+				'operators' => $operators,
+			];
 
-            $fields[] = $filter;
+			$fields[] = $filter;
 
-            $filterSubentry = [
-                'id' => $field . '.*',
-                'label' => $field . '.*',
-                'type' => $fieldType,
-                'input' => 'text',
-                'operators' => $operators,
-            ];
+			$filterSubentry = [
+				'id' => $field . '.*',
+				'label' => $field . '.*',
+				'type' => $fieldType,
+				'input' => 'text',
+				'operators' => $operators,
+			];
 
-            $fields[] = $filterSubentry;
-        }
-    }
+			$fields[] = $filterSubentry;
+		}
+	}
 
-    return json_encode($fields, JSON_PRETTY_PRINT);
+	return json_encode($fields, JSON_PRETTY_PRINT);
 }
 
 function getAllFields() {

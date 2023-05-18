@@ -382,8 +382,10 @@ $entries = getAllEntries();
 			    <?php endforeach; ?>
 			}
 
-			function deleteEntry(entryId, event) {
-				event.stopPropagation();
+			function deleteEntry(entryId, event=null) {
+				if(event) {
+					event.stopPropagation();
+				}
 				$.ajax({
 					url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
 						type: 'POST',

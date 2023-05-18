@@ -38,244 +38,244 @@ $namespace = "{$databaseName}.{$collectionName}";
 
 // Function to generate JSON structure for jQuery QueryBuilder
 function generateQueryBuilderStructure() {
-    $fields = getAllFields();
+	$fields = getAllFields();
 
-    $jsonStructure = [
-        "condition" => "AND",
-        "rules" => []
-    ];
+	$jsonStructure = [
+		"condition" => "AND",
+		"rules" => []
+	];
 
-    foreach ($fields as $field) {
-        // Determine the data type of the field
-        $fieldType = getFieldType($field);
+	foreach ($fields as $field) {
+		// Determine the data type of the field
+		$fieldType = getFieldType($field);
 
-        // Define operators based on the data type
-        $operators = [];
-        switch ($fieldType) {
-            case 'int':
-            case 'integer':
-            case 'float':
-                $operators = ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal'];
-                break;
-            case 'string':
-                $operators = ['equal', 'not_equal', 'contains', 'starts_with', 'ends_with'];
-                break;
-            // Add additional cases for other data types if needed
-        }
+		// Define operators based on the data type
+		$operators = [];
+		switch ($fieldType) {
+		case 'int':
+		case 'integer':
+		case 'float':
+			$operators = ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal'];
+			break;
+		case 'string':
+			$operators = ['equal', 'not_equal', 'contains', 'starts_with', 'ends_with'];
+			break;
+			// Add additional cases for other data types if needed
+		}
 
-        $jsonStructure['rules'][] = [
-            "id" => $field,
-            "field" => $field,
-            "type" => $fieldType,
-            "input" => "text",
-            "operators" => $operators,
-            "value" => ""
-        ];
-    }
+		$jsonStructure['rules'][] = [
+			"id" => $field,
+			"field" => $field,
+			"type" => $fieldType,
+			"input" => "text",
+			"operators" => $operators,
+			"value" => ""
+		];
+	}
 
-    return json_encode($jsonStructure, JSON_PRETTY_PRINT);
+	return json_encode($jsonStructure, JSON_PRETTY_PRINT);
 }
 
 function getFieldType($field) {
-    global $collectionName, $mongoClient, $namespace, $databaseName;
+	global $collectionName, $mongoClient, $namespace, $databaseName;
 
-    // Query the collection to retrieve the value type of the field
-    $pipeline = [
-        [
-            '$project' => [
-                'valueType' => ['$type' => '$' . $field]
-            ]
-        ],
-        [
-            '$limit' => 1
-        ]
-    ];
+	// Query the collection to retrieve the value type of the field
+	$pipeline = [
+		[
+			'$project' => [
+				'valueType' => ['$type' => '$' . $field]
+			]
+		],
+		[
+			'$limit' => 1
+		]
+	];
 
-    $command = new MongoDB\Driver\Command([
-        'aggregate' => $collectionName,
-        'pipeline' => $pipeline,
-        'cursor' => new stdClass(),
-    ]);
+	$command = new MongoDB\Driver\Command([
+		'aggregate' => $collectionName,
+		'pipeline' => $pipeline,
+		'cursor' => new stdClass(),
+	]);
 
-    $cursor = $mongoClient->executeCommand($databaseName, $command);
-    $result = current($cursor->toArray());
+	$cursor = $mongoClient->executeCommand($databaseName, $command);
+	$result = current($cursor->toArray());
 
-    $fieldType = 'string'; // Default data type if not determined
+	$fieldType = 'string'; // Default data type if not determined
 
-    if (isset($result->valueType)) {
-        switch ($result->valueType) {
-            case 'double':
-                $fieldType = 'float';
-                break;
-            case 'int':
-                $fieldType = 'integer';
-                break;
-            // Add cases for other value types as needed
-        }
-    }
+	if (isset($result->valueType)) {
+		switch ($result->valueType) {
+		case 'double':
+			$fieldType = 'float';
+			break;
+		case 'int':
+			$fieldType = 'integer';
+			break;
+			// Add cases for other value types as needed
+		}
+	}
 
-    return $fieldType;
+	return $fieldType;
 }
 
 function generateQueryBuilderFilters() {
-    global $collectionName, $mongoClient, $namespace, $databaseName;
+	global $collectionName, $mongoClient, $namespace, $databaseName;
 
-    // Query the collection to retrieve field names
-    $pipeline = [
-        [
-            '$project' => [
-                'fields' => ['$objectToArray' => '$$ROOT']
-            ]
-        ],
-        [
-            '$unwind' => '$fields'
-        ],
-        [
-            '$group' => [
-                '_id' => null,
-                'fields' => ['$addToSet' => '$fields.k']
-            ]
-        ]
-    ];
+	// Query the collection to retrieve field names
+	$pipeline = [
+		[
+			'$project' => [
+				'fields' => ['$objectToArray' => '$$ROOT']
+			]
+		],
+		[
+			'$unwind' => '$fields'
+		],
+		[
+			'$group' => [
+				'_id' => null,
+				'fields' => ['$addToSet' => '$fields.k']
+			]
+		]
+	];
 
-    $command = new MongoDB\Driver\Command([
-        'aggregate' => $collectionName,
-        'pipeline' => $pipeline,
-        'cursor' => new stdClass(),
-    ]);
+	$command = new MongoDB\Driver\Command([
+		'aggregate' => $collectionName,
+		'pipeline' => $pipeline,
+		'cursor' => new stdClass(),
+	]);
 
-    $cursor = $mongoClient->executeCommand($databaseName, $command);
-    $result = current($cursor->toArray());
+	$cursor = $mongoClient->executeCommand($databaseName, $command);
+	$result = current($cursor->toArray());
 
-    $fields = [];
-    if (isset($result->fields)) {
-        foreach ($result->fields as $field) {
-            $fieldType = getFieldType($field);
+	$fields = [];
+	if (isset($result->fields)) {
+		foreach ($result->fields as $field) {
+			$fieldType = getFieldType($field);
 
-            $operators = [];
-            switch ($fieldType) {
-                case 'integer':
-                case 'int':
-                case 'float':
-                    $operators = ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal'];
-                    break;
-                case 'string':
-                    $operators = ['equal', 'not_equal', 'contains', 'starts_with', 'ends_with'];
-                    break;
-                // Add additional cases for other data types if needed
-            }
+			$operators = [];
+			switch ($fieldType) {
+			case 'integer':
+			case 'int':
+			case 'float':
+				$operators = ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal'];
+				break;
+			case 'string':
+				$operators = ['equal', 'not_equal', 'contains', 'starts_with', 'ends_with'];
+				break;
+				// Add additional cases for other data types if needed
+			}
 
-            $filter = [
-                'id' => $field,
-                'label' => $field,
-                'type' => $fieldType,
-                'input' => 'text',
-                'operators' => $operators,
-            ];
+			$filter = [
+				'id' => $field,
+				'label' => $field,
+				'type' => $fieldType,
+				'input' => 'text',
+				'operators' => $operators,
+			];
 
-            $fields[] = $filter;
-        }
-    }
+			$fields[] = $filter;
+		}
+	}
 
-    return json_encode($fields, JSON_PRETTY_PRINT);
+	return json_encode($fields, JSON_PRETTY_PRINT);
 }
 
 function getAllFields() {
-    global $mongoClient, $namespace;
+	global $mongoClient, $namespace;
 
-    // Retrieve all entries from the collection
-    $query = new MongoDB\Driver\Query([]);
-    $cursor = $mongoClient->executeQuery($namespace, $query);
-    $entries = $cursor->toArray();
+	// Retrieve all entries from the collection
+	$query = new MongoDB\Driver\Query([]);
+	$cursor = $mongoClient->executeQuery($namespace, $query);
+	$entries = $cursor->toArray();
 
-    $fields = [];
+	$fields = [];
 
-    // Iterate over the entries to extract the fields
-    foreach ($entries as $entry) {
-        $entryData = (array)$entry;
-        $fields = array_merge($fields, array_keys($entryData));
-    }
+	// Iterate over the entries to extract the fields
+	foreach ($entries as $entry) {
+		$entryData = (array)$entry;
+		$fields = array_merge($fields, array_keys($entryData));
+	}
 
-    // Remove duplicate fields and sort them alphabetically
-    $fields = array_unique($fields);
-    sort($fields);
+	// Remove duplicate fields and sort them alphabetically
+	$fields = array_unique($fields);
+	sort($fields);
 
-    return $fields;
+	return $fields;
 }
 
 // Function to retrieve all entries from the collection
 function getAllEntries() {
-    global $mongoClient, $namespace;
-    $query = new MongoDB\Driver\Query([]);
-    $cursor = $mongoClient->executeQuery($namespace, $query);
-    $entries = $cursor->toArray();
-    return $entries;
+	global $mongoClient, $namespace;
+	$query = new MongoDB\Driver\Query([]);
+	$cursor = $mongoClient->executeQuery($namespace, $query);
+	$entries = $cursor->toArray();
+	return $entries;
 }
 
 // Function to delete an entry by ID
 function deleteEntry($entryId) {
-    global $mongoClient, $namespace;
-    $bulkWrite = new MongoDB\Driver\BulkWrite();
-    $filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
+	global $mongoClient, $namespace;
+	$bulkWrite = new MongoDB\Driver\BulkWrite();
+	$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
 
-    $bulkWrite->delete($filter);
+	$bulkWrite->delete($filter);
 
-    try {
-        $mongoClient->executeBulkWrite($namespace, $bulkWrite);
-        return json_encode(['success' => 'Entry deleted successfully.', 'entryId' => $entryId]);
-    } catch (Exception $e) {
-        return json_encode(['error' => 'Error deleting entry: ' . $e->getMessage()]);
-    }
+	try {
+		$mongoClient->executeBulkWrite($namespace, $bulkWrite);
+		return json_encode(['success' => 'Entry deleted successfully.', 'entryId' => $entryId]);
+	} catch (Exception $e) {
+		return json_encode(['error' => 'Error deleting entry: ' . $e->getMessage()]);
+	}
 }
 
 // Function to update an entry by ID
 function updateEntry($entryId, $newData) {
-    global $mongoClient, $namespace;
-    $bulkWrite = new MongoDB\Driver\BulkWrite();
-    $filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
+	global $mongoClient, $namespace;
+	$bulkWrite = new MongoDB\Driver\BulkWrite();
+	$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
 
-    // Delete the existing document
-    $bulkWrite->delete($filter);
+	// Delete the existing document
+	$bulkWrite->delete($filter);
 
-    // Insert the updated document
-    $newData['_id'] = new MongoDB\BSON\ObjectID($entryId);
-    $bulkWrite->insert($newData);
+	// Insert the updated document
+	$newData['_id'] = new MongoDB\BSON\ObjectID($entryId);
+	$bulkWrite->insert($newData);
 
-    try {
-        $mongoClient->executeBulkWrite($namespace, $bulkWrite);
-        return json_encode(['success' => 'Entry updated successfully.', 'entryId' => $entryId]);
-    } catch (Exception $e) {
-        return json_encode(['error' => 'Error updating entry: ' . $e->getMessage()]);
-    }
+	try {
+		$mongoClient->executeBulkWrite($namespace, $bulkWrite);
+		return json_encode(['success' => 'Entry updated successfully.', 'entryId' => $entryId]);
+	} catch (Exception $e) {
+		return json_encode(['error' => 'Error updating entry: ' . $e->getMessage()]);
+	}
 }
 
 // Handle form submission for updating an entry
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Handle form submission for deleting an entry
-    if (isset($_POST['delete_entry_id'])) {
-        $entryId = $_POST['delete_entry_id'];
-        $response = deleteEntry($entryId);
-        echo $response;
-        exit();
-    }
+	// Handle form submission for deleting an entry
+	if (isset($_POST['delete_entry_id'])) {
+		$entryId = $_POST['delete_entry_id'];
+		$response = deleteEntry($entryId);
+		echo $response;
+		exit();
+	}
 
-    // Handle form submission for adding a new entry
-    if (isset($_POST['new_entry_data'])) {
-        $newData = json_decode($_POST['new_entry_data'], true);
-        $entryId = (string) new MongoDB\BSON\ObjectID();
-        $response = updateEntry($entryId, $newData);
-        echo $response;
-        exit();
-    }
+	// Handle form submission for adding a new entry
+	if (isset($_POST['new_entry_data'])) {
+		$newData = json_decode($_POST['new_entry_data'], true);
+		$entryId = (string) new MongoDB\BSON\ObjectID();
+		$response = updateEntry($entryId, $newData);
+		echo $response;
+		exit();
+	}
 
-    if(isset($_POST["entry_id"])) {
-	    $entryId = $_POST['entry_id'];
-	    $newData = json_decode($_POST['json_data'], true);
+	if(isset($_POST["entry_id"])) {
+		$entryId = $_POST['entry_id'];
+		$newData = json_decode($_POST['json_data'], true);
 
-	    $response = updateEntry($entryId, $newData);
-	    echo $response;
-	    exit();
-    }
+		$response = updateEntry($entryId, $newData);
+		echo $response;
+		exit();
+	}
 }
 
 // Retrieve all entries

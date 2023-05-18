@@ -1,4 +1,6 @@
 <?php
+$enable_search = 0;
+
 function exception_error_handler($errno, $errstr, $errfile, $errline ) {
 	throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
 }
@@ -449,12 +451,18 @@ $entries = getAllEntries();
 	</head>
 	<body>
 		<!-- Display entries -->
-		<h2>Search</h2>
-		<form>
-			<div id="builder-basic"></div>
-			<button onclick="update_current_query(event)">Create search query</button>
-			<div id="current_query"></div>
-		</form>
+<?php
+		if($enable_search) {
+?>
+			<h2>Search</h2>
+			<form>
+				<div id="builder-basic"></div>
+				<button onclick="update_current_query(event)">Create search query</button>
+				<div id="current_query"></div>
+			</form>
+<?php
+	}
+?>
 		<div id="entry_list">
 			<?php foreach ($entries as $entry): ?>
 				<div id="entry_<?php echo $entry->_id; ?>">
@@ -466,6 +474,9 @@ $entries = getAllEntries();
 
 		<!-- Button to add a new entry -->
 		<button onclick="addNewEntry(event)">Add New Entry</button>
+<?php
+	if($enable_search) {
+?>
 		<script>
 			var jsonString = <?php echo generateQueryBuilderRules(); ?>; // Assuming $jsonString contains the generated JSON
 
@@ -505,5 +516,8 @@ $entries = getAllEntries();
 				}
 			}
 		</script>
+<?php
+	}
+?>
 	</body>
 </html>

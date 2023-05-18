@@ -324,6 +324,8 @@ $entries = getAllEntries();
 		<link href="query-builder.default.min.css" rel="stylesheet">
 		<script src="toastr.min.js"></script>
 		<script>
+			function log (...args) { console.log(args); }
+
 			// Initialize JSON Editor for each entry
 			function initJsonEditors() {
 				<?php foreach ($entries as $entry): ?>

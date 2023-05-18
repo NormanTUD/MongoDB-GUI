@@ -371,8 +371,6 @@ $entries = getAllEntries();
 								const entryId = '<?php echo $entry->_id; ?>';
 								updateEntry(entryId, jsonData);
 								focus_log["<?php echo $entry->_id; ?>"] = false;
-							} else {
-								log("No focus set, not saving.", focus_log);
 							}
 						}
 					}

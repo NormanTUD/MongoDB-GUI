@@ -466,7 +466,7 @@ $entries = getAllEntries();
 		<script>
 			var jsonString = <?php echo generateQueryBuilderRules(); ?>; // Assuming $jsonString contains the generated JSON
 
-			var jqueryquerybuilder = $('#builder-basic').queryBuilder({
+			$('#builder-basic').queryBuilder({
 				plugins: [],
 				filters: <?php print(generateQueryBuilderFilters($collectionName)); ?>,
 				rules: jsonString,

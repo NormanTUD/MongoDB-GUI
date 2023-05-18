@@ -442,12 +442,16 @@ $entries = getAllEntries();
 			$(document).ready(function () {
 				initJsonEditors();
 			});
+
 		</script>
 	</head>
 	<body>
 		<!-- Display entries -->
 		<h2>Search</h2>
-		<div id="builder-basic"></div>
+		<form onchange="update_current_query(event)">
+			<div id="builder-basic"></div>
+			<div id="current_query"></div>
+		</form>
 		<div id="entry_list">
 			<?php foreach ($entries as $entry): ?>
 				<div id="entry_<?php echo $entry->_id; ?>">
@@ -462,7 +466,7 @@ $entries = getAllEntries();
 		<script>
 			var jsonString = <?php echo generateQueryBuilderRules(); ?>; // Assuming $jsonString contains the generated JSON
 
-			$('#builder-basic').queryBuilder({
+			var jqueryquerybuilder = $('#builder-basic').queryBuilder({
 				plugins: [],
 				filters: <?php print(generateQueryBuilderFilters($collectionName)); ?>,
 				rules: jsonString,
@@ -483,6 +487,18 @@ $entries = getAllEntries();
 					alert(JSON.stringify(result, null, 2));
 				}
 			});
+
+			function update_current_query (e) {
+				e.stopPropagation();
+				var rules = $("#builder-basic").queryBuilder("getRules");
+				var rules_string = JSON.stringify(rules);
+
+				if(rules_string != "null") {
+					$("#current_query").html("<pre>" + rules_string + "</pre>");
+				} else {
+					$("#current_query").html("<pre>Could not get rules. Some search settings are probably missing.</pre>");
+				}
+			}
 		</script>
 	</body>
 </html>

@@ -1,19 +1,36 @@
 <?php
 function exception_error_handler($errno, $errstr, $errfile, $errline ) {
-    throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
+	throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
 }
 
 function dier ($msg) {
 	print_r($msg);
 	exit(1);
 }
+
+function read_first_line_of_file_or_die ($file) {
+	if (file_exists($file)) {
+		$handle = fopen($file, "r");
+		$firstLine = fgets($handle);
+		fclose($handle);
+
+		$firstLine = trim($firstLine);
+
+		// Use the $firstLine variable here
+		return $firstLine;
+	} else {
+		dier("File $file does not exist.");
+	}
+}
+
 set_error_handler("exception_error_handler");
 ini_set('display_errors', '1');
+
 // MongoDB connection settings
 $mongodbHost = 'localhost';
 $mongodbPort = 27017;
-$databaseName = 'test';
-$collectionName = 'BC';
+$databaseName = read_first_line_of_file_or_die("dbname");
+$collectionName =  read_first_line_of_file_or_die("collname");
 
 // Connect to MongoDB
 $mongoClient = new MongoDB\Driver\Manager("mongodb://{$mongodbHost}:{$mongodbPort}");
@@ -316,13 +333,13 @@ $entries = getAllEntries();
         }
     </style>
     <title>Entries</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsoneditor/dist/jsoneditor.min.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/jsoneditor/dist/jsoneditor.min.js"></script>
+    <script src="jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="jsoneditor.min.css"/>
+    <script src="jsoneditor.min.js"></script>
     <link rel="stylesheet" href="toastr.min.css"/>
 
-<script src=" https://cdn.jsdelivr.net/npm/jQuery-QueryBuilder/dist/js/query-builder.standalone.min.js"></script>
-<link href=" https://cdn.jsdelivr.net/npm/jQuery-QueryBuilder/dist/css/query-builder.default.min.css " rel="stylesheet">
+<script src="query-builder.standalone.min.js"></script>
+<link href="query-builder.default.min.css" rel="stylesheet">
 
     <script src="toastr.min.js"></script>
     <script>

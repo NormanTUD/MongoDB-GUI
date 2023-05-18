@@ -491,12 +491,13 @@ $entries = getAllEntries();
 			function update_current_query (e) {
 				e.stopPropagation();
 				var rules = $("#builder-basic").queryBuilder("getRules");
-				var rules_string = JSON.stringify(rules);
 
-				if(rules_string != "null") {
+				if(rules !== null) {
+					delete rules["valid"];
+					var rules_string = JSON.stringify(rules);
 					$("#current_query").html("<pre>" + rules_string + "</pre>");
 				} else {
-					$("#current_query").html("<pre>Could not get rules. Some search settings are probably missing.</pre>");
+					$("#current_query").html("<pre>Could not get rules. Some search settings are probably missing. Look out for red highlighted lines.</pre>");
 				}
 			}
 		</script>

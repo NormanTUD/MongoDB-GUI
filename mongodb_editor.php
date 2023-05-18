@@ -285,7 +285,7 @@ $entries = getAllEntries();
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Entries</title>
+    <title>MongoDB-GUI</title>
     <script src="jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="style.css"/>
     <link rel="stylesheet" href="jsoneditor.min.css"/>

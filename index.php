@@ -28,14 +28,23 @@ function read_first_line_of_file_or_die ($file) {
 set_error_handler("exception_error_handler");
 ini_set('display_errors', '1');
 
+function getEnvOrDie($name) {
+    $value = getenv($name);
+    if (!$value) {
+        die("Environment variable '$name' is not set.");
+    }
+    return $value;
+}
+
+
 // MongoDB connection settings
-$mongodbHost = 'localhost';
-$mongodbPort = 27017;
-$databaseName = read_first_line_of_file_or_die("dbname");
-$collectionName =  read_first_line_of_file_or_die("collname");
+$mongodbHost = getEnvOrDie('DB_HOST');
+$mongodbPort = getEnvOrDie('DB_PORT');
+$databaseName = getEnvOrDie('DB_NAME');
+$collectionName = getEnvOrDie('DB_COLLECTION');
 
 // Connect to MongoDB
-$mongoClient = new MongoDB\Driver\Manager("mongodb://{$mongodbHost}:{$mongodbPort}");
+$mongoClient = new MongoDB\Driver\Manager("mongodb://$mongodbHost:$mongodbPort");
 $namespace = "{$databaseName}.{$collectionName}";
 
 // Function to generate JSON structure for jQuery QueryBuilder

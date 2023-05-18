@@ -1,0 +1,12 @@
+version: '3'
+services:
+  mongodb-gui:
+    build:
+      context: .
+    ports:
+      - 8080:80
+    environment:
+      - DB_HOST=$DB_HOST
+      - DB_PORT=$DB_PORT
+      - DB_NAME=$DB_NAME
+      - DB_COLLECTION=$DB_COLLECTION

@@ -285,137 +285,135 @@ $entries = getAllEntries();
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MongoDB-GUI</title>
-    <script src="jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="style.css"/>
-    <link rel="stylesheet" href="jsoneditor.min.css"/>
-    <script src="jsoneditor.min.js"></script>
-    <link rel="stylesheet" href="toastr.min.css"/>
-
-<script src="query-builder.standalone.min.js"></script>
-<link href="query-builder.default.min.css" rel="stylesheet">
-
-    <script src="toastr.min.js"></script>
-    <script>
-        // Initialize JSON Editor for each entry
-        function initJsonEditors() {
-		<?php foreach ($entries as $entry): ?>
-		const editor_<?php echo $entry->_id; ?> = new JSONEditor(
-			document.getElementById('jsoneditor_<?php echo $entry->_id; ?>'),
-			{
-				mode: 'tree',
-				onBlur: function () {
-					const updatedJson = editor_<?php echo $entry->_id; ?>.get();
-					const jsonData = JSON.stringify(updatedJson, null, 2);
-					const entryId = '<?php echo $entry->_id; ?>';
-					updateEntry(entryId, jsonData);
+	<title>MongoDB-GUI</title>
+	<script src="jquery-3.6.0.min.js"></script>
+	<link rel="stylesheet" href="style.css"/>
+	<link rel="stylesheet" href="jsoneditor.min.css"/>
+	<script src="jsoneditor.min.js"></script>
+	<link rel="stylesheet" href="toastr.min.css"/>
+	<script src="query-builder.standalone.min.js"></script>
+	<link href="query-builder.default.min.css" rel="stylesheet">
+	<script src="toastr.min.js"></script>
+	<script>
+		// Initialize JSON Editor for each entry
+		function initJsonEditors() {
+			<?php foreach ($entries as $entry): ?>
+			const editor_<?php echo $entry->_id; ?> = new JSONEditor(
+				document.getElementById('jsoneditor_<?php echo $entry->_id; ?>'),
+				{
+					mode: 'tree',
+					onBlur: function () {
+						const updatedJson = editor_<?php echo $entry->_id; ?>.get();
+						const jsonData = JSON.stringify(updatedJson, null, 2);
+						const entryId = '<?php echo $entry->_id; ?>';
+						updateEntry(entryId, jsonData);
+					}
 				}
-			}
-		);
+			);
 
-            editor_<?php echo $entry->_id; ?>.set(<?php echo json_encode($entry, JSON_UNESCAPED_UNICODE); ?>);
-            <?php endforeach; ?>
-        }
+		    editor_<?php echo $entry->_id; ?>.set(<?php echo json_encode($entry, JSON_UNESCAPED_UNICODE); ?>);
+		    <?php endforeach; ?>
+		}
 
-	function deleteEntry(entryId, event) {
-		event.stopPropagation();
-		$.ajax({
-			url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
-				type: 'POST',
-				data: {
-				delete_entry_id: entryId
-			},
-			success: function (response) {
-				var data = JSON.parse(response);
-				if (data.success) {
-					toastr.success(data.success);
-					// Remove the deleted entry from the page
-					$('#entry_' + entryId).remove();
-					// Remove the deleted entry's JSON Editor instance
-					window['editor_' + entryId].destroy();
-					delete window['editor_' + entryId];
-				} else if (data.error) {
-					toastr.error(data.error);
-				}
-			},
-			error: function () {
-				toastr.error('Error deleting entry.');
-			}
-		});
-	}
-
-
-
-        // Function to add a new entry via AJAX
-        function addNewEntry(event) {
-		event.stopPropagation();
-		const jsonData = {}; // Set your initial data here
-		$.ajax({
-		url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
-			type: 'POST',
-			data: {
-				new_entry_data: JSON.stringify(jsonData)
-			},
-			success: function (response) {
-				var data = JSON.parse(response);
-				if (data.success) {
-					toastr.success(data.success);
-					// Append the new entry to the container
-					$('#entry_list').append('<div id="entry_' + data.entryId + '">' +
-						'<div id="jsoneditor_' + data.entryId + '"></div>' +
-						'<button onclick="deleteEntry(\'' + data.entryId + '\')">Delete</button>' +
-						'</div>');
-					const newEditor = new JSONEditor(
-						document.getElementById('jsoneditor_' + data.entryId),
-						{
-							mode: 'tree',
-								onBlur: function () {
-									const updatedJson = newEditor.get();
-									const newJsonData = JSON.stringify(updatedJson, null, 2);
-									updateEntry(data.entryId, newJsonData);
-								}
-						}
-					);
-					newEditor.set(jsonData);
-				} else if (data.error) {
-					toastr.error(data.error);
-				}
-			},
-			error: function () {
-				toastr.error('Error adding new entry.');
-			}
-		});
-	}
-
-
-        // Function to update an entry via AJAX
-	function updateEntry(entryId, jsonData) {
-		$.ajax({
-			url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
-				type: 'POST',
-				data: {
-					entry_id: entryId,
-					json_data: jsonData
+		function deleteEntry(entryId, event) {
+			event.stopPropagation();
+			$.ajax({
+				url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
+					type: 'POST',
+					data: {
+					delete_entry_id: entryId
 				},
-			success: function (response) {
-				var data = JSON.parse(response);
-				if (data.success) {
-					toastr.success(data.success);
-				} else if (data.error) {
-					toastr.error(data.error);
+				success: function (response) {
+					var data = JSON.parse(response);
+					if (data.success) {
+						toastr.success(data.success);
+						// Remove the deleted entry from the page
+						$('#entry_' + entryId).remove();
+						// Remove the deleted entry's JSON Editor instance
+						window['editor_' + entryId].destroy();
+						delete window['editor_' + entryId];
+					} else if (data.error) {
+						toastr.error(data.error);
+					}
+				},
+				error: function () {
+					toastr.error('Error deleting entry.');
 				}
-			},
-			error: function () {
-				toastr.error('Error updating entry.');
-			}
-		});
-	}
+			});
+		}
 
-	// Call the initialization function
-	$(document).ready(function () {
-		initJsonEditors();
-	});
-    </script>
+
+
+		// Function to add a new entry via AJAX
+		function addNewEntry(event) {
+			event.stopPropagation();
+			const jsonData = {}; // Set your initial data here
+			$.ajax({
+			url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
+				type: 'POST',
+				data: {
+					new_entry_data: JSON.stringify(jsonData)
+				},
+				success: function (response) {
+					var data = JSON.parse(response);
+					if (data.success) {
+						toastr.success(data.success);
+						// Append the new entry to the container
+						$('#entry_list').append('<div id="entry_' + data.entryId + '">' +
+							'<div id="jsoneditor_' + data.entryId + '"></div>' +
+							'<button onclick="deleteEntry(\'' + data.entryId + '\')">Delete</button>' +
+							'</div>');
+						const newEditor = new JSONEditor(
+							document.getElementById('jsoneditor_' + data.entryId),
+							{
+								mode: 'tree',
+									onBlur: function () {
+										const updatedJson = newEditor.get();
+										const newJsonData = JSON.stringify(updatedJson, null, 2);
+										updateEntry(data.entryId, newJsonData);
+									}
+							}
+						);
+						newEditor.set(jsonData);
+					} else if (data.error) {
+						toastr.error(data.error);
+					}
+				},
+				error: function () {
+					toastr.error('Error adding new entry.');
+				}
+			});
+		}
+
+
+		// Function to update an entry via AJAX
+		function updateEntry(entryId, jsonData) {
+			$.ajax({
+				url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
+					type: 'POST',
+					data: {
+						entry_id: entryId,
+						json_data: jsonData
+					},
+				success: function (response) {
+					var data = JSON.parse(response);
+					if (data.success) {
+						toastr.success(data.success);
+					} else if (data.error) {
+						toastr.error(data.error);
+					}
+				},
+				error: function () {
+					toastr.error('Error updating entry.');
+				}
+			});
+		}
+
+		// Call the initialization function
+		$(document).ready(function () {
+			initJsonEditors();
+		});
+	</script>
 </head>
 <body>
 	<!-- Display entries -->

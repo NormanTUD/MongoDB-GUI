@@ -36,5 +36,4 @@ RUN cat /usr/local/etc/php/php.ini
 EXPOSE $APACHE_PORT
 
 # Start Apache server
-CMD ["/var/www/html/run.sh"]
 CMD ["apache2-foreground"]

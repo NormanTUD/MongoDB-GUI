@@ -124,39 +124,39 @@ function generateQueryBuilderOptions()
 }
 
 function traverseDocument($data, $prefix, &$filters, &$options) {
-    foreach ($data as $key => $value) {
-        $path = $prefix . $key;
-        $type = getDataType($value);
+	foreach ($data as $key => $value) {
+		$path = $prefix . $key;
+		$type = getDataType($value);
 
-        $filter = [
-            'id' => $path,
-            'label' => $path,
-            'type' => $type,
-        ];
+		$filter = [
+			'id' => $path,
+			'label' => $path,
+			'type' => $type
+		];
 
-        $option = [
-            'id' => $path,
-            'label' => $path,
-        ];
+		$option = [
+			'id' => $path,
+			'label' => $path
+		];
 
-        if ($type === 'string') {
-            $filter['operators'] = ['equal', 'not equal', 'contains'];
-        } elseif ($type === 'integer' || $type === 'double') {
-            $filter['operators'] = ['equal', 'not equal', 'greater', 'less'];
-        } elseif ($type === 'date' || $type === 'time' || $type === 'datetime') {
-            $filter['operators'] = ['equal', "not equal"];
-        } elseif ($type === 'boolean') {
-            $filter['input'] = 'radio';
-            $filter['values'] = ['true', 'false'];
-        }
+		if ($type === 'string') {
+			$filter['operators'] = ['equal', 'not_equal', 'contains', 'type'];
+		} elseif ($type === 'integer' || $type === 'double') {
+			$filter['operators'] = ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal', 'type'];
+		} elseif ($type === 'boolean') {
+			$filter['input'] = 'radio';
+			$filter['values'] = ['true', 'false', 'type'];
+		} elseif ($type === 'array' || $type === 'object') {
+			$filter['operators'] = ['equal', 'not_equal', 'type'];
+		}
 
-        $filters[] = $filter;
-        $options[] = $option;
+		$filters[] = $filter;
+		$options[] = $option;
 
-        if (is_array($value)) {
-            traverseDocument($value, $path . '.', $filters, $options);
-        }
-    }
+		if (is_array($value) || is_object($value)) {
+			traverseDocument($value, $path . '.', $filters, $options);
+		}
+	}
 }
 
 function getDataType($value) {

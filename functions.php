@@ -203,6 +203,12 @@ function getAllEntries() {
 
 // Handle form submission for updating an entry
 if(isset($_SERVER['REQUEST_METHOD'])) {
+	if (isset($_POST['reset_search'])) {
+		$entries = getAllEntries();
+		echo json_encode($entries);
+		exit;
+	}
+
 	if (isset($_POST['search_query'])) {
 		$searchQuery = json_decode($_POST['search_query'], true);
 		$matchingEntries = searchEntries($searchQuery);

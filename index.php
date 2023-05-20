@@ -279,15 +279,43 @@ $entries = getAllEntries();
 			function resetSearch(e) {
 				e.preventDefault();
 				e.stopPropagation();
-
 				// Reset the query builder
 				$('#builder-basic').queryBuilder('reset');
 
-				// Show all entries
-				$('#entry_list > div').show();
-
 				// Clear the current query display
 				$("#current_query").empty();
+
+				// Load all entries
+				$.ajax({
+					url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
+						type: 'POST',
+						data: {
+						reset_search: true
+					},
+					success: function (response) {
+						var data = null;
+						try {
+							var data = JSON.parse(response);
+						} catch (e) {
+							console.error(e);
+						}
+
+						if (data !== null && data.success) {
+							toastr.success(data.success);
+
+							// Update the entry list with all entries
+							$('#entry_list').html(data.entries);
+
+							// Reinitialize JSON editors
+							initJsonEditors();
+						} else if (data.error) {
+							toastr.error(data.error);
+						}
+					},
+					error: function () {
+						toastr.error('Error resetting search.');
+					}
+				});
 			}
 
 			function searchEntries() {

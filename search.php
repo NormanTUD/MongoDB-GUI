@@ -1,7 +1,7 @@
 <?php
 include("functions.php");
 
-$collection = $GLOBALS["mongoClient"]->selectCollection($GLOBALS["databaseName"], $GLOBALS["collectionName"]);
+$collection = $mongoClient->$GLOBALS["databaseName"]->$GLOBALS["collectionName"];
 
 // Function to retrieve all available fields in the collection
 function getAllFields($collection)
@@ -85,18 +85,16 @@ function generateQueryBuilderRules($collection)
     return json_encode($jsonStructure, JSON_PRETTY_PRINT);
 }
 
-// Get the generated JSON structure for jQuery QueryBuilder
+// Generate the JSON structure for jQuery QueryBuilder
 $jsonStructure = generateQueryBuilderRules($collection);
-
 ?>
 
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>MongoDB Query Builder</title>
+    <title>Search Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jQuery-QueryBuilder/2.4.1/css/query-builder.default.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-QueryBuilder/2.4.1/js/query-builder.standalone.min.js"></script>
 
     <script type="text/javascript">
@@ -106,10 +104,7 @@ $jsonStructure = generateQueryBuilderRules($collection);
             // Initialize the QueryBuilder
             $builder.queryBuilder({
                 plugins: ['bt-tooltip-errors'],
-
-                filters: <?php echo generateQueryBuilderFilters($collection); ?>,
-
-                rules: <?php echo $jsonStructure; ?>
+                filters: <?php echo $jsonStructure; ?>
             });
 
             // Function to execute the search query and fetch results
@@ -146,5 +141,4 @@ $jsonStructure = generateQueryBuilderRules($collection);
     <div id="builder"></div>
     <button id="searchButton">Search</button>
 </body>
-
 </html>

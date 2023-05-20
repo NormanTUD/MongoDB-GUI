@@ -6,10 +6,10 @@ set_error_handler("exception_error_handler");
 ini_set('display_errors', '1');
 
 // MongoDB connection settings
-$GLOBALS["mongodbHost"] = getEnvOrDie('DB_HOST', 'db_host');
-$GLOBALS["mongodbPort"] = getEnvOrDie('DB_PORT', 'db_port');
-$GLOBALS["databaseName"] = getEnvOrDie('DB_NAME', 'db_name');
-$GLOBALS["collectionName"] = getEnvOrDie('DB_COLLECTION', 'db_collection');
+$GLOBALS["mongodbHost"] = getEnvOrDie('DB_HOST', 'dbhost');
+$GLOBALS["mongodbPort"] = getEnvOrDie('DB_PORT', 'dbport');
+$GLOBALS["databaseName"] = getEnvOrDie('DB_NAME', 'dbname');
+$GLOBALS["collectionName"] = getEnvOrDie('DB_COLLECTION', 'dbcollection');
 
 // Connect to MongoDB
 $GLOBALS["mongoClient"] = new MongoDB\Driver\Manager("mongodb://".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]);

@@ -249,8 +249,45 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			echo $response;
 			exit();
 		}
+
+		if (isset($_POST['data'])) {
+			$data = $_POST['data'];
+
+			// Detect data format
+			$lines = explode(PHP_EOL, $data);
+			$headers = str_getcsv(array_shift($lines));
+
+			$documents = [];
+			foreach ($lines as $line) {
+				$row = str_getcsv($line);
+				$document = [];
+				foreach ($headers as $index => $header) {
+					$document[$header] = isset($row[$index]) ? $row[$index] : '';
+				}
+				$documents[] = $document;
+			}
+
+			foreach ($documents as $document) {
+				echo insertDocument($document);
+			}
+		}
 	}
 }
+
+function insertDocument($document)
+{
+	$bulkWrite = new MongoDB\Driver\BulkWrite();
+	$bulkWrite->insert($document);
+
+	try {
+		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
+		return json_encode(['success' => 'Entry created successfully.']);
+	} catch (Exception $e) {
+		return json_encode(['error' => 'Error creating entry: ' . $e->getMessage()]);
+	}
+}
+
+
 
 function searchEntries($searchQuery) {
 	$filter = $searchQuery;

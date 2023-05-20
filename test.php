@@ -11,23 +11,21 @@ function extractFields($document, $parentField = '', &$fields = []) {
         $field = $parentField ? $parentField . '.' . $key : $key;
         $fields[] = $field;
 
-        echo "<pre>Extracted field: $field</pre>";
+        echo "<pre>Extracted field: $field</pre>\n";
 
-        if (is_array($value) && !empty($value) && isAssocArray($value)) {
+        if (is_array($value) && !empty($value)) {
             extractFields($value, $field, $fields); // Recurse for nested associative arrays
-        } elseif (is_array($value) && !empty($value)) {
-            if (isAssocArray($value)) {
-                extractFields($value, $field, $fields); // Recurse for nested associative arrays within arrays
-            } else {
-                foreach ($value as $subValue) {
-                    if (isAssocArray($subValue)) {
-                        extractFields($subValue, $field, $fields); // Recurse for nested associative arrays within arrays
-                    }
+        } elseif (is_array($value)) {
+            foreach ($value as $subValue) {
+                if (is_array($subValue) && !empty($subValue)) {
+                    extractFields($subValue, $field, $fields); // Recurse for nested associative arrays within arrays
                 }
             }
         }
     }
 }
+
+
 
 // Function to determine the data type of a field
 function determineFieldType($document, $field) {

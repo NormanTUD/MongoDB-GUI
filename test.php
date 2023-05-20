@@ -9,7 +9,6 @@
 
 	// Execute the query
 	$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
-	#check_cursor_object($cursor);
 
 	// Process the cursor results
 	foreach ($cursor as $document) {

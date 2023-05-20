@@ -203,6 +203,13 @@ function getAllEntries() {
 
 // Handle form submission for updating an entry
 if(isset($_SERVER['REQUEST_METHOD'])) {
+	if (isset($_POST['search_query'])) {
+		$searchQuery = json_decode($_POST['search_query'], true);
+		$matchingEntries = searchEntries($searchQuery);
+		echo json_encode($matchingEntries);
+		exit;
+	}
+
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		// Handle form submission for deleting an entry
 		if (isset($_POST['delete_entry_id'])) {
@@ -229,6 +236,22 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			echo $response;
 			exit();
 		}
+	}
+}
+
+function searchEntries($searchQuery) {
+	$filter = $searchQuery;
+	$options = [];
+	$query = new MongoDB\Driver\Query($filter, $options);
+
+	try {
+		$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
+		$entries = $cursor->toArray();
+		return $entries;
+	} catch (\Throwable $e) {
+		dier($e);
+		// Handle the error appropriately
+		// ...
 	}
 }
 ?>

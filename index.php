@@ -155,7 +155,7 @@ $entries = getAllEntries();
 		<h2>Search</h2>
 		<form>
 			<div id="builder-basic"></div>
-			<button onclick="update_current_query(event)">Create search query</button>
+			<button onclick="update_current_query(event);searchEntries()">Create search query</button>
 			<div id="current_query"></div>
 		</form>
 
@@ -272,6 +272,41 @@ $entries = getAllEntries();
 					// Add more operators as needed
 				default:
 					return operator;
+				}
+			}
+
+			function searchEntries() {
+				var rules = $("#builder-basic").queryBuilder("getRules");
+
+				if (rules !== null) {
+					var query = convertRulesToMongoQuery(rules);
+
+					$.ajax({
+						url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
+						type: 'POST',
+						data: {
+							search_query: JSON.stringify(query)
+						},
+						success: function (response) {
+							var matchingEntries = JSON.parse(response);
+
+							if (matchingEntries.length > 0) {
+								// Update JSON editors for matching entries
+								matchingEntries.forEach(function (entry) {
+									if (window['editor_' + entry._id]) {
+										window['editor_' + entry._id].set(entry);
+									}
+								});
+							} else {
+								toastr.info('No matching entries found.');
+							}
+						},
+						error: function () {
+							toastr.error('Error searching entries.');
+						}
+					});
+				} else {
+					toastr.info('Could not get search rules.');
 				}
 			}
 		</script>

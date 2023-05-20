@@ -17,29 +17,27 @@ function insertDocument($document)
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['data'])) {
-	$data = $_POST['data'];
+    $data = $_POST['data'];
 
-	// Detect data format
-	$jsonData = json_decode($data, true);
-	if ($jsonData !== null && json_last_error() === JSON_ERROR_NONE) {
-		echo insertDocument($jsonData);
-	} else {
-		$lines = explode(PHP_EOL, $data);
-		$headers = str_getcsv(array_shift($lines));
+    // Detect data format
+    $lines = explode(PHP_EOL, $data);
+    $headers = str_getcsv(array_shift($lines));
 
-		$documents = [];
-		foreach ($lines as $line) {
-			$row = str_getcsv($line);
-			$document = array_combine($headers, $row);
-			$documents[] = $document;
-		}
+    $documents = [];
+    foreach ($lines as $line) {
+        $row = str_getcsv($line);
+        $document = [];
+        foreach ($headers as $index => $header) {
+            $document[$header] = isset($row[$index]) ? $row[$index] : '';
+        }
+        $documents[] = $document;
+    }
 
-		if (!empty($documents)) {
-			echo insertDocument($documents);
-		} else {
-			echo json_encode(['error' => 'Invalid data format']);
-		}
-	}
+    if (!empty($documents)) {
+        echo insertDocument($documents);
+    } else {
+        echo json_encode(['error' => 'Invalid data format']);
+    }
 }
 ?>
 <!DOCTYPE html>

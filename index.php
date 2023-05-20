@@ -173,13 +173,15 @@ $entries = getAllEntries();
 		</script>
 	</head>
 	<body>
-		<h2>Search</h2>
-		<form>
-			<div id="builder-basic"></div>
-			<button onclick="update_current_query(event);searchEntries()">Search</button>
-			<button onclick="resetSearch(event)">Reset Search</button>
-			<div id="current_query"></div>
-		</form>
+		<div id="search_stuff">
+			<h3>Search</h3>
+			<form>
+				<div id="builder-basic"></div>
+				<button onclick="update_current_query(event);searchEntries()">Search</button>
+				<button onclick="resetSearch(event)">Reset Search</button>
+				<div id="current_query"></div>
+			</form>
+		</div>
 
 		<h3><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> on <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></h3>
 
@@ -234,11 +236,17 @@ $entries = getAllEntries();
 
 			var filters = removeDuplicates(<?php print json_encode($filters); ?>);
 
-			$('#builder-basic').queryBuilder({
-				plugins: ["bt-tooltip-errors"],
-				filters: filters,
-				rules: options
-			});
+			if(filters.len) {
+				$('#builder-basic').queryBuilder({
+					plugins: ["bt-tooltip-errors"],
+					filters: filters,
+					rules: options
+				});
+				$("#search_stuff").show();
+			} else {
+				$("#search_stuff").hide();
+				console.log("No DB entries found");
+			}
 
 			$('#btn-reset').on('click', function () {
 				$('#builder-basic').queryBuilder('reset');

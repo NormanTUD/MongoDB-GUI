@@ -12,7 +12,6 @@ $entries = getAllEntries();
 		<script src="jquery-3.6.0.min.js"></script>
 		<link rel="stylesheet" href="style.css"/>
 		<link rel="stylesheet" href="bootstrap.min.css"/>
-		<script src="jquery-3.4.1.slim.min.js"></script>
 		<script src="popper.min.js"></script>
 		<script src="bootstrap.min.js"></script>
 		<link rel="stylesheet" href="jsoneditor.min.css"/>

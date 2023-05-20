@@ -3,6 +3,20 @@ include("functions.php");
 
 // Retrieve all entries
 $entries = getAllEntries();
+
+$entries_with_geo_coords = [];
+foreach ($entries as $entry) {
+	$entry = json_decode(json_encode($entry), true);
+
+	if (isset($entry["geocoords"]) && isset($entry["geocoords"]["lat"]) && isset($entry["geocoords"]["lon"])) {
+		$lat = $entry["geocoords"]["lat"];
+		$lon = $entry["geocoords"]["lon"];
+
+		// Perform additional checks on lat and lon values if needed
+
+		$entries_with_geo_coords[] = $entry;
+	}
+}
 ?>
 
 <!DOCTYPE html>
@@ -76,6 +90,8 @@ $entries = getAllEntries();
 			</form>
 		</div>
 
+<div id="map" style="height: 400px;"></div>
+
 		<h3><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> on <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></h3>
 
 		<div id="entry_list">
@@ -132,5 +148,46 @@ $entries = getAllEntries();
 				}
 			});
 		</script>
+<script>
+    var events = <?php echo json_encode($entries_with_geo_coords); ?>;
+
+    // Generate iframe with events
+    var iframeContent = '';
+    for (var i = 0; i < events.length; i++) {
+        var event = events[i];
+        iframeContent += '<p>Event: ' + JSON.stringify(event) + '</p>';
+    }
+
+    var iframe = document.createElement('iframe');
+    iframe.setAttribute('srcdoc', iframeContent);
+    iframe.style.width = '100%';
+    iframe.style.height = '400px';
+    document.body.appendChild(iframe);
+
+  // Create a map object
+  var map = L.map('map').setView([0, 0], 2); // Set initial center and zoom level
+
+  // Add OpenStreetMap tile layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    maxZoom: 18
+  }).addTo(map);
+
+  // Create a marker cluster group
+  var markerCluster = L.markerClusterGroup();
+
+  // Iterate through the events and add markers to the cluster group
+  for (var i = 0; i < events.length; i++) {
+    var event = events[i];
+    var latLng = L.latLng(event.geocoords.lat, event.geocoords.lon);
+
+    // Create a marker and add it to the cluster group
+    var marker = L.marker(latLng);
+    markerCluster.addLayer(marker);
+  }
+
+  // Add the marker cluster group to the map
+  map.addLayer(markerCluster);
+</script>
 	</body>
 </html>

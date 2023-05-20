@@ -286,10 +286,14 @@ $entries = getAllEntries();
 				$("#current_query").empty();
 
 				// Load all entries
+				load_all_entries();
+			}
+
+			function load_all_entries () {
 				$.ajax({
 					url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
-						type: 'POST',
-						data: {
+					type: 'POST',
+					data: {
 						reset_search: true
 					},
 					success: function (response) {
@@ -311,6 +315,7 @@ $entries = getAllEntries();
 						toastr.error('Error resetting search.');
 					}
 				});
+
 			}
 
 			function searchEntries() {
@@ -356,6 +361,7 @@ $entries = getAllEntries();
 								});
 							} else {
 								toastr.info('No matching entries found.');
+								load_all_entries();
 							}
 						},
 						error: function () {

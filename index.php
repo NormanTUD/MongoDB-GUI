@@ -1,6 +1,4 @@
 <?php
-$enable_search = 1;
-
 include("functions.php");
 
 // Handle form submission for updating an entry
@@ -185,20 +183,15 @@ $entries = getAllEntries();
 		</script>
 	</head>
 	<body>
-		<!-- Display entries -->
-<?php
-		if($enable_search) {
-?>
-			<h2>Search</h2>
-			<form>
-				<div id="builder-basic"></div>
-				<button onclick="update_current_query(event)">Create search query</button>
-				<div id="current_query"></div>
-			</form>
-<?php
-	}
-?>
-	<h3><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> on <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></h3>
+		<h2>Search</h2>
+		<form>
+			<div id="builder-basic"></div>
+			<button onclick="update_current_query(event)">Create search query</button>
+			<div id="current_query"></div>
+		</form>
+
+		<h3><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> on <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></h3>
+
 		<div id="entry_list">
 			<?php foreach ($entries as $entry): ?>
 				<div id="entry_<?php echo $entry->_id; ?>">
@@ -211,7 +204,6 @@ $entries = getAllEntries();
 		<!-- Button to add a new entry -->
 		<button onclick="addNewEntry(event)">Add New Entry</button>
 <?php
-	if($enable_search) {
 		$optionsAndFilters = generateQueryBuilderOptions();
 		$options = $optionsAndFilters["options"];
 		$filters = $optionsAndFilters["filters"];
@@ -314,8 +306,5 @@ $entries = getAllEntries();
 				}
 			}
 		</script>
-<?php
-	}
-?>
 	</body>
 </html>

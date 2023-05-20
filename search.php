@@ -1,15 +1,7 @@
 <?php
-require 'vendor/autoload.php'; // Include the MongoDB driver
+include("functions.php");
 
-// MongoDB configuration
-$mongodbHost = 'localhost';
-$mongodbPort = 27017;
-$databaseName = 'your_database';
-$collectionName = 'your_collection';
-
-// Connect to MongoDB
-$mongoClient = new MongoDB\Client("mongodb://$mongodbHost:$mongodbPort");
-$collection = $mongoClient->selectCollection($databaseName, $collectionName);
+$collection = $GLOBALS["mongoClient"]->selectCollection($GLOBALS["databaseName"], $GLOBALS["collectionName"]);
 
 // Function to retrieve all available fields in the collection
 function getAllFields($collection)

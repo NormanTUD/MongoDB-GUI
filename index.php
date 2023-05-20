@@ -3,16 +3,6 @@ $enable_search = 0;
 
 include("functions.php");
 
-// MongoDB connection settings
-$GLOBALS["mongodbHost"] = getEnvOrDie('DB_HOST', 'db_host');
-$GLOBALS["mongodbPort"] = getEnvOrDie('DB_PORT', 'db_port');
-$GLOBALS["databaseName"] = getEnvOrDie('DB_NAME', 'db_name');
-$GLOBALS["collectionName"] = getEnvOrDie('DB_COLLECTION', 'db_collection');
-
-// Connect to MongoDB
-$GLOBALS["mongoClient"] = new MongoDB\Driver\Manager("mongodb://".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]);
-$GLOBALS["namespace"] = $GLOBALS["databaseName"].".".$GLOBALS['collectionName'];
-
 // Function to generate JSON structure for jQuery QueryBuilder
 function generateQueryBuilderRules() {
     $fields = getAllFields();
@@ -262,31 +252,33 @@ function updateEntry($entryId, $newData) {
 }
 
 // Handle form submission for updating an entry
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-	// Handle form submission for deleting an entry
-	if (isset($_POST['delete_entry_id'])) {
-		$entryId = $_POST['delete_entry_id'];
-		$response = deleteEntry($entryId);
-		echo $response;
-		exit();
-	}
+if(isset($_SERVER['REQUEST_METHOD'])) {
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		// Handle form submission for deleting an entry
+		if (isset($_POST['delete_entry_id'])) {
+			$entryId = $_POST['delete_entry_id'];
+			$response = deleteEntry($entryId);
+			echo $response;
+			exit();
+		}
 
-	// Handle form submission for adding a new entry
-	if (isset($_POST['new_entry_data'])) {
-		$newData = json_decode($_POST['new_entry_data'], true);
-		$entryId = (string) new MongoDB\BSON\ObjectID();
-		$response = updateEntry($entryId, $newData);
-		echo $response;
-		exit();
-	}
+		// Handle form submission for adding a new entry
+		if (isset($_POST['new_entry_data'])) {
+			$newData = json_decode($_POST['new_entry_data'], true);
+			$entryId = (string) new MongoDB\BSON\ObjectID();
+			$response = updateEntry($entryId, $newData);
+			echo $response;
+			exit();
+		}
 
-	if(isset($_POST["entry_id"])) {
-		$entryId = $_POST['entry_id'];
-		$newData = json_decode($_POST['json_data'], true);
+		if(isset($_POST["entry_id"])) {
+			$entryId = $_POST['entry_id'];
+			$newData = json_decode($_POST['json_data'], true);
 
-		$response = updateEntry($entryId, $newData);
-		echo $response;
-		exit();
+			$response = updateEntry($entryId, $newData);
+			echo $response;
+			exit();
+		}
 	}
 }
 

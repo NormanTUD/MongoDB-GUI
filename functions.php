@@ -5,6 +5,16 @@ function exception_error_handler($errno, $errstr, $errfile, $errline ) {
 set_error_handler("exception_error_handler");
 ini_set('display_errors', '1');
 
+// MongoDB connection settings
+$GLOBALS["mongodbHost"] = getEnvOrDie('DB_HOST', 'db_host');
+$GLOBALS["mongodbPort"] = getEnvOrDie('DB_PORT', 'db_port');
+$GLOBALS["databaseName"] = getEnvOrDie('DB_NAME', 'db_name');
+$GLOBALS["collectionName"] = getEnvOrDie('DB_COLLECTION', 'db_collection');
+
+// Connect to MongoDB
+$GLOBALS["mongoClient"] = new MongoDB\Driver\Manager("mongodb://".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]);
+$GLOBALS["namespace"] = $GLOBALS["databaseName"].".".$GLOBALS['collectionName'];
+
 function dier ($msg) {
 	print_r($msg);
 	exit(1);
@@ -36,6 +46,4 @@ function getEnvOrDie($name, $fn = 0) {
 	}
 	return $value;
 }
-
-
 ?>

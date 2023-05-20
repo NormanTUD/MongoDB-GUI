@@ -8,8 +8,7 @@ $filter = [
 
 // Selecting collection using MongoDB\Driver\Command
 $command = new MongoDB\Driver\Command([
-    'listCollections' => 1,
-    'filter' => $filter
+    'listCollections' => 1
 ]);
 
 $cursor = $GLOBALS["mongoClient"]->executeCommand($GLOBALS["databaseName"], $command);
@@ -19,7 +18,7 @@ if ($cursor->valid()) {
     echo "Collection found: " . $collection;
 } else {
     echo "Collection not found. Here's what I tried:<br>\n";
-    print("Filter: " . json_encode($filter) . "<br>\n");
+    #print("Filter: " . json_encode($filter) . "<br>\n");
     print("Database name: " . $GLOBALS["databaseName"] . "<br>\n");
     return;
 }

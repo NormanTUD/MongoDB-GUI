@@ -217,10 +217,12 @@ $entries = getAllEntries();
 
 
 			var options = removeDuplicates(<?php echo json_encode($options); ?>);
+			options = [options[0]];
+			var filters = removeDuplicates(<?php print json_encode($filters); ?>);
 
 			$('#builder-basic').queryBuilder({
 				plugins: [],
-				filters: removeDuplicates(<?php print json_encode($filters); ?>),
+				filters: filters,
 				rules: options
 			});
 

@@ -389,7 +389,7 @@ class MongoDBDocument
     }
 }
 
-$document = new MongoDBDocument('6469552aeb8474be4d0f00b2');
-$document->setValue('key', 'value');
-dier($document);
+#$document = new MongoDBDocument('6469552aeb8474be4d0f00b2');
+#$document->setValue('key', 'value');
+#dier($document);
 ?>

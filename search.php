@@ -1,7 +1,7 @@
 <?php
 include("functions.php");
 
-$collection = $mongoClient->$GLOBALS["databaseName"]->$GLOBALS["collectionName"];
+$collection = $GLOBALS["mongoClient"]->$GLOBALS["databaseName"]->$GLOBALS["collectionName"];
 
 // Function to retrieve all available fields in the collection
 function getAllFields($collection)

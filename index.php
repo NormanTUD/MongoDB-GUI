@@ -411,6 +411,7 @@ $entries = getAllEntries();
 <?php
 	}
 ?>
+	<h3><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> on <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></h3>
 		<div id="entry_list">
 			<?php foreach ($entries as $entry): ?>
 				<div id="entry_<?php echo $entry->_id; ?>">

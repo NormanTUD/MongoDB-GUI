@@ -160,23 +160,23 @@ function traverseDocument($data, $prefix, &$filters, &$options) {
 }
 
 function getDataType($value) {
-    if (is_numeric($value)) {
-        if (is_int($value)) {
-            return 'integer';
-        } elseif (is_float($value)) {
-            return 'double';
-        }
-    } elseif (is_string($value)) {
-        return 'string';
-    } elseif ($value instanceof DateTime || $value instanceof MongoDB\BSON\UTCDateTime) {
-        return 'datetime';
-    } elseif ($value instanceof MongoDB\BSON\Timestamp) {
-        return 'time';
-    } elseif (is_bool($value)) {
-        return 'boolean';
-    }
+	if (is_numeric($value)) {
+		if (is_int($value)) {
+			return 'integer';
+		} elseif (is_float($value)) {
+			return 'double';
+		}
+	} elseif (is_string($value)) {
+		return 'string';
+	} elseif ($value instanceof DateTime || $value instanceof MongoDB\BSON\UTCDateTime) {
+		return 'datetime';
+	} elseif ($value instanceof MongoDB\BSON\Timestamp) {
+		return 'time';
+	} elseif (is_bool($value)) {
+		return 'boolean';
+	}
 
-    return 'string'; // Default to string if data type cannot be determined
+	return 'string'; // Default to string if data type cannot be determined
 }
 
 function getAllEntries() {

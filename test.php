@@ -11,8 +11,20 @@ function extractFields($document, $parentField = '', &$fields = []) {
         $field = $parentField ? $parentField . '.' . $key : $key;
         $fields[] = $field;
 
-        if (is_array($value) && !empty($value)) {
-            extractFields($value, $field, $fields);
+        echo "<pre>Extracted field: $field</pre>";
+
+        if (is_array($value) && !empty($value) && isAssocArray($value)) {
+            extractFields($value, $field, $fields); // Recurse for nested associative arrays
+        } elseif (is_array($value) && !empty($value)) {
+            if (isAssocArray($value)) {
+                extractFields($value, $field, $fields); // Recurse for nested associative arrays within arrays
+            } else {
+                foreach ($value as $subValue) {
+                    if (isAssocArray($subValue)) {
+                        extractFields($subValue, $field, $fields); // Recurse for nested associative arrays within arrays
+                    }
+                }
+            }
         }
     }
 }
@@ -31,14 +43,21 @@ function determineFieldType($document, $field) {
     }
 
     if (is_array($value)) {
-        return 'string'; // Assume arrays are stored as strings
-    } elseif (is_numeric($value)) {
-        return 'double'; // Numeric values can be treated as doubles
+        return 'array'; // Field contains an array
+    }
+
+    if (is_numeric($value)) {
+        return 'double';
     } elseif (is_bool($value)) {
         return 'boolean';
     } else {
         return 'string';
     }
+}
+
+// Function to determine if an array is associative or indexed
+function isAssocArray($array) {
+    return array_keys($array) !== range(0, count($array) - 1);
 }
 
 // Retrieve the list of fields from the database
@@ -81,13 +100,16 @@ foreach ($fields as $field) {
         'type' => $fieldType,
         'operators' => $operators,
         'input' => $fieldType === 'string' ? 'text' : 'number',
-        'field' => $lastField
+        'field' => $field // Use the full field path as the filter field
     ];
 }
 
 // Output the generated options and filters
-print "<pre>";
+echo "<pre>";
+echo "Options:\n";
 print_r($options);
+echo "\nFilters:\n";
 print_r($filters);
+echo "</pre>";
 ?>
 

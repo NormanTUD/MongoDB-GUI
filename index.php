@@ -68,8 +68,10 @@ $entries = getAllEntries();
 							// Remove the deleted entry from the page
 							$('#entry_' + entryId).remove();
 							// Remove the deleted entry's JSON Editor instance
-							window['editor_' + entryId].destroy();
-							delete window['editor_' + entryId];
+							if('editor_' + entryId in window) {
+								window['editor_' + entryId].destroy();
+								delete window['editor_' + entryId];
+							}
 						} else if (data.error) {
 							toastr.error(data.error);
 						}

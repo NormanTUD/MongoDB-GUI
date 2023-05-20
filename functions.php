@@ -339,4 +339,57 @@ function deleteValue($documentId, $key)
 		return json_encode(['error' => 'Error deleting value: ' . $e->getMessage()]);
 	}
 }
+
+
+
+class MongoDBDocument
+{
+    private $documentId;
+    private $data;
+
+    public function __construct($documentId)
+    {
+        $this->documentId = $documentId;
+        $this->loadData();
+    }
+
+    private function loadData()
+    {
+        $filter = ['_id' => new MongoDB\BSON\ObjectID($this->documentId)];
+        $query = new MongoDB\Driver\Query($filter);
+        $cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
+        $this->data = (array) current($cursor->toArray());
+    }
+
+    public function setValue($key, $value)
+    {
+        $this->data[$key] = $value;
+        $this->updateData();
+    }
+
+    public function deleteValue($key)
+    {
+        unset($this->data[$key]);
+        $this->updateData();
+    }
+
+    private function updateData()
+    {
+        $bulkWrite = new MongoDB\Driver\BulkWrite();
+        $filter = ['_id' => new MongoDB\BSON\ObjectID($this->documentId)];
+        $update = ['$set' => $this->data];
+
+        $bulkWrite->update($filter, $update);
+
+        try {
+            $GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
+        } catch (Exception $e) {
+            // Handle update error if needed
+        }
+    }
+}
+
+$document = new MongoDBDocument('6469552aeb8474be4d0f00b2');
+$document->setValue('key', 'value');
+dier($document);
 ?>

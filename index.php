@@ -192,11 +192,35 @@ $entries = getAllEntries();
 
 ?>
 		<script>
-			var options = <?php echo json_encode($options); ?>;
+
+			function removeDuplicates(options) {
+				var uniqueOptions = [];
+
+				for (var i = 0; i < options.length; i++) {
+					var option = options[i];
+					var isDuplicate = false;
+
+					for (var j = i + 1; j < options.length; j++) {
+						if (option.id === options[j].id && option.label === options[j].label) {
+							isDuplicate = true;
+							break;
+						}
+					}
+
+					if (!isDuplicate) {
+						uniqueOptions.push(option);
+					}
+				}
+
+				return uniqueOptions;
+			}
+
+
+			var options = removeDuplicates(<?php echo json_encode($options); ?>);
 
 			$('#builder-basic').queryBuilder({
 				plugins: [],
-				filters: <?php print json_encode($filters); ?>,
+				filters: removeDuplicates(<?php print json_encode($filters); ?>),
 				rules: options
 			});
 

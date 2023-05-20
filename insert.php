@@ -33,10 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['data'])) {
         $documents[] = $document;
     }
 
-    if (!empty($documents)) {
-        echo insertDocument($documents);
-    } else {
-        echo json_encode(['error' => 'Invalid data format']);
+    foreach ($documents as $document) {
+        echo insertDocument($document);
     }
 }
 ?>

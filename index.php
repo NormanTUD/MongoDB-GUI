@@ -11,6 +11,7 @@ $entries = getAllEntries();
 		<title>MongoDB-GUI</title>
 		<script src="jquery-3.6.0.min.js"></script>
 		<link rel="stylesheet" href="style.css"/>
+		<link rel="stylesheet" href="bootstrap.min.css"/>
 		<link rel="stylesheet" href="jsoneditor.min.css"/>
 		<script src="jsoneditor.min.js"></script>
 		<link rel="stylesheet" href="toastr.min.css"/>
@@ -231,7 +232,7 @@ $entries = getAllEntries();
 			var filters = removeDuplicates(<?php print json_encode($filters); ?>);
 
 			$('#builder-basic').queryBuilder({
-				plugins: [],
+				plugins: ["bt-tooltip-errors"],
 				filters: filters,
 				rules: options
 			});

@@ -306,11 +306,31 @@ $entries = getAllEntries();
 					return '$gt';
 				case 'less':
 					return '$lt';
-					// Add more operators as needed
+				case 'greater_equal':
+					return '$gte';
+				case 'less_equal':
+					return '$lte';
+				case 'in':
+					return '$in';
+				case 'and':
+					return '$and';
+				case 'or':
+					return '$or';
+				case 'not':
+					return '$not';
+				case 'exists':
+					return '$exists';
+				case 'type':
+					return '$type';
+				case 'elem_match':
+					return '$elemMatch';
+				case 'size':
+					return '$size';
 				default:
 					return operator;
 				}
 			}
+
 
 			function resetSearch(e) {
 				e.preventDefault();

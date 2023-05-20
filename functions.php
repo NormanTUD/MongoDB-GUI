@@ -104,23 +104,23 @@ function updateEntry($entryId, $newData) {
 
 function generateQueryBuilderOptions()
 {
-    $query = new MongoDB\Driver\Query([], ['projection' => ['_id' => 0]]);
-    $cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
+	$query = new MongoDB\Driver\Query([], ['projection' => ['_id' => 0]]);
+	$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
 
-    $filters = [];
-    $options = [];
+	$filters = [];
+	$options = [];
 
-    foreach ($cursor as $document) {
-        $documentArray = json_decode(json_encode($document), true);
-        traverseDocument($documentArray, '', $filters, $options);
-    }
+	foreach ($cursor as $document) {
+		$documentArray = json_decode(json_encode($document), true);
+		traverseDocument($documentArray, '', $filters, $options);
+	}
 
-    $output = [
-        'filters' => $filters,
-        'options' => $options,
-    ];
+	$output = [
+		'filters' => $filters,
+		'options' => $options,
+	];
 
-    return $output;
+	return $output;
 }
 
 function traverseDocument($data, $prefix, &$filters, &$options) {
@@ -302,6 +302,41 @@ function searchEntries($searchQuery) {
 		dier($e);
 		// Handle the error appropriately
 		// ...
+	}
+}
+
+
+// Function to insert a single value into a document
+function insertValue($documentId, $key, $value)
+{
+	$bulkWrite = new MongoDB\Driver\BulkWrite();
+	$filter = ['_id' => new MongoDB\BSON\ObjectID($documentId)];
+	$update = ['$set' => [$key => $value]];
+
+	$bulkWrite->update($filter, $update);
+
+	try {
+		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
+		return json_encode(['success' => 'Value inserted successfully.', 'documentId' => $documentId]);
+	} catch (Exception $e) {
+		return json_encode(['error' => 'Error inserting value: ' . $e->getMessage()]);
+	}
+}
+
+// Function to delete a single value from a document
+function deleteValue($documentId, $key)
+{
+	$bulkWrite = new MongoDB\Driver\BulkWrite();
+	$filter = ['_id' => new MongoDB\BSON\ObjectID($documentId)];
+	$update = ['$unset' => [$key => '']];
+
+	$bulkWrite->update($filter, $update);
+
+	try {
+		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
+		return json_encode(['success' => 'Value deleted successfully.', 'documentId' => $documentId]);
+	} catch (Exception $e) {
+		return json_encode(['error' => 'Error deleting value: ' . $e->getMessage()]);
 	}
 }
 ?>

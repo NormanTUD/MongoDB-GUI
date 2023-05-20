@@ -1,5 +1,5 @@
 <?php
-$enable_search = 0;
+$enable_search = 1;
 
 include("functions.php");
 
@@ -212,6 +212,7 @@ $entries = getAllEntries();
 		<button onclick="addNewEntry(event)">Add New Entry</button>
 <?php
 	if($enable_search) {
+		$optionsAndFilters = generateQueryBuilderOptions();
 		$options = $optionsAndFilters["options"];
 		$filters = $optionsAndFilters["filters"];
 

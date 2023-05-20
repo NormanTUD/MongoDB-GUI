@@ -102,10 +102,10 @@ function updateEntry($entryId, $newData) {
 	}
 }
 
-function generateQueryBuilderOptions($mongoClient, $namespace, $databaseName, $collectionName, $mongodbHost, $mongodbPort)
+function generateQueryBuilderOptions()
 {
 	$query = new MongoDB\Driver\Query([], ['projection' => ['_id' => 0]]);
-	$cursor = $mongoClient->executeQuery($namespace, $query);
+	$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
 
 	$filters = [];
 	$options = [];

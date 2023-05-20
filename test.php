@@ -1,23 +1,28 @@
 <?php
 	include("functions.php");
 
-	// Selecting collection using MongoDB\Driver\Command
-	$command = new MongoDB\Driver\Command([
-		'listCollections' => 1,
-		'filter' => [
-			'name' => $GLOBALS["collectionName"],
-			'type' => 'collection',
-		],
-	]);
 
-	$cursor = $GLOBALS["mongoClient"]->executeCommand($GLOBALS["databaseName"], $command);
+// Selecting collection using MongoDB\Driver\Command
+$command = new MongoDB\Driver\Command([
+    'listCollections' => 1,
+    'filter' => new MongoDB\BSON\Document([
+        'name' => $GLOBALS["collectionName"],
+        'type' => 'collection',
+    ]),
+]);
 
-	if ($cursor->valid()) {
-		$collection = $cursor->current()->name;
-	} else {
-		echo "Collection not found.";
-		return;
-	}
+$cursor = $GLOBALS["mongoClient"]->executeCommand($GLOBALS["databaseName"], $command);
+
+if ($cursor->valid()) {
+    $collection = $cursor->current()->name;
+    echo "Collection found: " . $collection;
+} else {
+    echo "Collection not found. Here's what I tried:<br>\n";
+    $filter = $command->filter->getArrayCopy();
+    print("Filter: " . json_encode($filter) . "<br>\n");
+    print("Database name: " . $GLOBALS["databaseName"] . "<br>\n");
+    return;
+}
 
 	// Access the selected collection
 	$query = new MongoDB\Driver\Query([]);

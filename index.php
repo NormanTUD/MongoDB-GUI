@@ -276,39 +276,58 @@ $entries = getAllEntries();
 			}
 
 			function searchEntries() {
-				var rules = $("#builder-basic").queryBuilder("getRules");
+    var rules = $("#builder-basic").queryBuilder("getRules");
 
-				if (rules !== null) {
-					var query = convertRulesToMongoQuery(rules);
+    if (rules !== null) {
+        var query = convertRulesToMongoQuery(rules);
 
-					$.ajax({
-						url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
-						type: 'POST',
-						data: {
-							search_query: JSON.stringify(query)
-						},
-						success: function (response) {
-							var matchingEntries = JSON.parse(response);
+        $.ajax({
+            url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
+            type: 'POST',
+            data: {
+                search_query: JSON.stringify(query)
+            },
+            success: function (response) {
+                var matchingEntries = JSON.parse(response);
 
-							if (matchingEntries.length > 0) {
-								// Update JSON editors for matching entries
-								matchingEntries.forEach(function (entry) {
-									if (window['editor_' + entry._id]) {
-										window['editor_' + entry._id].set(entry);
-									}
-								});
-							} else {
-								toastr.info('No matching entries found.');
-							}
-						},
-						error: function () {
-							toastr.error('Error searching entries.');
-						}
-					});
-				} else {
-					toastr.info('Could not get search rules.');
-				}
-			}
+                if (matchingEntries.length > 0) {
+                    // Clear the existing entry list
+                    $('#entry_list').empty();
+
+                    // Update JSON editors for matching entries
+                    matchingEntries.forEach(function (entry) {
+                        // Append the updated entry to the container
+                        $('#entry_list').append('<div id="entry_' + entry._id + '">' +
+                            '<div id="jsoneditor_' + entry._id + '"></div>' +
+                            '<button onclick="deleteEntry(\'' + entry._id + '\')">Delete</button>' +
+                            '</div>');
+
+                        // Initialize JSON Editor for the updated entry
+                        const newEditor = new JSONEditor(
+                            document.getElementById('jsoneditor_' + entry._id),
+                            {
+                                mode: 'tree',
+                                onBlur: function () {
+                                    const updatedJson = newEditor.get();
+                                    const newJsonData = JSON.stringify(updatedJson, null, 2);
+                                    updateEntry(entry._id, newJsonData);
+                                }
+                            }
+                        );
+                        newEditor.set(entry);
+                    });
+                } else {
+                    toastr.info('No matching entries found.');
+                }
+            },
+            error: function () {
+                toastr.error('Error searching entries.');
+            }
+        });
+    } else {
+        toastr.info('Could not get search rules.');
+    }
+}
 		</script>
 	</body>
 </html>

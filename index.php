@@ -151,13 +151,18 @@ $entries = getAllEntries();
 				var urlParams = new URLSearchParams(window.location.search);
 				if (urlParams.has('search')) {
 					var searchParam = urlParams.get('search');
-					var query = JSON.parse(decodeURIComponent(searchParam));
+					try {
+						var query = JSON.parse(decodeURIComponent(searchParam));
 
-					// Set the query rules in the query builder
-					$("#builder-basic").queryBuilder("setRules", query);
+						// Set the query rules in the query builder
+						$("#builder-basic").queryBuilder("setRules", query);
 
-					// Trigger the search
-					searchEntries();
+						// Trigger the search
+						searchEntries();
+					} catch (e) {
+						console.error("ERROR: Could not parse search string from url");
+						console.error(e);
+					}
 				}
 			});
 
@@ -192,6 +197,10 @@ $entries = getAllEntries();
 
 ?>
 		<script>
+			function getQueryParam(param) {
+				const urlParams = new URLSearchParams(window.location.search);
+				return urlParams.get(param);
+			}
 
 			function removeDuplicates(options) {
 				var uniqueOptions = [];
@@ -218,6 +227,7 @@ $entries = getAllEntries();
 
 			var options = removeDuplicates(<?php echo json_encode($options); ?>);
 			options = [options[0]];
+
 			var filters = removeDuplicates(<?php print json_encode($filters); ?>);
 
 			$('#builder-basic').queryBuilder({
@@ -380,10 +390,8 @@ $entries = getAllEntries();
 				var rules = $("#builder-basic").queryBuilder("getRules");
 
 				if (rules !== null) {
-					var query = convertRulesToMongoQuery(rules);
-
 					// Convert the query object to a URL parameter string
-					var queryParam = encodeURIComponent(JSON.stringify(query));
+					var queryParam = encodeURIComponent(JSON.stringify(rules));
 
 					// Update the URL with the search parameter
 					var newUrl = updateQueryStringParameter(window.location.href, 'search', queryParam);
@@ -392,11 +400,11 @@ $entries = getAllEntries();
 					var query = convertRulesToMongoQuery(rules);
 
 					$.ajax({
-					url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
-						type: 'POST',
-						data: {
-						search_query: JSON.stringify(query)
-					},
+						url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
+							type: 'POST',
+							data: {
+							search_query: JSON.stringify(query)
+						},
 						success: function (response) {
 							var matchingEntries = JSON.parse(response);
 

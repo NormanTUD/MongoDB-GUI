@@ -3,219 +3,6 @@ $enable_search = 0;
 
 include("functions.php");
 
-// Function to generate JSON structure for jQuery QueryBuilder
-function generateQueryBuilderRules() {
-    $fields = getAllFields();
-    $jsonStructure = [
-        "condition" => "AND",
-        "rules" => []
-    ];
-
-    $i = 0;
-    foreach ($fields as $field) {
-        // Determine the data type of the field
-        $fieldType = getFieldType($field);
-
-	$type = "text";
-
-        // Define operators based on the data type
-        $operators = [];
-        switch ($fieldType) {
-            case 'int':
-            case 'integer':
-            case 'float':
-                $operators = ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal'];
-		$type = "number";
-                break;
-            case 'string':
-                $operators = ['equal', 'not_equal', 'contains', 'starts_with', 'ends_with'];
-                break;
-            // Add additional cases for other data types if needed
-        }
-
-	if($i == 0) {
-		$jsonStructure['rules'][] = [
-		    "id" => $field,
-		    "field" => $field,
-		    "type" => $fieldType,
-		    "input" => $type,
-		    "operators" => $operators,
-		    "value" => ""
-		];
-	}
-
-	$i++;
-
-/*
-        $jsonStructure['rules'][] = [
-            "id" => $field . '.*',
-            "field" => $field . '.*',
-            "type" => $fieldType,
-            "input" => $type,
-            "operators" => $operators,
-            "value" => ""
-        ];
-*/
-    }
-
-    return json_encode($jsonStructure, JSON_PRETTY_PRINT);
-}
-
-function getFieldType($field) {
-	// Query the collection to retrieve the value type of the field
-	$pipeline = [
-		[
-			'$project' => [
-				'valueType' => ['$type' => '$' . $field]
-			]
-		],
-		[
-			'$limit' => 1
-		]
-	];
-
-	$command = new MongoDB\Driver\Command([
-		'aggregate' => $GLOBALS["collectionName"],
-		'pipeline' => $pipeline,
-		'cursor' => new stdClass(),
-	]);
-
-	$cursor = $GLOBALS["mongoClient"]->executeCommand($GLOBALS["databaseName"], $command);
-	$result = current($cursor->toArray());
-
-	$fieldType = 'string'; // Default data type if not determined
-
-	if (isset($result->valueType)) {
-		switch ($result->valueType) {
-		case 'double':
-			$fieldType = 'float';
-			break;
-		case 'int':
-			$fieldType = 'integer';
-			break;
-			// Add cases for other value types as needed
-		}
-	}
-
-	return $fieldType;
-}
-
-
-function generateQueryBuilderFilters() {
-	// Query the collection to retrieve field names
-	$pipeline = [
-		[
-			'$project' => [
-				'fields' => ['$objectToArray' => '$$ROOT']
-			]
-		],
-		[
-			'$unwind' => '$fields'
-		],
-		[
-			'$group' => [
-				'_id' => null,
-				'fields' => ['$addToSet' => '$fields.k']
-			]
-		]
-	];
-
-	$command = new MongoDB\Driver\Command([
-		'aggregate' => $GLOBALS["collectionName"],
-		'pipeline' => $pipeline,
-		'cursor' => new stdClass(),
-	]);
-
-	$cursor = $GLOBALS["mongoClient"]->executeCommand($GLOBALS["databaseName"], $command);
-	$result = current($cursor->toArray());
-
-	$fields = [];
-	if (isset($result->fields)) {
-		foreach ($result->fields as $field) {
-			$fieldType = getFieldType($field);
-
-			$operators = [];
-			switch ($fieldType) {
-			case 'integer':
-			case 'int':
-			case 'float':
-				$operators = ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal'];
-				break;
-			case 'string':
-				$operators = ['equal', 'not_equal', 'contains', 'starts_with', 'ends_with'];
-				break;
-				// Add additional cases for other data types if needed
-			}
-
-			$filter = [
-				'id' => $field,
-				'label' => $field,
-				'type' => $fieldType,
-				'input' => 'text',
-				'operators' => $operators,
-			];
-
-			$fields[] = $filter;
-
-			$filterSubentry = [
-				'id' => $field . '.*',
-				'label' => $field . '.*',
-				'type' => $fieldType,
-				'input' => 'text',
-				'operators' => $operators,
-			];
-
-			$fields[] = $filterSubentry;
-		}
-	}
-
-	return json_encode($fields, JSON_PRETTY_PRINT);
-}
-
-function getAllFields() {
-	// Retrieve all entries from the collection
-	$query = new MongoDB\Driver\Query([]);
-	$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
-	$entries = $cursor->toArray();
-
-	$fields = [];
-
-	// Iterate over the entries to extract the fields
-	foreach ($entries as $entry) {
-		$entryData = (array)$entry;
-		$fields = array_merge($fields, array_keys($entryData));
-	}
-
-	// Remove duplicate fields and sort them alphabetically
-	$fields = array_unique($fields);
-	sort($fields);
-
-	return $fields;
-}
-
-// Function to retrieve all entries from the collection
-function getAllEntries() {
-	$query = new MongoDB\Driver\Query([]);
-	try {
-		$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
-	} catch (\Throwable $e) { // For PHP 7
-		$serverIP = $_SERVER['SERVER_ADDR'];
-		print "There was an error connecting to MongoDB. Are you sure you bound it to 0.0.0.0?<br>\n";
-		print "Try, in <code>/etc/mongod.conf</code>, to change the line\n<br>";
-		print "<code>bindIp: 127.0.0.1</code>\n<br>";
-		print "or:<br>\n";
-		print "<code>bindIp: $serverIP</code>\n<br>";
-		print "to\n<br>";
-		print "<code>bindIp: 0.0.0.0</code>\n<br>";
-		print "and then try sudo service mongod restart";
-		print "\n<br>\n<br>\n<br>\n";
-		print "Error:<br>\n<br>\n";
-		print($e);
-	}
-	$entries = $cursor->toArray();
-	return $entries;
-}
-
 // Handle form submission for updating an entry
 if(isset($_SERVER['REQUEST_METHOD'])) {
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -425,14 +212,17 @@ $entries = getAllEntries();
 		<button onclick="addNewEntry(event)">Add New Entry</button>
 <?php
 	if($enable_search) {
+		$options = $optionsAndFilters["options"];
+		$filters = $optionsAndFilters["filters"];
+
 ?>
 		<script>
-			var jsonString = <?php echo generateQueryBuilderRules(); ?>; // Assuming $jsonString contains the generated JSON
+			var options = <?php echo json_encode($options); ?>;
 
 			$('#builder-basic').queryBuilder({
 				plugins: [],
-				filters: <?php print(generateQueryBuilderFilters($GLOBALS["collectionName"])); ?>,
-				rules: jsonString,
+				filters: <?php print json_encode($filters); ?>,
+				rules: options
 			});
 
 			$('#btn-reset').on('click', function () {
@@ -440,7 +230,7 @@ $entries = getAllEntries();
 			});
 
 			$('#btn-set').on('click', function () {
-				$('#builder-basic').queryBuilder('setRules', JSON.parse(jsonString));
+				$('#builder-basic').queryBuilder('setRules', JSON.parse(options));
 			});
 
 			$('#btn-get').on('click', function () {

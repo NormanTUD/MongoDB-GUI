@@ -242,17 +242,75 @@ $entries = getAllEntries();
 				}
 			});
 
-			function update_current_query (e) {
+			function update_current_query(e) {
 				event.preventDefault();
 				e.stopPropagation();
 				var rules = $("#builder-basic").queryBuilder("getRules");
 
-				if(rules !== null) {
-					delete rules["valid"];
-					var rules_string = JSON.stringify(rules);
-					$("#current_query").html("<pre>" + rules_string + "</pre>");
+				if (rules !== null) {
+					var query = convertRulesToMongoQuery(rules);
+					var query_string = JSON.stringify(query);
+					$("#current_query").html("<pre>" + query_string + "</pre>");
 				} else {
 					$("#current_query").html("<pre>Could not get rules. Some search settings are probably missing. Look out for red highlighted lines.</pre>");
+				} 
+			}
+
+			function convertRulesToMongoQuery(rules) {
+				var condition = rules.condition.toUpperCase();
+				var query = {};
+
+				if (rules.rules && rules.rules.length > 0) {
+					var subQueries = rules.rules.map(function(rule) {
+						if (rule.rules && rule.rules.length > 0) {
+							return convertRulesToMongoQuery(rule);
+						} else {
+							var operator = getMongoOperator(rule.operator);
+							var value = rule.value;
+							if (rule.type === 'integer') {
+								value = parseInt(value);
+							} else if (rule.type === 'double') {
+								value = parseFloat(value);
+							} else if (rule.type === 'boolean') {
+								value = (value === 'true');
+							}
+							var fieldQuery = {};
+							fieldQuery[operator] = value;
+							return {
+							[rule.field]: fieldQuery
+							};
+						}
+					});
+
+					if (condition === 'AND') {
+						query = {
+						$and: subQueries
+					};
+					} else if (condition === 'OR') {
+						query = {
+						$or: subQueries
+					};
+					}
+				}
+
+				return query;
+			}
+
+			function getMongoOperator(operator) {
+				switch (operator) {
+				case 'equal':
+					return '$eq';
+				case 'not_equal':
+					return '$ne';
+				case 'contains':
+					return '$regex';
+				case 'greater':
+					return '$gt';
+				case 'less':
+					return '$lt';
+					// Add more operators as needed
+				default:
+					return operator;
 				}
 			}
 		</script>

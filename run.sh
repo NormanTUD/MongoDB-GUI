@@ -145,4 +145,6 @@ echo "DB_NAME=$DB_NAME" >> .env
 echo "DB_COLLECTION=$DB_COLLECTION" >> .env
 echo "LOCAL_PORT=$LOCAL_PORT" >> .env
 
+php -l *.php && echo "Syntax checks for PHP Ok" || echo "Syntax Checks for PHP failed"
+
 sudo docker-compose build && sudo docker-compose up -d || echo "Failed to build container"

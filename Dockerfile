@@ -12,8 +12,6 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y pkg-config libssl-dev
-
 # Install the MongoDB extension using pecl
 RUN pecl install mongodb && \
     docker-php-ext-enable mongodb

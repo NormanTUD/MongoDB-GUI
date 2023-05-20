@@ -200,4 +200,35 @@ function getAllEntries() {
 	$entries = $cursor->toArray();
 	return $entries;
 }
+
+// Handle form submission for updating an entry
+if(isset($_SERVER['REQUEST_METHOD'])) {
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		// Handle form submission for deleting an entry
+		if (isset($_POST['delete_entry_id'])) {
+			$entryId = $_POST['delete_entry_id'];
+			$response = deleteEntry($entryId);
+			echo $response;
+			exit();
+		}
+
+		// Handle form submission for adding a new entry
+		if (isset($_POST['new_entry_data'])) {
+			$newData = json_decode($_POST['new_entry_data'], true);
+			$entryId = (string) new MongoDB\BSON\ObjectID();
+			$response = updateEntry($entryId, $newData);
+			echo $response;
+			exit();
+		}
+
+		if(isset($_POST["entry_id"])) {
+			$entryId = $_POST['entry_id'];
+			$newData = json_decode($_POST['json_data'], true);
+
+			$response = updateEntry($entryId, $newData);
+			echo $response;
+			exit();
+		}
+	}
+}
 ?>

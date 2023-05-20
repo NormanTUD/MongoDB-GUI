@@ -12,9 +12,7 @@ A very simple GUI for viewing, deleting, adding and updating MongoDB-Databases w
 bash run.sh --db-host localhost --db-port 27017 --db-name dbname --db-collection collname --local-port 1234
 ```
 
-# Caveats
-
-The search does not work, yet. Hopefully it will soon.
+# Credits
 
 Thanks to chatGPT for helping writing this script.
 

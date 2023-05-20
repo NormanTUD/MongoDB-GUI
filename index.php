@@ -293,12 +293,7 @@ $entries = getAllEntries();
 						reset_search: true
 					},
 					success: function (response) {
-						var data = null;
-						try {
-							var data = JSON.parse(response);
-						} catch (e) {
-							console.error(e);
-						}
+						var data = JSON.parse(response);
 
 						if (data !== null && data.success) {
 							toastr.success(data.success);

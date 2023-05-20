@@ -216,41 +216,6 @@ function getAllEntries() {
 	return $entries;
 }
 
-// Function to delete an entry by ID
-function deleteEntry($entryId) {
-	$bulkWrite = new MongoDB\Driver\BulkWrite();
-	$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
-
-	$bulkWrite->delete($filter);
-
-	try {
-		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
-		return json_encode(['success' => 'Entry deleted successfully.', 'entryId' => $entryId]);
-	} catch (Exception $e) {
-		return json_encode(['error' => 'Error deleting entry: ' . $e->getMessage()]);
-	}
-}
-
-// Function to update an entry by ID
-function updateEntry($entryId, $newData) {
-	$bulkWrite = new MongoDB\Driver\BulkWrite();
-	$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
-
-	// Delete the existing document
-	$bulkWrite->delete($filter);
-
-	// Insert the updated document
-	$newData['_id'] = new MongoDB\BSON\ObjectID($entryId);
-	$bulkWrite->insert($newData);
-
-	try {
-		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
-		return json_encode(['success' => 'Entry updated successfully.', 'entryId' => $entryId]);
-	} catch (Exception $e) {
-		return json_encode(['error' => 'Error updating entry: ' . $e->getMessage()]);
-	}
-}
-
 // Handle form submission for updating an entry
 if(isset($_SERVER['REQUEST_METHOD'])) {
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {

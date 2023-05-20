@@ -1,7 +1,6 @@
 <?php
 	include("functions.php");
 
-
 	// Selecting collection using MongoDB\Driver\Command
 	$command = new MongoDB\Driver\Command([
 		'listCollections' => 1,

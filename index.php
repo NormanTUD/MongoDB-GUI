@@ -1,51 +1,17 @@
 <?php
 $enable_search = 0;
 
-function exception_error_handler($errno, $errstr, $errfile, $errline ) {
-	throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
-}
-
-function dier ($msg) {
-	print_r($msg);
-	exit(1);
-}
-
-function read_first_line_of_file_or_die ($file) {
-	if (file_exists($file)) {
-		$handle = fopen($file, "r");
-		$firstLine = fgets($handle);
-		fclose($handle);
-
-		$firstLine = trim($firstLine);
-
-		// Use the $firstLine variable here
-		return $firstLine;
-	} else {
-		dier("File $file does not exist.");
-	}
-}
-
-set_error_handler("exception_error_handler");
-ini_set('display_errors', '1');
-
-function getEnvOrDie($name) {
-    $value = getenv($name);
-    if (!$value) {
-        die("Environment variable '$name' is not set.");
-    }
-    return $value;
-}
-
+include("functions.php");
 
 // MongoDB connection settings
-$mongodbHost = getEnvOrDie('DB_HOST');
-$mongodbPort = getEnvOrDie('DB_PORT');
-$databaseName = getEnvOrDie('DB_NAME');
-$collectionName = getEnvOrDie('DB_COLLECTION');
+$GLOBALS["mongodbHost"] = getEnvOrDie('DB_HOST', 'db_host');
+$GLOBALS["mongodbPort"] = getEnvOrDie('DB_PORT', 'db_port');
+$GLOBALS["databaseName"] = getEnvOrDie('DB_NAME', 'db_name');
+$GLOBALS["collectionName"] = getEnvOrDie('DB_COLLECTION', 'db_collection');
 
 // Connect to MongoDB
-$mongoClient = new MongoDB\Driver\Manager("mongodb://$mongodbHost:$mongodbPort");
-$namespace = "{$databaseName}.{$collectionName}";
+$GLOBALS["mongoClient"] = new MongoDB\Driver\Manager("mongodb://".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]);
+$GLOBALS["namespace"] = $GLOBALS["databaseName"].".".$GLOBALS['collectionName'];
 
 // Function to generate JSON structure for jQuery QueryBuilder
 function generateQueryBuilderRules() {
@@ -106,8 +72,6 @@ function generateQueryBuilderRules() {
 }
 
 function getFieldType($field) {
-	global $collectionName, $mongoClient, $namespace, $databaseName;
-
 	// Query the collection to retrieve the value type of the field
 	$pipeline = [
 		[
@@ -121,12 +85,12 @@ function getFieldType($field) {
 	];
 
 	$command = new MongoDB\Driver\Command([
-		'aggregate' => $collectionName,
+		'aggregate' => $GLOBALS["collectionName"],
 		'pipeline' => $pipeline,
 		'cursor' => new stdClass(),
 	]);
 
-	$cursor = $mongoClient->executeCommand($databaseName, $command);
+	$cursor = $GLOBALS["mongoClient"]->executeCommand($GLOBALS["databaseName"], $command);
 	$result = current($cursor->toArray());
 
 	$fieldType = 'string'; // Default data type if not determined
@@ -148,8 +112,6 @@ function getFieldType($field) {
 
 
 function generateQueryBuilderFilters() {
-	global $collectionName, $mongoClient, $namespace, $databaseName;
-
 	// Query the collection to retrieve field names
 	$pipeline = [
 		[
@@ -169,12 +131,12 @@ function generateQueryBuilderFilters() {
 	];
 
 	$command = new MongoDB\Driver\Command([
-		'aggregate' => $collectionName,
+		'aggregate' => $GLOBALS["collectionName"],
 		'pipeline' => $pipeline,
 		'cursor' => new stdClass(),
 	]);
 
-	$cursor = $mongoClient->executeCommand($databaseName, $command);
+	$cursor = $GLOBALS["mongoClient"]->executeCommand($GLOBALS["databaseName"], $command);
 	$result = current($cursor->toArray());
 
 	$fields = [];
@@ -221,11 +183,9 @@ function generateQueryBuilderFilters() {
 }
 
 function getAllFields() {
-	global $mongoClient, $namespace;
-
 	// Retrieve all entries from the collection
 	$query = new MongoDB\Driver\Query([]);
-	$cursor = $mongoClient->executeQuery($namespace, $query);
+	$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
 	$entries = $cursor->toArray();
 
 	$fields = [];
@@ -245,10 +205,9 @@ function getAllFields() {
 
 // Function to retrieve all entries from the collection
 function getAllEntries() {
-	global $mongoClient, $namespace;
 	$query = new MongoDB\Driver\Query([]);
 	try {
-		$cursor = $mongoClient->executeQuery($namespace, $query);
+		$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
 	} catch (\Throwable $e) { // For PHP 7
 		$serverIP = $_SERVER['SERVER_ADDR'];
 		print "There was an error connecting to MongoDB. Are you sure you bound it to 0.0.0.0?<br>\n";
@@ -269,14 +228,13 @@ function getAllEntries() {
 
 // Function to delete an entry by ID
 function deleteEntry($entryId) {
-	global $mongoClient, $namespace;
 	$bulkWrite = new MongoDB\Driver\BulkWrite();
 	$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
 
 	$bulkWrite->delete($filter);
 
 	try {
-		$mongoClient->executeBulkWrite($namespace, $bulkWrite);
+		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
 		return json_encode(['success' => 'Entry deleted successfully.', 'entryId' => $entryId]);
 	} catch (Exception $e) {
 		return json_encode(['error' => 'Error deleting entry: ' . $e->getMessage()]);
@@ -285,7 +243,6 @@ function deleteEntry($entryId) {
 
 // Function to update an entry by ID
 function updateEntry($entryId, $newData) {
-	global $mongoClient, $namespace;
 	$bulkWrite = new MongoDB\Driver\BulkWrite();
 	$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
 
@@ -297,7 +254,7 @@ function updateEntry($entryId, $newData) {
 	$bulkWrite->insert($newData);
 
 	try {
-		$mongoClient->executeBulkWrite($namespace, $bulkWrite);
+		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
 		return json_encode(['success' => 'Entry updated successfully.', 'entryId' => $entryId]);
 	} catch (Exception $e) {
 		return json_encode(['error' => 'Error updating entry: ' . $e->getMessage()]);
@@ -516,7 +473,7 @@ $entries = getAllEntries();
 
 			$('#builder-basic').queryBuilder({
 				plugins: [],
-				filters: <?php print(generateQueryBuilderFilters($collectionName)); ?>,
+				filters: <?php print(generateQueryBuilderFilters($GLOBALS["collectionName"])); ?>,
 				rules: jsonString,
 			});
 

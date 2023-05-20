@@ -1,3 +1,7 @@
 dbname
 .env
 collname
+db_host
+db_port
+db_name
+db_collection

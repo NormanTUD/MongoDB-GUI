@@ -104,54 +104,50 @@ function updateEntry($entryId, $newData) {
 
 
 function check_cursor_object($cursor) {
-	$errors = 0;
-	// Print the cursor object
-	/*
-	    echo "<pre>";
-	    print_r($cursor);
-	    echo "</pre>";
-	 */
+    $errors = 0;
 
-	// Convert the cursor object to JSON and then to an array
-	$cursorArray = json_decode(json_encode($cursor), true);
-	dier($cursorArray);
+    $cursor = $cursor->toArray();
 
-	// Check for required properties
-	if (!isset($cursorArray['database'])) {
-		$msg = "Missing 'database' property.";
-		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
-		$errors++;
-	}
+    // Print the cursor object
+    /*
+    echo "<pre>";
+    print_r($cursor);
+    echo "</pre>";
+     */
 
-	if (!isset($cursorArray['command'])) {
-		$msg = "Missing 'command' property.";
-		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
-		$errors++;
-	}
+    // Check for required properties
+    if (!isset($cursor[0]->name)) {
+        $msg = "Missing 'name' property.";
+        echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+        $errors++;
+    }
 
-	if (!isset($cursorArray['session'])) {
-		$msg = "Missing 'session' property.";
-		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
-		$errors++;
-	}
+    if (!isset($cursor[0]->type)) {
+        $msg = "Missing 'type' property.";
+        echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+        $errors++;
+    }
 
-	if (!isset($cursorArray['server'])) {
-		$msg = "Missing 'server' property.";
-		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
-		$errors++;
-	}
+    if (!isset($cursor[0]->info)) {
+        $msg = "Missing 'info' property.";
+        echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+        $errors++;
+    }
 
-	// Additional checks...
+    if (!isset($cursor[0]->idIndex)) {
+        $msg = "Missing 'idIndex' property.";
+        echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+        $errors++;
+    }
 
-	// If all checks pass, return true
-	if ($errors == 0) {
-		return true;
-	}
-	return false;
+    // Additional checks...
+
+    // If all checks pass, return true
+    if ($errors == 0) {
+        return true;
+    }
+    return false;
 }
-
-
-
 
 
 ?>

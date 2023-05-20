@@ -104,64 +104,79 @@ function updateEntry($entryId, $newData) {
 
 function generateQueryBuilderOptions()
 {
-	$query = new MongoDB\Driver\Query([], ['projection' => ['_id' => 0]]);
-	$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
+    $query = new MongoDB\Driver\Query([], ['projection' => ['_id' => 0]]);
+    $cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
 
-	$filters = [];
-	$options = [];
+    $filters = [];
+    $options = [];
 
-	foreach ($cursor as $document) {
-		$documentArray = json_decode(json_encode($document), true);
-		traverseDocument($documentArray, '', $filters, $options);
-	}
+    foreach ($cursor as $document) {
+        $documentArray = json_decode(json_encode($document), true);
+        traverseDocument($documentArray, '', $filters, $options);
+    }
 
-	$output = [
-		'filters' => $filters,
-		'options' => $options,
-	];
+    $output = [
+        'filters' => $filters,
+        'options' => $options,
+    ];
 
-	return $output;
+    return $output;
 }
 
 function traverseDocument($data, $prefix, &$filters, &$options) {
-	foreach ($data as $key => $value) {
-		$path = $prefix . $key;
-		$type = getDataType($value);
+    foreach ($data as $key => $value) {
+        $path = $prefix . $key;
+        $type = getDataType($value);
 
-		$filter = [
-			'id' => $path,
-			'label' => $path,
-			'type' => $type,
-		];
+        $filter = [
+            'id' => $path,
+            'label' => $path,
+            'type' => $type,
+        ];
 
-		$option = [
-			'id' => $path,
-			'label' => $path,
-		];
+        $option = [
+            'id' => $path,
+            'label' => $path,
+        ];
 
-		if ($type === 'string') {
-			$filter['operators'] = ['equal', 'contains'];
-		} elseif ($type === 'number') {
-			$filter['operators'] = ['equal', 'greater', 'less'];
-		}
+        if ($type === 'string') {
+            $filter['operators'] = ['equal', 'contains'];
+        } elseif ($type === 'integer' || $type === 'double') {
+            $filter['operators'] = ['equal', 'greater', 'less'];
+        } elseif ($type === 'date' || $type === 'time' || $type === 'datetime') {
+            $filter['operators'] = ['equal'];
+        } elseif ($type === 'boolean') {
+            $filter['input'] = 'radio';
+            $filter['values'] = ['true', 'false'];
+        }
 
-		$filters[] = $filter;
-		$options[] = $option;
+        $filters[] = $filter;
+        $options[] = $option;
 
-		if (is_array($value)) {
-			traverseDocument($value, $path . '.', $filters, $options);
-		}
-	}
+        if (is_array($value)) {
+            traverseDocument($value, $path . '.', $filters, $options);
+        }
+    }
 }
 
 function getDataType($value) {
-	if (is_numeric($value)) {
-		return 'number';
-	} elseif (is_string($value)) {
-		return 'string';
-	} else {
-		return 'string'; // Default to string if data type cannot be determined
-	}
+    if (is_numeric($value)) {
+        if (is_int($value)) {
+            return 'integer';
+        } elseif (is_float($value)) {
+            return 'double';
+        }
+    } elseif (is_string($value)) {
+        return 'string';
+    } elseif ($value instanceof DateTime || $value instanceof MongoDB\BSON\UTCDateTime) {
+        return 'datetime';
+    } elseif ($value instanceof MongoDB\BSON\Timestamp) {
+        return 'time';
+    } elseif (is_bool($value)) {
+        return 'boolean';
+    }
+
+    return 'string'; // Default to string if data type cannot be determined
 }
 
 function getAllEntries() {

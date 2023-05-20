@@ -140,11 +140,11 @@ function traverseDocument($data, $prefix, &$filters, &$options) {
         ];
 
         if ($type === 'string') {
-            $filter['operators'] = ['equal', 'contains'];
+            $filter['operators'] = ['equal', 'not equal', 'contains'];
         } elseif ($type === 'integer' || $type === 'double') {
-            $filter['operators'] = ['equal', 'greater', 'less'];
+            $filter['operators'] = ['equal', 'not equal', 'greater', 'less'];
         } elseif ($type === 'date' || $type === 'time' || $type === 'datetime') {
-            $filter['operators'] = ['equal'];
+            $filter['operators'] = ['equal', "not equal"];
         } elseif ($type === 'boolean') {
             $filter['input'] = 'radio';
             $filter['values'] = ['true', 'false'];

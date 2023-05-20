@@ -104,49 +104,49 @@ function updateEntry($entryId, $newData) {
 
 
 function check_cursor_object($cursor) {
-    $errors = 0;
+	$errors = 0;
 
-    $cursor = $cursor->toArray();
+	$cursor = $cursor->toArray();
 
-    // Print the cursor object
-    /*
-    echo "<pre>";
-    print_r($cursor);
-    echo "</pre>";
-     */
+	// Print the cursor object
+	/*
+	echo "<pre>";
+	print_r($cursor);
+	echo "</pre>";
+	*/
 
-    // Check for required properties
-    if (!isset($cursor[0]->name)) {
-        $msg = "Missing 'name' property.";
-        echo "Msg:<br>\n<pre>$msg</pre><br>\n";
-        $errors++;
-    }
+	// Check for required properties
+	if (!isset($cursor[0]->name)) {
+		$msg = "Missing 'name' property.";
+		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+		$errors++;
+	}
 
-    if (!isset($cursor[0]->type)) {
-        $msg = "Missing 'type' property.";
-        echo "Msg:<br>\n<pre>$msg</pre><br>\n";
-        $errors++;
-    }
+	if (!isset($cursor[0]->type)) {
+		$msg = "Missing 'type' property.";
+		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+		$errors++;
+	}
 
-    if (!isset($cursor[0]->info)) {
-        $msg = "Missing 'info' property.";
-        echo "Msg:<br>\n<pre>$msg</pre><br>\n";
-        $errors++;
-    }
+	if (!isset($cursor[0]->info)) {
+		$msg = "Missing 'info' property.";
+		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+		$errors++;
+	}
 
-    if (!isset($cursor[0]->idIndex)) {
-        $msg = "Missing 'idIndex' property.";
-        echo "Msg:<br>\n<pre>$msg</pre><br>\n";
-        $errors++;
-    }
+	if (!isset($cursor[0]->idIndex)) {
+		$msg = "Missing 'idIndex' property.";
+		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+		$errors++;
+	}
 
-    // Additional checks...
+	// Additional checks...
 
-    // If all checks pass, return true
-    if ($errors == 0) {
-        return true;
-    }
-    return false;
+	// If all checks pass, return true
+	if ($errors == 0) {
+		return true;
+	}
+	return false;
 }
 
 

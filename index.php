@@ -144,9 +144,21 @@ $entries = getAllEntries();
 				});
 			}
 
-			// Call the initialization function
 			$(document).ready(function () {
 				initJsonEditors();
+
+				// Check if the 'search' parameter exists in the URL
+				var urlParams = new URLSearchParams(window.location.search);
+				if (urlParams.has('search')) {
+					var searchParam = urlParams.get('search');
+					var query = JSON.parse(decodeURIComponent(searchParam));
+
+					// Set the query rules in the query builder
+					$("#builder-basic").queryBuilder("setRules", query);
+
+					// Trigger the search
+					searchEntries();
+				}
 			});
 
 		</script>
@@ -324,6 +336,15 @@ $entries = getAllEntries();
 				if (rules !== null) {
 					var query = convertRulesToMongoQuery(rules);
 
+					// Convert the query object to a URL parameter string
+					var queryParam = encodeURIComponent(JSON.stringify(query));
+
+					// Update the URL with the search parameter
+					var newUrl = updateQueryStringParameter(window.location.href, 'search', queryParam);
+					history.pushState({ path: newUrl }, '', newUrl);
+
+					var query = convertRulesToMongoQuery(rules);
+
 					$.ajax({
 					url: '<?php echo basename($_SERVER['PHP_SELF']); ?>',
 						type: 'POST',
@@ -370,6 +391,17 @@ $entries = getAllEntries();
 					});
 				} else {
 					toastr.info('Could not get search rules.');
+				}
+			}
+
+			function updateQueryStringParameter(url, key, value) {
+				var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+				var separator = url.indexOf('?') !== -1 ? "&" : "?";
+
+				if (url.match(re)) {
+					return url.replace(re, '$1' + key + "=" + value + '$2');
+				} else {
+					return url + separator + key + "=" + value;
 				}
 			}
 		</script>

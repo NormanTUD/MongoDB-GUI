@@ -104,47 +104,54 @@ function updateEntry($entryId, $newData) {
 
 
 function check_cursor_object($cursor) {
-    // Check if the cursor is valid
-    if (!$cursor instanceof MongoDB\Driver\Cursor) {
-        die("Invalid cursor object. Expected MongoDB\Driver\Cursor.");
-    }
-    
-    // Check if the cursor has a valid collection name
-    $collection = $cursor->collection;
-    if (!is_string($collection) || empty($collection)) {
-        die("Invalid or missing collection name.");
-    }
-    
-    // Check if the cursor has a valid command object
-    $command = $cursor->command;
-    if (!$command instanceof MongoDB\Driver\Command) {
-        die("Invalid command object. Expected MongoDB\Driver\Command.");
-    }
-    
-    // Check if the command object has the necessary properties
-    $commandProperties = $command->command ?? null;
-    if (!is_object($commandProperties) || !property_exists($commandProperties, 'listCollections') || !property_exists($commandProperties, 'filter')) {
-        die("Invalid command properties. Expected 'listCollections' and 'filter'.");
-    }
-    
-    // Check if the cursor has a valid server object
-    $server = $cursor->server;
-    if (!$server instanceof MongoDB\Driver\Server) {
-        die("Invalid server object. Expected MongoDB\Driver\Server.");
-    }
-    
-    // Check if the server object has a valid host and port
-    $host = $server->host;
-    $port = $server->port;
-    if (!is_string($host) || empty($host) || !is_int($port) || $port <= 0) {
-        die("Invalid server host or port.");
-    }
-    
-    // Additional checks or error handling can be added as needed
-    
-    // If no errors occurred, return true or perform additional actions
-    return true;
+	$errors = 0;
+	// Print the cursor object
+	/*
+	    echo "<pre>";
+	    print_r($cursor);
+	    echo "</pre>";
+	 */
+
+	// Convert the cursor object to JSON and then to an array
+	$cursorArray = json_decode(json_encode($cursor), true);
+	dier($cursorArray);
+
+	// Check for required properties
+	if (!isset($cursorArray['database'])) {
+		$msg = "Missing 'database' property.";
+		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+		$errors++;
+	}
+
+	if (!isset($cursorArray['command'])) {
+		$msg = "Missing 'command' property.";
+		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+		$errors++;
+	}
+
+	if (!isset($cursorArray['session'])) {
+		$msg = "Missing 'session' property.";
+		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+		$errors++;
+	}
+
+	if (!isset($cursorArray['server'])) {
+		$msg = "Missing 'server' property.";
+		echo "Msg:<br>\n<pre>$msg</pre><br>\n";
+		$errors++;
+	}
+
+	// Additional checks...
+
+	// If all checks pass, return true
+	if ($errors == 0) {
+		return true;
+	}
+	return false;
 }
+
+
+
 
 
 ?>

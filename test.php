@@ -28,9 +28,6 @@
 		print("<pre>=================<br>\n");
 		print_r($command);
 		print("\n=================<br></pre>");
-		print("<pre>=================<br>\n");
-		print_r($cursor);
-		print("\n=================<br></pre>");
 		print("Database name: " . $GLOBALS["databaseName"] . "<br>\n");
 		return;
 	}

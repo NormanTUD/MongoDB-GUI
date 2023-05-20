@@ -202,6 +202,7 @@ $entries = getAllEntries();
 
 ?>
 		<script>
+			"use strict";
 			function getQueryParam(param) {
 				const urlParams = new URLSearchParams(window.location.search);
 				return urlParams.get(param);
@@ -235,7 +236,7 @@ $entries = getAllEntries();
 
 			var filters = removeDuplicates(<?php print json_encode($filters); ?>);
 
-			if(filters.len) {
+			if(filters.length) {
 				$('#builder-basic').queryBuilder({
 					plugins: ["bt-tooltip-errors"],
 					filters: filters,

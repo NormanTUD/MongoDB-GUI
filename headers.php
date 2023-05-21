@@ -15,3 +15,4 @@
 		<link rel="stylesheet" href="MarkerCluster.css" />
 		<link rel="stylesheet" href="MarkerCluster.Default.css" />
 		<script src="leaflet.markercluster.js"></script>
+		<script src="leaflet-heat.js"></script>

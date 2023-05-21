@@ -149,20 +149,20 @@ foreach ($entries as $entry) {
 			});
 		</script>
 <script>
-    var events = <?php echo json_encode($entries_with_geo_coords); ?>;
+  var events = <?php echo json_encode($entries_with_geo_coords); ?>;
 
-    // Generate iframe with events
-    var iframeContent = '';
-    for (var i = 0; i < events.length; i++) {
-        var event = events[i];
-        iframeContent += '<p>Event: ' + JSON.stringify(event) + '</p>';
-    }
+  // Generate iframe with events
+  var iframeContent = '';
+  for (var i = 0; i < events.length; i++) {
+    var event = events[i];
+    iframeContent += '<p>Event: ' + JSON.stringify(event) + '</p>';
+  }
 
-    var iframe = document.createElement('iframe');
-    iframe.setAttribute('srcdoc', iframeContent);
-    iframe.style.width = '100%';
-    iframe.style.height = '400px';
-    document.body.appendChild(iframe);
+  var iframe = document.createElement('iframe');
+  iframe.setAttribute('srcdoc', iframeContent);
+  iframe.style.width = '100%';
+  iframe.style.height = '400px';
+  document.body.appendChild(iframe);
 
   // Create a map object
   var map = L.map('map').setView([0, 0], 2); // Set initial center and zoom level
@@ -186,8 +186,40 @@ foreach ($entries as $entry) {
     markerCluster.addLayer(marker);
   }
 
-  // Add the marker cluster group to the map
-  map.addLayer(markerCluster);
+  // Create an array to store heatmap data
+  var heatmapData = [];
+
+  // Iterate through the events and add heatmap data
+  for (var i = 0; i < events.length; i++) {
+    var event = events[i];
+    var latLng = L.latLng(event.geocoords.lat, event.geocoords.lon);
+
+    // Add the latLng to the heatmap data
+    heatmapData.push(latLng);
+  }
+
+  // Create a heatmap layer
+  var heatLayer = L.heatLayer(heatmapData, {
+    radius: 25, // Adjust the radius as per your preference
+    blur: 15, // Adjust the blur as per your preference
+    gradient: {
+      0.4: 'blue', // Define the colors and positions in the gradient
+      0.6: 'cyan',
+      0.7: 'lime',
+      0.8: 'yellow',
+      1.0: 'red'
+    }
+  });
+
+  // Add the marker cluster group and the heatmap layer to the map
+  markerCluster.addTo(map);
+  heatLayer.addTo(map);
+
+  // Fit the map bounds to include both markers and heatmap layer
+  var markersBounds = markerCluster.getBounds();
+  var heatmapBounds = heatLayer.getBounds();
+  var bounds = markersBounds.extend(heatmapBounds);
+  map.fitBounds(bounds);
 </script>
 	</body>
 </html>

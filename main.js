@@ -203,17 +203,18 @@ function convertRulesToMongoQuery(rules) {
 
 	if (rules.rules && rules.rules.length > 0) {
 		var subQueries = rules.rules.map(function(rule) {
-			log(rule);
 			if (rule.rules && rule.rules.length > 0) {
 				return convertRulesToMongoQuery(rule);
 			} else {
 				var operator = getMongoOperator(rule.operator);
 				var value = rule.value;
-				if (rule.type === 'integer') {
+				if (rule.type == 'integer') {
 					value = parseInt(value);
-				} else if (rule.type === 'double') {
+				} else if (rule.type == 'double') {
 					value = parseFloat(value);
-				} else if (rule.type === 'boolean') {
+				} else if (rule.type == 'string') {
+					value = "" + value;
+				} else if (rule.type == 'boolean') {
 					if(value == "true" || value == true) {
 						value = true;
 					} else {

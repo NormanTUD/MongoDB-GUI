@@ -144,6 +144,7 @@
 		];
 
 		$result = find_lat_lon_variables_recursive($entry);
+		dier($result);
 		$expected = [['lat' => '10.123', 'lon' => '-20.456', 'original_entry' => $entry]];
 
 		is_equal("find_lat_lon_variables_recursive 1", $result, $expected);

@@ -18,3 +18,4 @@
 		<script src="nouislider.min.js"></script>
 		<script src="leaflet.markercluster.js"></script>
 		<script src="leaflet-heat.js"></script>
+		<script src="plotly-latest.min.js"></script>

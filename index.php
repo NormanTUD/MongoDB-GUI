@@ -4,8 +4,6 @@ include("functions.php");
 
 // Retrieve all entries
 $entries = getAllEntries();
-
-$entries_with_geo_coords = get_entries_with_geo_coordinates($entries);
 ?>
 
 <!DOCTYPE html>

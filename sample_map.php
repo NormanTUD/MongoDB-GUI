@@ -2,6 +2,8 @@
 	if (!defined('INCLUDED_FROM_INDEX')) {
 	    die('This file must be included from index.php');
 	}
+
+	$entries_with_geo_coords = get_entries_with_geo_coordinates($entries);
 ?>
 var events = <?php echo json_encode($entries_with_geo_coords); ?>;
 

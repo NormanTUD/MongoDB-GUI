@@ -253,18 +253,22 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 		if (isset($_POST['data'])) {
 			$data = $_POST['data'];
 
-			// Detect data format
-			$lines = explode(PHP_EOL, $data);
-			$headers = str_getcsv(array_shift($lines));
+			try {
+				$documents[] = json_decode($_POST["data"]);
+			} catch (\Throwable $e) {
+				// Detect data format
+				$lines = explode(PHP_EOL, $data);
+				$headers = str_getcsv(array_shift($lines));
 
-			$documents = [];
-			foreach ($lines as $line) {
-				$row = str_getcsv($line);
-				$document = [];
-				foreach ($headers as $index => $header) {
-					$document[$header] = isset($row[$index]) ? $row[$index] : '';
+				$documents = [];
+				foreach ($lines as $line) {
+					$row = str_getcsv($line);
+					$document = [];
+					foreach ($headers as $index => $header) {
+						$document[$header] = isset($row[$index]) ? $row[$index] : '';
+					}
+					$documents[] = $document;
 				}
-				$documents[] = $document;
 			}
 
 			foreach ($documents as $document) {

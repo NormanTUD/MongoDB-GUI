@@ -131,5 +131,6 @@
 			<?php include("sample_map.php"); ?>
 			<?php include("sample_analyze.php"); ?>
 		</script>
+		<?php include("sample_test.php"); ?>
 	</body>
 </html>

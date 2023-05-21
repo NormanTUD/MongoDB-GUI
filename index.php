@@ -100,6 +100,8 @@
 			<?php endforeach; ?>
 		</div>
 
+		<button onclick="addNewEntry(event)">Add New Entry</button>
+
 		<div id="chart"></div>
 
 		<div id="chart_two"></div>
@@ -107,7 +109,6 @@
 		<div id="map" style="height: 400px;"></div>
 
 		<!-- Button to add a new entry -->
-		<button onclick="addNewEntry(event)">Add New Entry</button>
 <?php
 		include("import.php");
 		$optionsAndFilters = generateQueryBuilderOptions();

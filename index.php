@@ -149,6 +149,7 @@ foreach ($entries as $entry) {
 			});
 		</script>
 <script>
+
   var events = <?php echo json_encode($entries_with_geo_coords); ?>;
 
   // Generate iframe with events
@@ -176,26 +177,21 @@ foreach ($entries as $entry) {
   // Create a marker cluster group
   var markerCluster = L.markerClusterGroup();
 
-  // Iterate through the events and add markers to the cluster group
-  for (var i = 0; i < events.length; i++) {
-    var event = events[i];
-    var latLng = L.latLng(event.geocoords.lat, event.geocoords.lon);
-
-    // Create a marker and add it to the cluster group
-    var marker = L.marker(latLng);
-    markerCluster.addLayer(marker);
-  }
-
   // Create an array to store heatmap data
   var heatmapData = [];
 
-  // Iterate through the events and add heatmap data
+  // Iterate through the events
   for (var i = 0; i < events.length; i++) {
     var event = events[i];
-    var latLng = L.latLng(event.geocoords.lat, event.geocoords.lon);
+    var lat = event.geocoords.lat;
+    var lon = event.geocoords.lon;
 
-    // Add the latLng to the heatmap data
-    heatmapData.push(latLng);
+    // Create a marker and add it to the marker cluster group
+    var marker = L.marker([lat, lon]);
+    markerCluster.addLayer(marker);
+
+    // Add the coordinates to the heatmap data
+    heatmapData.push([lat, lon]);
   }
 
   // Create a heatmap layer
@@ -216,10 +212,7 @@ foreach ($entries as $entry) {
   heatLayer.addTo(map);
 
   // Fit the map bounds to include both markers and heatmap layer
-  var markersBounds = markerCluster.getBounds();
-  var heatmapBounds = heatLayer.getBounds();
-  var bounds = markersBounds.extend(heatmapBounds);
-  map.fitBounds(bounds);
+  map.fitBounds(markerCluster.getBounds());
 </script>
 	</body>
 </html>

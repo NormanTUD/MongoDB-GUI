@@ -203,6 +203,7 @@ function convertRulesToMongoQuery(rules) {
 
 	if (rules.rules && rules.rules.length > 0) {
 		var subQueries = rules.rules.map(function(rule) {
+			log(rule);
 			if (rule.rules && rule.rules.length > 0) {
 				return convertRulesToMongoQuery(rule);
 			} else {
@@ -213,24 +214,32 @@ function convertRulesToMongoQuery(rules) {
 				} else if (rule.type === 'double') {
 					value = parseFloat(value);
 				} else if (rule.type === 'boolean') {
-					value = (value === 'true');
+					if(value == "true" || value == true) {
+						value = true;
+					} else {
+						value = false;
+					}
+				} else {
+					console.error("Unknown rule type", rule.type, rule);
 				}
+
 				var fieldQuery = {};
 				fieldQuery[operator] = value;
+
 				return {
-				[rule.field]: fieldQuery
+					[rule.field]: fieldQuery
 				};
 			}
 		});
 
 		if (condition === 'AND') {
 			query = {
-			$and: subQueries
-		};
+				$and: subQueries
+			};
 		} else if (condition === 'OR') {
 			query = {
-			$or: subQueries
-		};
+				$or: subQueries
+			};
 		}
 	}
 

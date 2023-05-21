@@ -140,14 +140,14 @@ function traverseDocument($data, $prefix, &$filters, &$options) {
 		];
 
 		if ($type === 'string') {
-			$filter['operators'] = ['equal', 'not_equal', 'contains', 'type'];
+			$filter['operators'] = ['equal', 'not_equal', 'contains'];
 		} elseif ($type === 'integer' || $type === 'double') {
-			$filter['operators'] = ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal', 'type'];
+			$filter['operators'] = ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal'];
 		} elseif ($type === 'boolean') {
 			$filter['input'] = 'radio';
-			$filter['values'] = ['true', 'false', 'type'];
+			$filter['values'] = ['True', 'False'];
 		} elseif ($type === 'array' || $type === 'object') {
-			$filter['operators'] = ['equal', 'not_equal', 'type'];
+			$filter['operators'] = ['equal', 'not_equal'];
 		}
 
 		$filters[] = $filter;

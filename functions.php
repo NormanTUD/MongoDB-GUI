@@ -446,8 +446,8 @@ function generateVisualizationCode($entries, $fields)
 			break;
 		case 'none':
 		default:
-		$result = $config['analysis']($values);
-		break;
+			$result = $config['analysis']($values);
+			break;
 		}
 
 		$data[] = array(
@@ -504,6 +504,17 @@ function get_entries_with_geo_coordinates ($entries) {
 	}
 
 	return $entries_with_geo_coords;
+}
+
+function avg($numbers) {
+    $sum = array_sum($numbers);
+    $count = count($numbers);
+
+    if ($count === 0) {
+        return 0; // Return 0 to avoid division by zero error
+    }
+
+    return $sum / $count;
 }
 
 ?>

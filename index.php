@@ -107,49 +107,18 @@ $entries_with_geo_coords = get_entries_with_geo_coordinates($entries);
 		$filters = $optionsAndFilters["filters"];
 
 
-		// Define the fields and aggregation functions
-$analyze_fields = array(
-    'geocoords' => array(
-        'aggregation' => 'none', // Options: 'none', 'average', 'range', 'histogram'
-        'analysis' => function ($values) {
-            // Your custom analysis function for 'geocoords'
-            // Example: Return the list of coordinates as-is
-            return $values;
-        }
-    ),
-    'a' => array(
-        'aggregation' => 'count', // Options: 'count', 'distinct', 'custom'
-        'analysis' => function ($values) {
-            // Your custom analysis function for 'a'
-            // Example: Count the occurrences of each value
-            $valueCounts = array_count_values($values);
-            return $valueCounts;
-        }
-    ),
-    'b' => array(
-        'aggregation' => 'none',
-        'analysis' => function ($values) {
-            // Your custom analysis function for 'b'
-            // Example: Return the values as-is
-            return $values;
-        }
-    ),
-    // Add more fields and their corresponding configurations here
-);
-
-$jsCode = generateVisualizationCode($entries, $analyze_fields);
 ?>
 <script>
 			"use strict";
 
 			//jsCode {
 <?php
-			print $jsCode;
 ?>
 			//} jsCode
 
 
 			<?php include("initialize_query_builder.php"); ?>
+			<?php include("sample_generalized_visualization.php"); ?>
 			<?php include("sample_map.php"); ?>
 			<?php include("sample_analyze.php"); ?>
 		</script>

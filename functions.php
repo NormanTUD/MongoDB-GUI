@@ -427,66 +427,67 @@ class MongoDBDocument {
 #dier($document);
 
 
-function generateVisualizationCode($entries, $fields)
-{
-	$data = array();
-	foreach ($fields as $field => $config) {
-		$values = array_column($entries, $field);
+function generateVisualizationCode($entries, $fields) {
+    $data = array();
+    foreach ($fields as $field => $config) {
+        $column = $config['column'];
+        $values = array_column($entries, $column);
 
-		// Perform aggregation or analysis based on the configuration
-		switch ($config['aggregation']) {
-		case 'count':
-			$result = count($values);
-			break;
-		case 'distinct':
-			$result = count(array_unique($values));
-			break;
-		case 'custom':
-			$result = $config['analysis']($values);
-			break;
-		case 'none':
-		default:
-			$result = $config['analysis']($values);
-			break;
-		}
+        // Perform aggregation or analysis based on the configuration
+        switch ($config['aggregation']) {
+            case 'count':
+                $result = count($values);
+                break;
+            case 'distinct':
+                $result = count(array_unique($values));
+                break;
+            case 'custom':
+                $result = $config['analysis']($values);
+                break;
+            case 'none':
+            default:
+                $result = $config['analysis']($values);
+                break;
+        }
 
-		$data[] = array(
-			'field' => $field,
-			'result' => $result,
-		);
-	}
+        $data[] = array(
+            'field' => $field,
+            'result' => $result,
+        );
+    }
 
-	$jsCode = "
-	    var data = " . json_encode($data) . ";
+    $jsCode = "
+        var data = " . json_encode($data) . ";
 
-	    // Plotting logic using Plotly.js
-	    // Customize this part to generate the desired visualization
+        // Plotting logic using Plotly.js
+        // Customize this part to generate the desired visualization
 
-	    // Example: Generate a bar chart
-	    var x = data.map(entry => entry.field);
-	    var y = data.map(entry => entry.result);
+        // Example: Generate a bar chart
+        var x = data.map(entry => entry.field);
+        var y = data.map(entry => entry.result);
 
-	    var trace = {
-		x: x,
-		y: y,
-		type: 'bar'
-	    };
+        var trace = {
+            x: x,
+            y: y,
+            type: 'bar'
+        };
 
-	    var layout = {
-		title: 'General Statistics',
-		xaxis: {
-		    title: 'Fields'
-		},
-		yaxis: {
-		    title: 'Results'
-		}
-	    };
+        var layout = {
+            title: 'General Statistics',
+            xaxis: {
+                title: 'Fields'
+            },
+            yaxis: {
+                title: 'Results'
+            }
+        };
 
-	    Plotly.newPlot('chart_two', [trace], layout);
+        Plotly.newPlot('chart_two', [trace], layout);
     ";
 
-return $jsCode;
+    return $jsCode;
 }
+
 
 function get_entries_with_geo_coordinates ($entries) {
 	$entries_with_geo_coords = [];

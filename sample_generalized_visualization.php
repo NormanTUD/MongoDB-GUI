@@ -6,14 +6,16 @@
 
 	// Define the fields and aggregation functions
 	$analyze_fields = array(
-		'age' => array(
+		'age (avg)' => array(
 			'aggregation' => 'average', // Options: 'none', 'average', 'range', 'histogram'
+			'column' => 'age',
 			'analysis' => function ($values) {
 				return avg($values);
 			}
 		),
-		'a' => array(
+		'age (count)' => array(
 			'aggregation' => 'count', // Options: 'count', 'distinct', 'custom'
+			'column' => 'age',
 			'analysis' => function ($values) {
 				return $values;
 			}

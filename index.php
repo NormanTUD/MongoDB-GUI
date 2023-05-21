@@ -6,37 +6,6 @@ include("functions.php");
 $entries = getAllEntries();
 
 $entries_with_geo_coords = get_entries_with_geo_coordinates($entries);
-
-// plotly data
-
-$totalEntries = count($entries);
-
-// Count the occurrence of each property
-$propertyCounts = array();
-foreach ($entries as $entry) {
-    foreach ($entry as $property => $value) {
-        if (!isset($propertyCounts[$property])) {
-            $propertyCounts[$property] = 0;
-        }
-        $propertyCounts[$property]++;
-    }
-}
-
-// Identify properties with numerical values
-$numericProperties = array();
-foreach ($entries as $entry) {
-    foreach ($entry as $property => $value) {
-        if (is_numeric($value) && !in_array($property, $numericProperties)) {
-            $numericProperties[] = $property;
-        }
-    }
-}
-
-// Generate data for plotting
-$propertyLabels = array_keys($propertyCounts);
-$propertyOccurrences = array_values($propertyCounts);
-
-// plotly data end
 ?>
 
 <!DOCTYPE html>

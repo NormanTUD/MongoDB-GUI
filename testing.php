@@ -133,7 +133,4 @@
 	is_unequal("Test 2", "Hello", "World");
 	regex_matches("Test 3", "OpenAI", "/Open/");
 	regex_fails("Test 4", "Open", "/AI/");
-
-	// Call done_testing() manually if needed
-	done_testing();
 ?>

@@ -123,37 +123,54 @@ function generateQueryBuilderOptions()
 	return $output;
 }
 
+function get_filters ($path, $value) {
+	$type = getDataType($value);
+
+	$filter = [
+		'id' => $path,
+		'label' => $path,
+		'type' => $type
+	];
+
+	if ($type === 'string') {
+		$filter['operators'] = ['equal', 'not_equal', 'contains'];
+	} elseif ($type === 'integer' || $type === 'double') {
+		$filter['operators'] = ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal'];
+	} elseif ($type === 'boolean') {
+		$filter['input'] = 'radio';
+		$filter['operators'] = ['equal', 'not_equal'];
+		$filter['values'] = ['True', 'False'];
+	} elseif ($type === 'array' || $type === 'object') {
+		$filter['operators'] = ['equal', 'not_equal'];
+	} else {
+		die("Invalid datatype: $type");
+	}
+	return $filter;
+}
+
 function traverseDocument($data, $prefix, &$filters, &$options) {
 	foreach ($data as $key => $value) {
 		$path = $prefix . $key;
-		$type = getDataType($value);
 
-		$filter = [
-			'id' => $path,
-			'label' => $path,
-			'type' => $type
-		];
 
 		$option = [
 			'id' => $path,
 			'label' => $path
 		];
 
-		if ($type === 'string') {
-			$filter['operators'] = ['equal', 'not_equal', 'contains'];
-		} elseif ($type === 'integer' || $type === 'double') {
-			$filter['operators'] = ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal'];
-		} elseif ($type === 'boolean') {
-			$filter['input'] = 'radio';
-			$filter['operators'] = ['equal', 'not_equal'];
-			$filter['values'] = ['True', 'False'];
-		} elseif ($type === 'array' || $type === 'object') {
-			$filter['operators'] = ['equal', 'not_equal'];
-		} else {
-			die("Invalid datatype: $type");
+		if(preg_match("/\./", $path)) {
+			$generalized_path = preg_replace("/^.*\./", "*.", $path);
+			$generalized_option = [
+				'id' => $generalized_path,
+				'label' => $generalized_path
+			];
+			$options[] = $generalized_option;
+			$filters[] = get_filters($generalized_path, $value); //$filter;
 		}
 
-		$filters[] = $filter;
+		
+
+		$filters[] = get_filters($path, $value); //$filter;
 		$options[] = $option;
 
 		if (is_array($value) || is_object($value)) {
@@ -258,6 +275,9 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 
 			try {
 				$documents[] = json_decode($_POST["data"]);
+				if (json_last_error() !== JSON_ERROR_NONE) {
+					throw new Exception('Failed to decode JSON: ' . json_last_error_msg());
+				}
 			} catch (\Throwable $e) {
 				// Detect data format
 				$lines = explode(PHP_EOL, $data);
@@ -275,22 +295,25 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			}
 
 			foreach ($documents as $document) {
-				echo insertDocument($document);
+				insertDocument($document);
 			}
 		}
 	}
 }
 
-function insertDocument($document)
-{
-	$bulkWrite = new MongoDB\Driver\BulkWrite();
-	$bulkWrite->insert($document);
+function insertDocument($document) {
+	if($document) {
+		$bulkWrite = new MongoDB\Driver\BulkWrite();
+		$bulkWrite->insert($document);
 
-	try {
-		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
-		return json_encode(['success' => 'Entry created successfully.']);
-	} catch (Exception $e) {
-		return json_encode(['error' => 'Error creating entry: ' . $e->getMessage()]);
+		try {
+			$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
+			return json_encode(['success' => 'Entry created successfully.']);
+		} catch (Exception $e) {
+			return json_encode(['error' => 'Error creating entry: ' . $e->getMessage()]);
+		}
+	} else {
+		dier("Document not defined in insertDocument");
 	}
 }
 

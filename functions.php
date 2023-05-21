@@ -102,8 +102,7 @@ function updateEntry($entryId, $newData) {
 	}
 }
 
-function generateQueryBuilderOptions()
-{
+function generateQueryBuilderOptions() {
 	$query = new MongoDB\Driver\Query([], ['projection' => ['_id' => 0]]);
 	$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
 
@@ -160,6 +159,7 @@ function traverseDocument($data, $prefix, &$filters, &$options) {
 
 		if(preg_match("/\./", $path)) {
 			$generalized_path = preg_replace("/^.*\./", "*.", $path);
+			$generalized_path_id = str_replace('.*.', '.#.', $generalized_path);
 			$generalized_option = [
 				'id' => $generalized_path,
 				'label' => $generalized_path

@@ -206,7 +206,7 @@
 		'type' => 'string',
 		'operators' => ['equal', 'not_equal', 'contains']
 	];
-	is_equal("Test 1", get_filters($path1, $value1), $expected1);
+	is_equal("Test get_filters(path1, value1)", get_filters($path1, $value1), $expected1);
 
 	// Test 2: Numeric value (integer)
 	$path2 = 'age';
@@ -217,7 +217,7 @@
 		'type' => 'integer',
 		'operators' => ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal']
 	];
-	is_equal("Test 2", get_filters($path2, $value2), $expected2);
+	is_equal("Test get_filters(path2, value2)", get_filters($path2, $value2), $expected2);
 
 	// Test 3: Numeric value (double)
 	$path3 = 'price';
@@ -228,7 +228,7 @@
 		'type' => 'double',
 		'operators' => ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal']
 	];
-	is_equal("Test 3", get_filters($path3, $value3), $expected3);
+	is_equal("Test get_filters(path3, value3)", get_filters($path3, $value3), $expected3);
 
 	// Test 4: Boolean value
 	$path4 = 'active';
@@ -241,7 +241,7 @@
 		'operators' => ['equal', 'not_equal'],
 		'values' => ['True', 'False']
 	];
-	is_equal("Test 4", get_filters($path4, $value4), $expected4);
+	is_equal("Test get_filters(path4, value4)", get_filters($path4, $value4), $expected4);
 
 	// Test 5: Array value
 	$path5 = 'tags';
@@ -261,5 +261,5 @@
 		"operators" => ["in", "not_in"]
 	];
 
-	is_equal("Test 5", get_filters($path5, $value5), $expected5);
+	is_equal("get_filters(path5, value5)", get_filters($path5, $value5), $expected5);
 ?>

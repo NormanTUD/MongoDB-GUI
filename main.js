@@ -186,6 +186,7 @@ function getMongoOperator(operator) {
 function update_current_query(e) {
 	e.preventDefault();
 	e.stopPropagation();
+
 	var rules = $("#builder-basic").queryBuilder("getRules");
 
 	if (rules !== null) {

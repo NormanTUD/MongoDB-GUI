@@ -484,4 +484,22 @@ function generateVisualizationCode($entries, $fields)
 return $jsCode;
 }
 
+function get_entries_with_geo_coordinates ($entries) {
+	$entries_with_geo_coords = [];
+	foreach ($entries as $entry) {
+		$entry = json_decode(json_encode($entry), true);
+
+		if (isset($entry["geocoords"]) && isset($entry["geocoords"]["lat"]) && isset($entry["geocoords"]["lon"])) {
+			$lat = $entry["geocoords"]["lat"];
+			$lon = $entry["geocoords"]["lon"];
+
+			// Perform additional checks on lat and lon values if needed
+
+			$entries_with_geo_coords[] = $entry;
+		}
+	}
+
+	return $entries_with_geo_coords;
+}
+
 ?>

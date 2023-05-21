@@ -13,3 +13,9 @@
 	padding: 10px;
 	/* Add more custom styles */
 }
+
+.event-link {
+	cursor: pointer;
+	color: blue;
+	text-decoration: underline;
+}

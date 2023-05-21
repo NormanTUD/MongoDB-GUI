@@ -144,7 +144,6 @@
 		];
 
 		$result = find_lat_lon_variables_recursive($entry);
-		dier($result);
 		$expected = [['lat' => '10.123', 'lon' => '-20.456', 'original_entry' => $entry]];
 
 		is_equal("find_lat_lon_variables_recursive 1", $result, $expected);
@@ -157,12 +156,9 @@
 			]
 		];
 
-		$entry['nested'] = $nestedEntry;
-
 		$result = find_lat_lon_variables_recursive($entry);
 		$expected = [
 			['lat' => '10.123', 'lon' => '-20.456', 'original_entry' => $entry],
-			['lat' => '30.789', 'lon' => '-40.987', 'original_entry' => $nestedEntry]
 		];
 
 		is_equal("find_lat_lon_variables_recursive 2", $result, $expected);

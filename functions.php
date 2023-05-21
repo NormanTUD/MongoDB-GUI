@@ -144,7 +144,7 @@ function get_filters ($path, $value) {
 		$filter['operators'] = ['in', 'not_in'];
 	} elseif ($type === 'boolean') {
 		$filter['input'] = 'radio';
-		$filter['operators'] = ['equaal', 'not_equal'];
+		$filter['operators'] = ['equal', 'not_equal'];
 		$filter['values'] = ['True', 'False'];
 	} elseif ($type === 'array' || $type === 'object') {
 		$filter['operators'] = ['equal', 'not_equal'];

@@ -1,9 +1,19 @@
 <?php
-define('INCLUDED_FROM_INDEX', true);
-include("functions.php");
+	define('INCLUDED_FROM_INDEX', true);
+	include("functions.php");
 
-// Retrieve all entries
-$entries = getAllEntries();
+	// Retrieve all entries
+	$entries = getAllEntries();
+
+	$latlng = [];
+	foreach ($entries as $entry) {
+		$n = find_lat_lon_variables_recursive($entry);
+		if(count($n)) {
+			$latlng[] = $n;
+		}
+	}
+
+	#dier($latlng);
 ?>
 
 <!DOCTYPE html>

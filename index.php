@@ -145,9 +145,46 @@ $propertyOccurrences = array_values($propertyCounts);
 		$options = $optionsAndFilters["options"];
 		$filters = $optionsAndFilters["filters"];
 
+
+
+		// Define the fields and aggregation functions
+$analyze_fields = array(
+    'geocoords' => array(
+        'aggregation' => 'none', // Options: 'none', 'average', 'range', 'histogram'
+        'analysis' => function ($values) {
+            // Your custom analysis function for 'geocoords'
+            // Example: Return the list of coordinates as-is
+            return $values;
+        }
+    ),
+    'a' => array(
+        'aggregation' => 'count', // Options: 'count', 'distinct', 'custom'
+        'analysis' => function ($values) {
+            // Your custom analysis function for 'a'
+            // Example: Count the occurrences of each value
+            $valueCounts = array_count_values($values);
+            return $valueCounts;
+        }
+    ),
+    'b' => array(
+        'aggregation' => 'none',
+        'analysis' => function ($values) {
+            // Your custom analysis function for 'b'
+            // Example: Return the values as-is
+            return $values;
+        }
+    ),
+    // Add more fields and their corresponding configurations here
+);
+
+$jsCode = generateVisualizationCode($entries, $analyze_fields);
 ?>
 		<script>
 			"use strict";
+
+<?php
+			print $jsCode;
+?>
 
 			var options = removeDuplicates(<?php echo json_encode($options); ?>);
 			options = [options[0]];
@@ -181,8 +218,6 @@ $propertyOccurrences = array_values($propertyCounts);
 					alert(JSON.stringify(result, null, 2));
 				}
 			});
-		</script>
-<script>
 
   var events = <?php echo json_encode($entries_with_geo_coords); ?>;
 

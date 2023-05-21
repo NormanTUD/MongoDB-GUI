@@ -131,10 +131,10 @@
 	register_shutdown_function('done_testing');
 
 	// Usage example:
-	is_equal("Test 1", 5, 5);
-	is_unequal("Test 2", "Hello", "World");
-	regex_matches("Test 3", "OpenAI", "/Open/");
-	regex_fails("Test 4", "Open", "/AI/");
+	is_equal("Basis Tests for the framework (1)", 5, 5);
+	is_unequal("Basis Tests for the framework (2)", "Hello", "World");
+	regex_matches("Basis Tests for the framework (3)", "OpenAI", "/Open/");
+	regex_fails("Basis Tests for the framework (4)", "Open", "/AI/");
 
 	function test_find_lat_lon_variables_recursive() {
 		$entry = [
@@ -167,19 +167,19 @@
 	test_find_lat_lon_variables_recursive();
 
 	// Test 1: Numeric values
-	is_equal("Test 1.1", getDataType(42), "integer");
-	is_equal("Test 1.2", getDataType(3.14), "double");
+	is_equal("getDataType(42)", getDataType(42), "integer");
+	is_equal("getDataType(3.14)", getDataType(3.14), "double");
 
 	// Test 2: String value
-	is_equal("Test 2", getDataType("Hello, World!"), "string");
+	is_equal("getDataType('Hello, World!')", getDataType("Hello, World!"), "string");
 
 	// Test 3: DateTime object
 	$date = new DateTime();
-	is_equal("Test 3", getDataType($date), "datetime");
+	is_equal("getDataType(new DateTime)", getDataType($date), "datetime");
 
 	// Test 4: MongoDB\BSON\UTCDateTime object
 	$utcDate = new MongoDB\BSON\UTCDateTime();
-	is_equal("Test 4", getDataType($utcDate), "datetime");
+	is_equal("getDataType(new MongoDB\BSON\UTCDateTime())", getDataType($utcDate), "datetime");
 
 	/*
 	// Test 5: MongoDB\BSON\Timestamp object
@@ -188,10 +188,10 @@
 	 */
 
 	// Test 6: Boolean value
-	is_equal("Test 6", getDataType(true), "boolean");
+	is_equal("getDataType(true)", getDataType(true), "boolean");
 
 	// Test 7: Unknown value (default to string)
 	$unknown = new stdClass();
-	is_equal("Test 7", getDataType($unknown), "string");
+	is_equal("getDataType(new stdClass())", getDataType($unknown), "string");
 
 ?>

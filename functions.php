@@ -509,7 +509,10 @@ function get_entries_with_geo_coordinates ($entries) {
 }
 
 
-function find_lat_lon_variables_recursive($entry) {
+function find_lat_lon_variables_recursive($entry, $original_entry=null) {
+	if(is_null($original_entry)) {
+		$original_entry = json_decode(json_encode($entry), true);
+	}
 	$entry = json_decode(json_encode($entry), true);
 	$lat_lon_variables = [];
 	$geo_coord_regex = '/^-?\d{1,3}(?:\.\d+)?$/';
@@ -528,10 +531,10 @@ function find_lat_lon_variables_recursive($entry) {
 				$lon_name = $kw[1];
 
 				if (is_array($value) || is_object($value)) {
-					$nested_variables = find_lat_lon_variables_recursive($value);
+					$nested_variables = find_lat_lon_variables_recursive($value, $original_entry);
 					$lat_lon_variables = array_merge($lat_lon_variables, $nested_variables);
 				} elseif ($key === $lat_name && preg_match($geo_coord_regex, $value) && isset($entry[$lon_name]) && preg_match($geo_coord_regex, $value)) {
-					$ll = ['lat' => $value, 'lon' => $entry[$lon_name]];
+					$ll = ['lat' => $value, 'lon' => $entry[$lon_name], 'original_entry' => $original_entry];
 				}
 				if (count($ll)) {
 					$lat_lon_variables[] = $ll;

@@ -198,68 +198,68 @@
 
 
 	// Test 1: String value
-$path1 = 'name';
-$value1 = 'John Doe';
-$expected1 = [
-    'id' => $path1,
-    'label' => $path1,
-    'type' => 'string',
-    'operators' => ['equal', 'not_equal', 'contains']
-];
-is_equal("Test 1", get_filters($path1, $value1), $expected1);
+	$path1 = 'name';
+	$value1 = 'John Doe';
+	$expected1 = [
+		'id' => $path1,
+		'label' => $path1,
+		'type' => 'string',
+		'operators' => ['equal', 'not_equal', 'contains']
+	];
+	is_equal("Test 1", get_filters($path1, $value1), $expected1);
 
-// Test 2: Numeric value (integer)
-$path2 = 'age';
-$value2 = 25;
-$expected2 = [
-    'id' => $path2,
-    'label' => $path2,
-    'type' => 'integer',
-    'operators' => ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal']
-];
-is_equal("Test 2", get_filters($path2, $value2), $expected2);
+	// Test 2: Numeric value (integer)
+	$path2 = 'age';
+	$value2 = 25;
+	$expected2 = [
+		'id' => $path2,
+		'label' => $path2,
+		'type' => 'integer',
+		'operators' => ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal']
+	];
+	is_equal("Test 2", get_filters($path2, $value2), $expected2);
 
-// Test 3: Numeric value (double)
-$path3 = 'price';
-$value3 = 9.99;
-$expected3 = [
-    'id' => $path3,
-    'label' => $path3,
-    'type' => 'double',
-    'operators' => ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal']
-];
-is_equal("Test 3", get_filters($path3, $value3), $expected3);
+	// Test 3: Numeric value (double)
+	$path3 = 'price';
+	$value3 = 9.99;
+	$expected3 = [
+		'id' => $path3,
+		'label' => $path3,
+		'type' => 'double',
+		'operators' => ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal']
+	];
+	is_equal("Test 3", get_filters($path3, $value3), $expected3);
 
-// Test 4: Boolean value
-$path4 = 'active';
-$value4 = true;
-$expected4 = [
-    'id' => $path4,
-    'label' => $path4,
-    'type' => 'boolean',
-    'input' => 'radio',
-    'operators' => ['equal', 'not_equal'],
-    'values' => ['True', 'False']
-];
-is_equal("Test 4", get_filters($path4, $value4), $expected4);
+	// Test 4: Boolean value
+	$path4 = 'active';
+	$value4 = true;
+	$expected4 = [
+		'id' => $path4,
+		'label' => $path4,
+		'type' => 'boolean',
+		'input' => 'radio',
+		'operators' => ['equal', 'not_equal'],
+		'values' => ['True', 'False']
+	];
+	is_equal("Test 4", get_filters($path4, $value4), $expected4);
 
-// Test 5: Array value
-$path5 = 'tags';
-$value5 = ['red', 'blue', 'green'];
-$expected5 = [
-    'id' => $path5,
-    'label' => $path5,
-    'type' => 'array',
-    'operators' => ['equal', 'not_equal']
-];
+	// Test 5: Array value
+	$path5 = 'tags';
+	$value5 = ['red', 'blue', 'green'];
+	$expected5 = [
+		'id' => $path5,
+		'label' => $path5,
+		'type' => 'array',
+		'operators' => ['equal', 'not_equal']
+	];
 
-$expected5 = [
-	"id" => "tags",
-	"label" => "tags",
-	"type" => "array",
-	"input" => "radio",
-	"operators" => ["in", "not_in"]
-];
+	$expected5 = [
+		"id" => "tags",
+		"label" => "tags",
+		"type" => "array",
+		"input" => "radio",
+		"operators" => ["in", "not_in"]
+	];
 
-is_equal("Test 5", get_filters($path5, $value5), $expected5);
+	is_equal("Test 5", get_filters($path5, $value5), $expected5);
 ?>

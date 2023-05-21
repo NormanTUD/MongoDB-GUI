@@ -135,6 +135,8 @@ $propertyOccurrences = array_values($propertyCounts);
 
 		<div id="chart"></div>
 
+		<div id="chart_two"></div>
+
 		<div id="map" style="height: 400px;"></div>
 
 		<!-- Button to add a new entry -->

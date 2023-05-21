@@ -448,7 +448,7 @@ function generateVisualizationCode($entries, $fields)
 		}
 	    };
 
-	    Plotly.newPlot('chart', [trace], layout);
+	    Plotly.newPlot('chart_two', [trace], layout);
     ";
 
 return $jsCode;

@@ -103,6 +103,7 @@ $propertyOccurrences = array_values($propertyCounts);
 						// Trigger the search
 						searchEntries();
 					} catch (e) {
+						alert("ERROR: Could not parse search string from url");
 						console.error("ERROR: Could not parse search string from url");
 						console.error(e);
 					}

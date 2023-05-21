@@ -8,16 +8,22 @@
 	$groupedData = [];
 
 	// Helper function to recursively traverse the data and build grouping keys
-	function buildGroupingKey($data) {
-		if(is_array($data)) {
-			$keys = array_keys($data);
-			sort($keys);
-			$key = implode('-', $keys);
-			return $key;
+	function buildGroupingKey($data, $path = '') {
+		$keyValuePairs = [];
+
+		if (is_array($data)) {
+			foreach ($data as $key => $value) {
+				$subPath = $path . '[' . $key . ']';
+				$subKey = buildGroupingKey($value, $subPath);
+				$keyValuePairs[] = $subKey;
+			}
 		} else {
-			dier($data);
+			$keyValuePairs[] = $path . '=' . $data;
 		}
+
+		return implode('-', $keyValuePairs);
 	}
+
 
 	// Group JSON structures by nested structure
 	foreach ($entries as $data) {
@@ -29,6 +35,7 @@
 		$groups[$groupingKey][] = $data;
 	}
 
+	/*
 	// Display the grouped JSON structures
 	foreach ($groups as $group => $data) {
 		echo "Parameter-Group: $group<br>\n";
@@ -36,7 +43,10 @@
 		foreach ($data as $item) {
 			echo json_encode($item) . "<br>\n";
 		}
-		 */
+		 * /
 		echo "<br>\n";
 	}
+	 */
+
+	echo "There are ".count($groups)." different groups of documents";
 ?>

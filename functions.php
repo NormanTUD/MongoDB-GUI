@@ -508,45 +508,44 @@ function get_entries_with_geo_coordinates ($entries) {
 	return $entries_with_geo_coords;
 }
 
-function find_lat_lon_variables_recursive($data) {
-	$lat_lon_variables = [];
 
+function find_lat_lon_variables_recursive($entry) {
+	$entry = json_decode(json_encode($entry), true);
+	$lat_lon_variables = [];
 	$geo_coord_regex = '/^-?\d{1,3}(?:\.\d+)?$/';
 
-	foreach ($data as $key => $value) {
-		if (is_array($value)) {
-			$nested_variables = find_lat_lon_variables_recursive($value);
-			foreach ($nested_variables as $lat => $lonArray) {
-				foreach ($lonArray as $lon => $element) {
-					$lat_lon_variables[$lat][$lon] = $element;
-				}
-			}
-		} else {
-			$keywords = [
-				["latitude", "longitude"],
-				["lat", "lon"]
-			];
+	$keywords = [
+		["lat", "lon"],
+		["latitude", "longitude"]
+	];
 
-			foreach ($keywords as $keyword) {
-				if ($key == "lat") {
-					if(isset($data[$keyword[0]]) && (is_numeric($data[$keyword[0]]) || is_string($data[$keyword[0]])) && preg_match($geo_coord_regex, $data[$keyword[0]])) {
-						if (isset($data[$keyword[0]])) {
-							$lat_lon_variables[$data[$keyword[0]]][$keyword[1]] = $data;
-						}
-					}
-				}
+	if (is_array($entry) || is_object($entry)) {
+		foreach ($entry as $key => $value) {
+			foreach ($keywords as $kw) {
+				$ll = [];
 
-				if ($key == $keyword[1] && preg_match($geo_coord_regex, $value)) {
-					if (isset($data[$keyword[1]]) && is_string($data[$keyword[1]] || is_numeric($data[$keyword[1]])) && preg_match($geo_coord_regex, $data[$keyword[1]])) {
-						$lat_lon_variables[$data[$keywords[0]]][$data[$keyword[1]]] = $data;
-					}
+				$lat_name = $kw[0];
+				$lon_name = $kw[1];
+
+				if (is_array($value) || is_object($value)) {
+					$nested_variables = find_lat_lon_variables_recursive($value);
+					$lat_lon_variables = array_merge($lat_lon_variables, $nested_variables);
+				} elseif ($key === $lat_name && preg_match($geo_coord_regex, $value) && isset($entry[$lon_name]) && preg_match($geo_coord_regex, $value)) {
+					$ll = ['lat' => $value, 'lon' => $entry[$lon_name]];
+				}
+				if (count($ll)) {
+					$lat_lon_variables[] = $ll;
 				}
 			}
 		}
+	} else {
+		dier("Entry is not an array/object");
 	}
 
 	return $lat_lon_variables;
 }
+
+
 
 
 function avg($numbers) {

@@ -13,7 +13,7 @@
 		}
 	}
 
-	#dier($latlng);
+	dier($latlng);
 ?>
 
 <!DOCTYPE html>

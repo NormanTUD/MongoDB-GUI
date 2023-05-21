@@ -14,5 +14,7 @@
 		<script src="leaflet.js"></script>
 		<link rel="stylesheet" href="MarkerCluster.css" />
 		<link rel="stylesheet" href="MarkerCluster.Default.css" />
+		<link rel="stylesheet" href="nouislider.min.css" />
+		<script src="nouislider.min.js"></script>
 		<script src="leaflet.markercluster.js"></script>
 		<script src="leaflet-heat.js"></script>

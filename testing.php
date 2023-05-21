@@ -1,4 +1,6 @@
 <?php
+	define('INCLUDED_FROM_INDEX', true);
+	include("functions.php");
 	// Define a counter for the number of started tests
 	$GLOBALS['started_tests'] = 0;
 
@@ -133,4 +135,38 @@
 	is_unequal("Test 2", "Hello", "World");
 	regex_matches("Test 3", "OpenAI", "/Open/");
 	regex_fails("Test 4", "Open", "/AI/");
+
+	function test_find_lat_lon_variables_recursive() {
+		$entry = [
+			'lat' => '10.123',
+			'lon' => '-20.456',
+			'other' => 'data'
+		];
+
+		$result = find_lat_lon_variables_recursive($entry);
+		$expected = [['lat' => '10.123', 'lon' => '-20.456', 'original_entry' => $entry]];
+
+		is_equal("find_lat_lon_variables_recursive 1", $result, $expected);
+
+		$nestedEntry = [
+			'nested' => [
+				'latitude' => '30.789',
+				'longitude' => '-40.987',
+				'other' => 'nested data'
+			]
+		];
+
+		$entry['nested'] = $nestedEntry;
+
+		$result = find_lat_lon_variables_recursive($entry);
+		$expected = [
+			['lat' => '10.123', 'lon' => '-20.456', 'original_entry' => $entry],
+			['lat' => '30.789', 'lon' => '-40.987', 'original_entry' => $nestedEntry]
+		];
+
+		is_equal("find_lat_lon_variables_recursive 2", $result, $expected);
+	}
+
+	test_find_lat_lon_variables_recursive();
+
 ?>

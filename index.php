@@ -181,9 +181,11 @@ $jsCode = generateVisualizationCode($entries, $analyze_fields);
 <script>
 			"use strict";
 
+			//jsCode {
 <?php
 			print $jsCode;
 ?>
+			//} jsCode
 
 			var options = removeDuplicates(<?php echo json_encode($options); ?>);
 			options = [options[0]];

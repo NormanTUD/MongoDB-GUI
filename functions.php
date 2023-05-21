@@ -423,8 +423,6 @@ function generateVisualizationCode($entries, $fields)
 	}
 
 	$jsCode = "
-	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
-	<script>
 	    var data = " . json_encode($data) . ";
 
 	    // Plotting logic using Plotly.js
@@ -451,7 +449,6 @@ function generateVisualizationCode($entries, $fields)
 	    };
 
 	    Plotly.newPlot('chart', [trace], layout);
-	</script>
     ";
 
 return $jsCode;

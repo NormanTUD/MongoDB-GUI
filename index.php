@@ -146,7 +146,6 @@ $propertyOccurrences = array_values($propertyCounts);
 		$filters = $optionsAndFilters["filters"];
 
 
-
 		// Define the fields and aggregation functions
 $analyze_fields = array(
     'geocoords' => array(
@@ -179,7 +178,7 @@ $analyze_fields = array(
 
 $jsCode = generateVisualizationCode($entries, $analyze_fields);
 ?>
-		<script>
+<script>
 			"use strict";
 
 <?php

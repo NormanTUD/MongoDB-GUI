@@ -145,9 +145,12 @@ function traverseDocument($data, $prefix, &$filters, &$options) {
 			$filter['operators'] = ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal'];
 		} elseif ($type === 'boolean') {
 			$filter['input'] = 'radio';
+			$filter['operators'] = ['equal', 'not_equal'];
 			$filter['values'] = ['True', 'False'];
 		} elseif ($type === 'array' || $type === 'object') {
 			$filter['operators'] = ['equal', 'not_equal'];
+		} else {
+			die("Invalid datatype: $type");
 		}
 
 		$filters[] = $filter;

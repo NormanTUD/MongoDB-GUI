@@ -139,6 +139,9 @@ function get_filters ($path, $value) {
 		$filter['operators'] = ['equal', 'not_equal', 'contains'];
 	} elseif ($type === 'integer' || $type === 'double') {
 		$filter['operators'] = ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal'];
+	} elseif ($type === 'array') {
+		$filter['input'] = 'radio';
+		$filter['operators'] = ['in', 'not_in'];
 	} elseif ($type === 'boolean') {
 		$filter['input'] = 'radio';
 		$filter['operators'] = ['equal', 'not_equal'];
@@ -198,6 +201,8 @@ function getDataType($value) {
 		return 'time';
 	} elseif (is_bool($value)) {
 		return 'boolean';
+	} elseif (is_array($value)) {
+		return "array";
 	}
 
 	return 'string'; // Default to string if data type cannot be determined

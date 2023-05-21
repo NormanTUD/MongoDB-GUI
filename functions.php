@@ -222,7 +222,6 @@ function getAllEntries() {
 		print($e);
 	}
 	$entries = $cursor->toArray();
-	$entries = json_decode(json_encode($entries), true);
 	return $entries;
 }
 
@@ -492,7 +491,10 @@ function generateVisualizationCode($entries, $fields) {
 
 function get_entries_with_geo_coordinates ($entries) {
 	$entries_with_geo_coords = [];
+	$entries = json_decode(json_encode($entries), true);
+
 	foreach ($entries as $entry) {
+
 		if (isset($entry["geocoords"]) && isset($entry["geocoords"]["lat"]) && isset($entry["geocoords"]["lon"])) {
 			$lat = $entry["geocoords"]["lat"];
 			$lon = $entry["geocoords"]["lon"];

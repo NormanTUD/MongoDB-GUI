@@ -1,4 +1,8 @@
 <?php
+if (!defined('INCLUDED_FROM_INDEX')) {
+    die('This file must be included from index.php');
+}
+
 function exception_error_handler($errno, $errstr, $errfile, $errline ) {
 	print "<pre>\n";
 	throw new ErrorException($errstr, $errno, 0, $errfile, $errline);

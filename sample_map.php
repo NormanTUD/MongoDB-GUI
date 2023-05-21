@@ -1,4 +1,8 @@
-
+<?php
+if (!defined('INCLUDED_FROM_INDEX')) {
+    die('This file must be included from index.php');
+}
+?>
 			var events = <?php echo json_encode($entries_with_geo_coords); ?>;
 
 			// Generate iframe with events

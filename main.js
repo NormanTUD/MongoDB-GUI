@@ -238,7 +238,8 @@ function updateQueryStringParameter(url, key, value) {
 	}
 }
 
-function resetSearch(e=null) {
+function resetSearch(e=false) {
+	log("resetSearch");
 	if(e) {
 		e.preventDefault();
 		e.stopPropagation();

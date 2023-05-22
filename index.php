@@ -78,6 +78,8 @@
 		</script>
 	</head>
 	<body>
+		<div id="map" style="height: 400px;"></div>
+
 		<div id="search_stuff">
 			<h3>Search</h3>
 			<form>
@@ -106,8 +108,6 @@
 
 		<div id="chart_two"></div>
 
-		<div id="map" style="height: 400px;"></div>
-
 		<!-- Button to add a new entry -->
 <?php
 		include("import.php");
@@ -117,7 +117,7 @@
 
 
 ?>
-<script>
+		<script>
 			"use strict";
 			<?php include("initialize_query_builder.php"); ?>
 			<?php include("sample_generalized_visualization.php"); ?>

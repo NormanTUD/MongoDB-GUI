@@ -86,29 +86,29 @@ function deleteEntry($entryId) {
 
 
 function convertNumericStrings($data) {
-    if (is_array($data)) {
-        $result = [];
-        foreach ($data as $key => $value) {
-            $result[$key] = convertNumericStrings($value);
-        }
-        return $result;
-    } elseif (is_object($data)) {
-        $result = [];
-        foreach ($data as $key => $value) {
-            $result[$key] = convertNumericStrings($value);
-        }
-        return $result;
-    } elseif (is_string($data)) {
-        if (is_numeric($data)) {
-            if (strpos($data, '.') !== false) {
-                return floatval($data);
-            } else {
-                return intval($data);
-            }
-        }
-    }
+	if (is_array($data)) {
+		$result = [];
+		foreach ($data as $key => $value) {
+			$result[$key] = convertNumericStrings($value);
+		}
+		return $result;
+	} elseif (is_object($data)) {
+		$result = [];
+		foreach ($data as $key => $value) {
+			$result[$key] = convertNumericStrings($value);
+		}
+		return $result;
+	} elseif (is_string($data)) {
+		if (is_numeric($data)) {
+			if (strpos($data, '.') !== false) {
+				return floatval($data);
+			} else {
+				return intval($data);
+			}
+		}
+	}
 
-    return $data;
+	return $data;
 }
 
 
@@ -117,8 +117,8 @@ function convertNumericStrings($data) {
 // Function to update an entry by ID
 function updateEntry($entryId, $newData) {
 	$bulkWrite = new MongoDB\Driver\BulkWrite();
-	if(is_array($entryId) && isset($entryId['$oid'])) {
-		$entryId = $entryId['$oid'];
+	if(is_array($entryId) && isset($entryId['oid'])) {
+		$entryId = $entryId['oid'];
 	}
 	$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
 

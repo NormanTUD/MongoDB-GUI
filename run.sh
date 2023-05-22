@@ -151,6 +151,12 @@ echo "=== Current git hash before auto-pulling ==="
 
 git pull
 
-php -l *.php && echo "Syntax checks for PHP Ok" || echo "Syntax Checks for PHP failed"
+function die {
+	echo $1
+	exit 1
+}
+
+php -l *.php && echo "Syntax checks for PHP Ok" || die "Syntax Checks for PHP failed"
+php testing.php && echo "Syntax checks for PHP Ok" || die "Syntax Checks for PHP failed"
 
 sudo docker-compose build && sudo docker-compose up -d || echo "Failed to build container"

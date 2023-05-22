@@ -221,11 +221,13 @@ function traverseDocument($data, $prefix, &$filters, &$options) {
 	}
 }
 
-function getDataType($value) {
+function getDataType($value, $is_recursion=0) {
 	if (is_numeric($value)) {
-		if (preg_match('/^[+-]?\d+(?:\.\d+)?$/', $value)) {
+		if (preg_match('/^[+-]?\d+$/', $value)) {
 			return 'integer';
 		} elseif (is_float($value)) {
+			return 'double';
+		} elseif (preg_match('/^[+-]?\d+(?:\.\d+)?$/', $value)) {
 			return 'double';
 		} else {
 			dier("Unhandled numeric type, >$value<");
@@ -241,8 +243,8 @@ function getDataType($value) {
 	} elseif (is_array($value)) {
 		return null;
 		//return 'array';
-	} else {
-		die("Something completely out of this world: ".$value);
+	} elseif ($is_recursion = 0) {
+		return getDataType(json_decode(json_encode($value), true), 1);
 	}
 
 	return 'string'; // Default to string if data type cannot be determined

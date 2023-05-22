@@ -81,6 +81,7 @@ function deleteEntry($entryId) {
 		$bulkWrite->delete($filter);
 
 		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
+
 		return json_encode(['success' => 'Entry deleted successfully.', 'entryId' => $entryId]);
 	} catch (Exception $e) {
 		return json_encode(['error' => 'Error deleting entry: ' . $e->getMessage()]);

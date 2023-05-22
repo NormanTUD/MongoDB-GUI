@@ -98,10 +98,8 @@ function searchEntries() {
 					// Update JSON editors for matching entries
 					matchingEntries.forEach(function (entry) {
 						// Append the updated entry to the container
-						$('#entry_list').append('<div id="entry_' + entry._id + '">' +
-							'<div id="jsoneditor_' + entry._id + '"></div>' +
-							'<button onclick="deleteEntry(\'' + entry._id.oid + '\')">Delete</button>' +
-							'</div>');
+						var entry_id = entry._id;
+
 
 						// Initialize JSON Editor for the updated entry
 						initJsonEditor(entry);
@@ -129,7 +127,12 @@ function searchEntries() {
 
 // Initialize JSON Editor for each entry
 function initJsonEditor(entry) {
-	const containerId = 'jsoneditor_' + entry._id;
+	var entry_id = entry["_id"]["oid"];
+	if(!entry_id) {
+		entry_id = entry["_id"]["$oid"];
+	}
+
+	const containerId = 'jsoneditor_' + entry_id;
 	let container = document.getElementById(containerId);
 
 	if (!container) {
@@ -139,24 +142,32 @@ function initJsonEditor(entry) {
 		document.getElementById('entry_list').appendChild(container);
 	}
 
+	var full_entry = '<div id="entry_' + entry_id + '">' +
+			'<div id="jsoneditor_' + entry_id + '"></div>' +
+			'<button onclick="deleteEntry(\'' + entry_id + '\')">Delete</button>' +
+		'</div>'
+
+	$('#entry_list').append(full_entry);
+
 	const editor = new JSONEditor(
 		container,
 		{
 			onFocus: function () {
-				focus_log[entry._id] = true;
+				focus_log[entry_id] = true;
 			},
 			mode: 'tree', // view, form
 			onBlur: function () {
-				if (entry._id in focus_log && focus_log[entry._id] == true) {
+				if (entry_id in focus_log && focus_log[entry_id] == true) {
 					const updatedJson = editor.get();
 					const jsonData = JSON.stringify(updatedJson, null, 2);
-					const entryId = entry._id;
+					const entryId = entry_id;
 					updateEntry(entryId, jsonData);
 					focus_log[entry._id] = false;
 				}
 			}
 		}
 	);
+
 
 	editor.set(entry);
 }
@@ -349,6 +360,7 @@ function deleteEntry(entryId, event=null) {
 	if(event) {
 		event.stopPropagation();
 	}
+
 	$.ajax({
 		url: PHP_SELF,
 			type: 'POST',
@@ -360,7 +372,7 @@ function deleteEntry(entryId, event=null) {
 			if (data.success) {
 				toastr.success(data.success);
 				// Remove the deleted entry from the page
-				$('#entry_' + entryId).remove();
+				$('#json_editor_' + entryId).remove();
 				// Remove the deleted entry's JSON Editor instance
 				if('editor_' + entryId in window) {
 					window['editor_' + entryId].destroy();
@@ -368,6 +380,8 @@ function deleteEntry(entryId, event=null) {
 				}
 			} else if (data.error) {
 				toastr.error(data.error);
+			} else {
+				console.error("??? case ???", data);
 			}
 		},
 		error: function () {
@@ -389,11 +403,6 @@ function addNewEntry(event) {
 			var data = JSON.parse(response);
 			if (data.success) {
 				toastr.success(data.success);
-				// Append the new entry to the container
-				$('#entry_list').append('<div id="entry_' + data.entryId + '">' +
-					'<div id="jsoneditor_' + data.entryId + '"></div>' +
-					'<button onclick="deleteEntry(\'' + data.entryId + '\')">Delete</button>' +
-					'</div>');
 				const newEditor = new JSONEditor(
 					document.getElementById('jsoneditor_' + data.entryId),
 					{

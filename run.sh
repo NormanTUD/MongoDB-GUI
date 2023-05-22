@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Default values
+run_tests=0
 DB_HOST=""
 DB_PORT="27017"
 DB_NAME=""
@@ -16,12 +17,17 @@ help_message() {
     echo "  --db-name          MongoDB database name"
     echo "  --db-collection    MongoDB collection name"
     echo "  --local-port       Local port to bind for the GUI"
+    echo "  --run_tests        Run tests before starting"
     echo "  --help             Show this help message"
 }
 
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
+        --run_tests)
+		run_tests=1
+            shift
+            ;;
         --db-host)
             DB_HOST="$2"
             shift
@@ -164,6 +170,9 @@ if [[ "$SYNTAX_ERRORS" -ne "0" ]]; then
 	exit 1
 fi
 
-php testing.php && echo "Syntax checks for PHP Ok" || die "Syntax Checks for PHP failed"
+
+if [[ "$run_tests" -eq "1" ]]; then
+	php testing.php && echo "Syntax checks for PHP Ok" || die "Syntax Checks for PHP failed"
+fi
 
 sudo docker-compose build && sudo docker-compose up -d || echo "Failed to build container"

@@ -49,12 +49,18 @@ function load_all_entries () {
 
 				// Reinitialize JSON editors
 				data.entries.forEach(function (entry) {
-					log(entry);
 					initJsonEditor(entry);
 
 				});
 
-				updateMap(findLatLonVariablesRecursive(data.entries));
+				var entries = data.entries;
+
+				log("entries", entries);
+
+				var entries_with_geo_coords = findLatLonVariablesRecursive(entries);
+				log("entries_with_geo_coords", entries_with_geo_coords);
+
+				updateMap(entries_with_geo_coords);
 			} else if (data.error) {
 				toastr.error(data.error);
 			}
@@ -105,7 +111,13 @@ function searchEntries() {
 					});
 
 					// Update the map with the new matching entries
-					updateMap(findLatLonVariablesRecursive(matchingEntries));
+					log("matchingEntries", matchingEntries);
+
+					var entries_with_geo_coords = findLatLonVariablesRecursive(matchingEntries);
+					log("entries_with_geo_coords", entries_with_geo_coords);
+
+					updateMap(entries_with_geo_coords);
+
 				} else {
 					toastr.info('No matching entries found.');
 					load_all_entries();
@@ -161,8 +173,8 @@ function updateMap(entries) {
 	// Iterate through the entries
 	for (var i = 0; i < entries.length; i++) {
 		var entry = entries[i];
-		var lat = entry.lat;
-		var lon = entry.lon;
+		var lat = parseFloat(entry.lat);
+		var lon = parseFloat(entry.lon);
 
 		// Add the coordinates to the heatmap data
 		heatmapData.push([lat, lon]);
@@ -433,11 +445,13 @@ function updateEntry(entryId, jsonData) {
 
 function findLatLonVariablesRecursive(entry, originalEntry = null) {
 	if (originalEntry === null) {
+		log(entry);
+		console.trace();
 		originalEntry = JSON.parse(JSON.stringify(entry));
 	}
 
 	const latLonVariables = [];
-	const geoCoordRegex = /^-?\d{1,3}(?:\.\d+)?$/;
+	const geoCoordRegex = /^[-+]?\d{1,3}(?:\.\d+)?$/;
 
 	const keywords = [
 		["lat", "lon"],
@@ -456,10 +470,10 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 				if (Array.isArray(value) || typeof value === "object") {
 					const nestedVariables = findLatLonVariablesRecursive(value, originalEntry);
 					latLonVariables.push(...nestedVariables);
-				} else if (key === latName && geoCoordRegex.test(value) && entry[lonName] && geoCoordRegex.test(entry[lonName])) {
+				} else if (key === latName && geoCoordRegex.test(value) && Object.keys(entry).includes(lonName) && geoCoordRegex.test(entry[lonName])) {
 					latLon = {
-						lat: value,
-						lon: entry[lonName],
+						lat: parseFloat(value),
+						lon: parseFloat(entry[lonName]),
 						originalEntry: originalEntry
 					};
 				}
@@ -472,6 +486,26 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 	} else {
 		console.error("Entry is not an array/object");
 	}
+	
+	//log("latLonVariables", latLonVariables);
+	var no_duplicates = removeDuplicatesFromJSON(latLonVariables);
+	//log("no_duplicates", no_duplicates);
 
-	return latLonVariables;
+	return no_duplicates;
+}
+
+function removeDuplicatesFromJSON(arr) {
+	const uniqueEntries = [];
+	const seenIds = new Set();
+
+	for (const entry of arr) {
+		const id = JSON.stringify(entry);
+
+		if (!seenIds.has(id)) {
+			uniqueEntries.push(entry);
+			seenIds.add(id);
+		}
+	}
+
+	return uniqueEntries;
 }

@@ -440,8 +440,6 @@ function updateEntry(entryId, jsonData) {
 
 function findLatLonVariablesRecursive(entry, originalEntry = null) {
 	if (originalEntry === null) {
-		log(entry);
-		console.trace();
 		originalEntry = JSON.parse(JSON.stringify(entry));
 	}
 

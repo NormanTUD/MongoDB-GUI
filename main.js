@@ -100,7 +100,7 @@ function searchEntries() {
 						// Append the updated entry to the container
 						$('#entry_list').append('<div id="entry_' + entry._id + '">' +
 							'<div id="jsoneditor_' + entry._id + '"></div>' +
-							'<button onclick="deleteEntry(\'' + entry._id + '\')">Delete</button>' +
+							'<button onclick="deleteEntry(\'' + entry._id.oid + '\')">Delete</button>' +
 							'</div>');
 
 						// Initialize JSON Editor for the updated entry

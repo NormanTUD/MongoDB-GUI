@@ -71,12 +71,15 @@ function getEnvOrDie($name, $fn = 0) {
 
 // Function to delete an entry by ID
 function deleteEntry($entryId) {
-	$bulkWrite = new MongoDB\Driver\BulkWrite();
-	$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
-
-	$bulkWrite->delete($filter);
-
 	try {
+		$bulkWrite = new MongoDB\Driver\BulkWrite();
+		if(is_array($entryId) && isset($entryId['oid'])) {
+			$entryId = $entryId['oid'];
+		}
+		$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
+
+		$bulkWrite->delete($filter);
+
 		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
 		return json_encode(['success' => 'Entry deleted successfully.', 'entryId' => $entryId]);
 	} catch (Exception $e) {
@@ -116,20 +119,20 @@ function convertNumericStrings($data) {
 
 // Function to update an entry by ID
 function updateEntry($entryId, $newData) {
-	$bulkWrite = new MongoDB\Driver\BulkWrite();
-	if(is_array($entryId) && isset($entryId['oid'])) {
-		$entryId = $entryId['oid'];
-	}
-	$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
-
-	// Delete the existing document
-	$bulkWrite->delete($filter);
-
-	// Insert the updated document
-	$newData['_id'] = new MongoDB\BSON\ObjectID($entryId);
-	$bulkWrite->insert(convertNumericStrings($newData));
-
 	try {
+		$bulkWrite = new MongoDB\Driver\BulkWrite();
+		if(is_array($entryId) && isset($entryId['oid'])) {
+			$entryId = $entryId['oid'];
+		}
+		$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
+
+		// Delete the existing document
+		$bulkWrite->delete($filter);
+
+		// Insert the updated document
+		$newData['_id'] = new MongoDB\BSON\ObjectID($entryId);
+		$bulkWrite->insert(convertNumericStrings($newData));
+
 		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
 		return json_encode(['success' => 'Entry updated successfully.', 'entryId' => $entryId]);
 	} catch (Exception $e) {

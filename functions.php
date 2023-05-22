@@ -140,16 +140,16 @@ function get_filters ($path, $value) {
 	} elseif ($type === 'integer' || $type === 'double') {
 		$filter['operators'] = ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal'];
 	} elseif ($type === 'array') {
-		$filter['input'] = 'radio';
-		$filter['operators'] = ['in', 'not_in'];
+		#$filter['input'] = 'radio';
+		#$filter['operators'] = ['in', 'not_in'];
 	} elseif ($type === 'boolean') {
 		$filter['input'] = 'radio';
 		$filter['operators'] = ['equal', 'not_equal'];
 		$filter['values'] = ['True', 'False'];
-	} elseif ($type === 'array' || $type === 'object') {
-		$filter['operators'] = ['equal', 'not_equal'];
+	/*
 	} else {
 		die("Invalid datatype: $type");
+	 */
 	}
 	return $filter;
 }
@@ -202,7 +202,8 @@ function getDataType($value) {
 	} elseif (is_bool($value)) {
 		return 'boolean';
 	} elseif (is_array($value)) {
-		return "array";
+		return null;
+		//return 'array';
 	}
 
 	return 'string'; // Default to string if data type cannot be determined

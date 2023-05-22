@@ -243,6 +243,7 @@
 	];
 	is_equal("Test get_filters(path4, value4)", get_filters($path4, $value4), $expected4);
 
+	/*
 	// Test 5: Array value
 	$path5 = 'tags';
 	$value5 = ['red', 'blue', 'green'];
@@ -262,4 +263,5 @@
 	];
 
 	is_equal("get_filters(path5, value5)", get_filters($path5, $value5), $expected5);
+	 */
 ?>

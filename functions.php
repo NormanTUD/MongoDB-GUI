@@ -85,6 +85,34 @@ function deleteEntry($entryId) {
 }
 
 
+function convertNumericStrings($data) {
+    if (is_array($data)) {
+        $result = [];
+        foreach ($data as $key => $value) {
+            $result[$key] = convertNumericStrings($value);
+        }
+        return $result;
+    } elseif (is_object($data)) {
+        $result = [];
+        foreach ($data as $key => $value) {
+            $result[$key] = convertNumericStrings($value);
+        }
+        return $result;
+    } elseif (is_string($data)) {
+        if (is_numeric($data)) {
+            if (strpos($data, '.') !== false) {
+                return floatval($data);
+            } else {
+                return intval($data);
+            }
+        }
+    }
+
+    return $data;
+}
+
+
+
 
 // Function to update an entry by ID
 function updateEntry($entryId, $newData) {
@@ -99,7 +127,7 @@ function updateEntry($entryId, $newData) {
 
 	// Insert the updated document
 	$newData['_id'] = new MongoDB\BSON\ObjectID($entryId);
-	$bulkWrite->insert($newData);
+	$bulkWrite->insert(convertNumericStrings($newData));
 
 	try {
 		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
@@ -314,7 +342,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 function insertDocument($document) {
 	if($document) {
 		$bulkWrite = new MongoDB\Driver\BulkWrite();
-		$bulkWrite->insert($document);
+		$bulkWrite->insert(convertNumericStrings($document));
 
 		try {
 			$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);

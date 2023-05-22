@@ -27,34 +27,6 @@
 		<script>
 			var focus_log = {};
 
-	/*
-			// Initialize JSON Editor for each entry
-			function initJsonEditors() {
-				<?php foreach ($entries as $entry): ?>
-				const editor_<?php echo $entry->_id; ?> = new JSONEditor(
-				document.getElementById('jsoneditor_<?php echo $entry->_id; ?>'),
-					{
-						onFocus: function () {
-							focus_log["<?php echo $entry->_id; ?>"] = true;
-						},
-						mode: 'tree',
-						onBlur: function () {
-							if("<?php echo $entry->_id; ?>" in focus_log && focus_log["<?php echo $entry->_id; ?>"] == true) {
-								const updatedJson = editor_<?php echo $entry->_id; ?>.get();
-								const jsonData = JSON.stringify(updatedJson, null, 2);
-								const entryId = '<?php echo $entry->_id; ?>';
-								updateEntry(entryId, jsonData);
-								focus_log["<?php echo $entry->_id; ?>"] = false;
-							}
-						}
-					}
-				);
-
-				    editor_<?php echo $entry->_id; ?>.set(<?php echo json_encode($entry, JSON_UNESCAPED_UNICODE); ?>);
-			    <?php endforeach; ?>
-			}
-	 */
-
 			$(document).ready(function () {
 				//initJsonEditors();
 

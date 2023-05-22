@@ -81,7 +81,6 @@
 		<div id="map" style="height: 400px;"></div>
 
 		<div id="search_stuff">
-			<h3>Search</h3>
 			<form>
 				<div id="builder-basic"></div>
 				<button onclick="update_current_query(event);searchEntries()">Search</button>
@@ -91,7 +90,7 @@
 		</div>
 
 
-		<h3><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> on <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></h3>
+		<b><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> on <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></b><br>
 
 		<div id="entry_list">
 			<?php foreach ($entries as $entry): ?>

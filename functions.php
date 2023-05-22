@@ -89,6 +89,9 @@ function deleteEntry($entryId) {
 // Function to update an entry by ID
 function updateEntry($entryId, $newData) {
 	$bulkWrite = new MongoDB\Driver\BulkWrite();
+	if(is_array($entryId) && isset($entryId['$oid'])) {
+		$entryId = $entryId['$oid'];
+	}
 	$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
 
 	// Delete the existing document

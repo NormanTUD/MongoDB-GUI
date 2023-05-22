@@ -99,15 +99,11 @@
 					<button onclick="deleteEntry('<?php echo $entry->_id; ?>', event)">Delete</button>
 				</div>
 			<?php endforeach; ?>
+			<button onclick="addNewEntry(event)">Add New Entry</button>
 		</div>
 
-		<button onclick="addNewEntry(event)">Add New Entry</button>
-
 		<div id="chart"></div>
-
 		<div id="chart_two"></div>
-
-		<!-- Button to add a new entry -->
 <?php
 		include("import.php");
 		$optionsAndFilters = generateQueryBuilderOptions();

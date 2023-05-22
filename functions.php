@@ -237,15 +237,8 @@ function getAllEntries() {
 // Handle form submission for updating an entry
 if(isset($_SERVER['REQUEST_METHOD'])) {
 	if (isset($_POST['reset_search'])) {
-		$entries = getAllEntries();
-		$entry_html = '';
-		foreach ($entries as $entry) {
-			$entry_html .= '<div id="entry_'.$entry->_id.'">
-				<div id="jsoneditor_'.$entry->_id.'"></div>
-				<button onclick="deleteEntry(\''.$entry->_id.'\', event)">Delete</button>
-				</div>';
-		}
-		echo json_encode(array('success' => 'Search reset successfully.', 'entries' => $entry_html));
+		$entries = json_decode(json_encode(getAllEntries()), true);
+		echo json_encode(array('success' => 'Search reset successfully.', 'entries' => $entries));
 		exit;
 	}
 

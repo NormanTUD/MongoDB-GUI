@@ -27,6 +27,7 @@
 		<script>
 			var focus_log = {};
 
+	/*
 			// Initialize JSON Editor for each entry
 			function initJsonEditors() {
 				<?php foreach ($entries as $entry): ?>
@@ -52,9 +53,10 @@
 				    editor_<?php echo $entry->_id; ?>.set(<?php echo json_encode($entry, JSON_UNESCAPED_UNICODE); ?>);
 			    <?php endforeach; ?>
 			}
+	 */
 
 			$(document).ready(function () {
-				initJsonEditors();
+				//initJsonEditors();
 
 				// Check if the 'search' parameter exists in the URL
 				var urlParams = new URLSearchParams(window.location.search);
@@ -73,6 +75,8 @@
 						console.error("ERROR: Could not parse search string from url");
 						console.error(e);
 					}
+				} else {
+					resetSearch();
 				}
 			});
 		</script>
@@ -93,14 +97,8 @@
 		<b><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> on <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></b><br>
 
 		<div id="entry_list">
-			<?php foreach ($entries as $entry): ?>
-				<div id="entry_<?php echo $entry->_id; ?>">
-					<div id="jsoneditor_<?php echo $entry->_id; ?>"></div>
-					<button onclick="deleteEntry('<?php echo $entry->_id; ?>', event)">Delete</button>
-				</div>
-			<?php endforeach; ?>
-			<button onclick="addNewEntry(event)">Add New Entry</button>
 		</div>
+		<button onclick="addNewEntry(event)">Add New Entry</button>
 
 		<div id="chart"></div>
 		<div id="chart_two"></div>

@@ -1,4 +1,5 @@
 "use strict";
+var focus_log = {};
 
 function log (...args) { console.log(args); }
 
@@ -35,7 +36,7 @@ function load_all_entries () {
 		url: PHP_SELF,
 		type: 'POST',
 		data: {
-			reset_search: true
+			'reset_search': true
 		},
 		success: function (response) {
 			var data = JSON.parse(response);
@@ -47,7 +48,10 @@ function load_all_entries () {
 				$('#entry_list').html(data.entries);
 
 				// Reinitialize JSON editors
-				initJsonEditors();
+				data.entries.forEach(function (entry) {
+					log(entry);
+					initJsonEditor(entry);
+				});
 			} else if (data.error) {
 				toastr.error(data.error);
 			}
@@ -58,6 +62,8 @@ function load_all_entries () {
 	});
 
 }
+
+/*
 function searchEntries() {
 	var rules = $("#builder-basic").queryBuilder("getRules");
 
@@ -84,7 +90,7 @@ function searchEntries() {
 					// Clear the existing entry list
 					$('#entry_list').empty();
 
-					// Update JSON editors for matching entries
+		// Update JSON editors for matching entries
 					matchingEntries.forEach(function (entry) {
 						// Append the updated entry to the container
 						$('#entry_list').append('<div id="entry_' + entry._id + '">' +
@@ -92,7 +98,7 @@ function searchEntries() {
 							'<button onclick="deleteEntry(\'' + entry._id + '\')">Delete</button>' +
 							'</div>');
 
-						// Initialize JSON Editor for the updated entry
+		// Initialize JSON Editor for the updated entry
 						const newEditor = new JSONEditor(
 							document.getElementById('jsoneditor_' + entry._id),
 							{
@@ -119,6 +125,233 @@ function searchEntries() {
 		toastr.info('Could not get search rules.');
 	}
 }
+*/
+
+/*
+function searchEntries() {
+	var rules = $("#builder-basic").queryBuilder("getRules");
+
+	if (rules !== null) {
+		// Convert the query object to a URL parameter string
+		var queryParam = encodeURIComponent(JSON.stringify(rules));
+
+		// Update the URL with the search parameter
+		var newUrl = updateQueryStringParameter(window.location.href, 'search', queryParam);
+		history.pushState({ path: newUrl }, '', newUrl);
+
+		var query = convertRulesToMongoQuery(rules);
+
+		$.ajax({
+			url: PHP_SELF,
+			type: 'POST',
+			data: {
+				search_query: JSON.stringify(query)
+			},
+			success: function (response) {
+				var matchingEntries = JSON.parse(response);
+
+				if (matchingEntries.length > 0) {
+					// Clear the existing entry list
+					$('#entry_list').empty();
+
+					// Update JSON editors for matching entries
+					matchingEntries.forEach(function (entry) {
+						// Append the updated entry to the container
+						$('#entry_list').append('<div id="entry_' + entry._id + '">' +
+							'<div id="jsoneditor_' + entry._id + '"></div>' +
+							'<button onclick="deleteEntry(\'' + entry._id + '\')">Delete</button>' +
+							'</div>');
+
+						// Initialize JSON Editor for the updated entry
+						const newEditor = new JSONEditor(
+							document.getElementById('jsoneditor_' + entry._id),
+							{
+								mode: 'tree',
+								onBlur: function () {
+									const updatedJson = newEditor.get();
+									const newJsonData = JSON.stringify(updatedJson, null, 2);
+									updateEntry(entry._id, newJsonData);
+								}
+							}
+						);
+						newEditor.set(entry);
+					});
+
+					// Update the map with the new matching entries
+					updateMap(findLatLonVariablesRecursive(matchingEntries));
+				} else {
+					toastr.info('No matching entries found.');
+					$("#map").hide();
+					//load_all_entries();
+				}
+			},
+			error: function () {
+				toastr.error('Error searching entries.');
+			}
+		});
+	} else {
+		toastr.info('Could not get search rules.');
+	}
+}
+*/
+
+
+function searchEntries() {
+	var rules = $("#builder-basic").queryBuilder("getRules");
+
+	if (rules !== null) {
+		// Convert the query object to a URL parameter string
+		var queryParam = encodeURIComponent(JSON.stringify(rules));
+
+		// Update the URL with the search parameter
+		var newUrl = updateQueryStringParameter(window.location.href, 'search', queryParam);
+		history.pushState({ path: newUrl }, '', newUrl);
+
+		var query = convertRulesToMongoQuery(rules);
+
+		$.ajax({
+			url: PHP_SELF,
+			type: 'POST',
+			data: {
+				search_query: JSON.stringify(query)
+			},
+			success: function (response) {
+				var matchingEntries = JSON.parse(response);
+
+				if (matchingEntries.length > 0) {
+					// Clear the existing entry list
+					$('#entry_list').empty();
+
+					// Update JSON editors for matching entries
+					matchingEntries.forEach(function (entry) {
+						// Append the updated entry to the container
+						$('#entry_list').append('<div id="entry_' + entry._id + '">' +
+							'<div id="jsoneditor_' + entry._id + '"></div>' +
+							'<button onclick="deleteEntry(\'' + entry._id + '\')">Delete</button>' +
+							'</div>');
+
+						// Initialize JSON Editor for the updated entry
+						initJsonEditor(entry);
+					});
+
+					// Update the map with the new matching entries
+					updateMap(findLatLonVariablesRecursive(matchingEntries));
+				} else {
+					toastr.info('No matching entries found.');
+					load_all_entries();
+				}
+			},
+			error: function () {
+				toastr.error('Error searching entries.');
+			}
+		});
+	} else {
+		toastr.info('Could not get search rules.');
+	}
+}
+
+// Initialize JSON Editor for each entry
+function initJsonEditor(entry) {
+	const containerId = 'jsoneditor_' + entry._id;
+	let container = document.getElementById(containerId);
+
+	if (!container) {
+		// Create the container element if it doesn't exist
+		container = document.createElement('div');
+		container.id = containerId;
+		document.getElementById('entry_list').appendChild(container);
+	}
+
+	const editor = new JSONEditor(
+		container,
+		{
+			onFocus: function () {
+				focus_log[entry._id] = true;
+			},
+			mode: 'tree', // view, form
+			onBlur: function () {
+				if (entry._id in focus_log && focus_log[entry._id] == true) {
+					const updatedJson = editor.get();
+					const jsonData = JSON.stringify(updatedJson, null, 2);
+					const entryId = entry._id;
+					updateEntry(entryId, jsonData);
+					focus_log[entry._id] = false;
+				}
+			}
+		}
+	);
+
+	editor.set(entry);
+}
+
+function updateMap(entries) {
+	// Create an array to store heatmap data
+	var heatmapData = [];
+
+	// Iterate through the entries
+	for (var i = 0; i < entries.length; i++) {
+		var entry = entries[i];
+		var lat = entry.lat;
+		var lon = entry.lon;
+
+		// Add the coordinates to the heatmap data
+		heatmapData.push([lat, lon]);
+	}
+
+	// Clear the existing map markers and heatmap layer
+	markerCluster.clearLayers();
+	map.removeLayer(heatLayer);
+
+	// Add the new markers and heatmap layer to the map
+	for (var i = 0; i < entries.length; i++) {
+		var entry = entries[i];
+		var lat = entry.lat;
+		var lon = entry.lon;
+
+		// Create a marker and add it to the marker cluster group
+		var marker = L.marker([lat, lon]);
+		markerCluster.addLayer(marker);
+	}
+
+	// Create a new heatmap layer with the updated heatmap data
+	heatLayer = L.heatLayer(heatmapData, {
+		radius: 25, // Adjust the radius as per your preference
+		blur: 15, // Adjust the blur as per your preference
+		gradient: {
+			0.4: 'blue', // Define the colors and positions in the gradient
+			0.6: 'cyan',
+			0.7: 'lime',
+			0.8: 'yellow',
+			1.0: 'red'
+		}
+	});
+
+	// Add the marker cluster group and the new heatmap layer to the map
+	markerCluster.addTo(map);
+	heatLayer.addTo(map);
+
+	// Fit the map bounds to include both markers and heatmap layer
+	try {
+		map.fitBounds(markerCluster.getBounds());
+		$("#map").show();
+	} catch (e) {
+		$("#map").hide();
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function updateQueryStringParameter(url, key, value) {
 	var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
 	var separator = url.indexOf('?') !== -1 ? "&" : "?";
@@ -132,9 +365,12 @@ function updateQueryStringParameter(url, key, value) {
 
 
 
-function resetSearch(e) {
-	e.preventDefault();
-	e.stopPropagation();
+function resetSearch(e=null) {
+	if(e) {
+		e.preventDefault();
+		e.stopPropagation();
+	}
+
 	// Reset the query builder
 	$('#builder-basic').queryBuilder('reset');
 
@@ -342,4 +578,49 @@ function updateEntry(entryId, jsonData) {
 			toastr.error('Error updating entry.');
 		}
 	});
+}
+
+function findLatLonVariablesRecursive(entry, originalEntry = null) {
+	if (originalEntry === null) {
+		originalEntry = JSON.parse(JSON.stringify(entry));
+	}
+
+	const latLonVariables = [];
+	const geoCoordRegex = /^-?\d{1,3}(?:\.\d+)?$/;
+
+	const keywords = [
+		["lat", "lon"],
+		["latitude", "longitude"]
+	];
+
+	if (Array.isArray(entry) || typeof entry === "object") {
+		for (const key in entry) {
+			const value = entry[key];
+			for (const kw of keywords) {
+				let latLon = {};
+
+				const latName = kw[0];
+				const lonName = kw[1];
+
+				if (Array.isArray(value) || typeof value === "object") {
+					const nestedVariables = findLatLonVariablesRecursive(value, originalEntry);
+					latLonVariables.push(...nestedVariables);
+				} else if (key === latName && geoCoordRegex.test(value) && entry[lonName] && geoCoordRegex.test(entry[lonName])) {
+					latLon = {
+						lat: value,
+						lon: entry[lonName],
+						originalEntry: originalEntry
+					};
+				}
+
+				if (Object.keys(latLon).length !== 0) {
+					latLonVariables.push(latLon);
+				}
+			}
+		}
+	} else {
+		console.error("Entry is not an array/object");
+	}
+
+	return latLonVariables;
 }

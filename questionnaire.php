@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = isset($_POST[$inputName]) ? $_POST[$inputName] : '';
 
                 // Validate if the field is required and empty
-                if ($question['required'] && empty($response)) {
+                if (isset($required["required"]) && $question['required'] && empty($response)) {
                     $isValid = false;
                     echo 'Required question not answered: ' . $question['question'] . '<br>';
                 }

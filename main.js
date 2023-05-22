@@ -55,10 +55,7 @@ function load_all_entries () {
 
 				var entries = data.entries;
 
-				log("entries", entries);
-
 				var entries_with_geo_coords = findLatLonVariablesRecursive(entries);
-				log("entries_with_geo_coords", entries_with_geo_coords);
 
 				updateMap(entries_with_geo_coords);
 			} else if (data.error) {
@@ -111,10 +108,8 @@ function searchEntries() {
 					});
 
 					// Update the map with the new matching entries
-					log("matchingEntries", matchingEntries);
 
 					var entries_with_geo_coords = findLatLonVariablesRecursive(matchingEntries);
-					log("entries_with_geo_coords", entries_with_geo_coords);
 
 					updateMap(entries_with_geo_coords);
 

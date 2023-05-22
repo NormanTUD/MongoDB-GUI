@@ -51,7 +51,10 @@ function load_all_entries () {
 				data.entries.forEach(function (entry) {
 					log(entry);
 					initJsonEditor(entry);
+
 				});
+
+				updateMap(findLatLonVariablesRecursive(data.entries));
 			} else if (data.error) {
 				toastr.error(data.error);
 			}

@@ -121,7 +121,7 @@
 			echo "Seemingly no tests done!\n";
 		}
 
-		if (isset($GLOBALS['failed_tests'])) {
+		if ($GLOBALS['failed_tests']) {
 			echo "Failed tests: " . $GLOBALS['failed_tests'] . "\n";
 			exit(1);
 		}
@@ -215,7 +215,7 @@
 		'id' => $path2,
 		'label' => $path2,
 		'type' => 'integer',
-		'operators' => ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal']
+		'operators' => ['equal', 'not_equal', 'greater', 'less', 'less_or_equal', 'greater_or_equal']
 	];
 	is_equal("Test get_filters(path2, value2)", get_filters($path2, $value2), $expected2);
 
@@ -226,7 +226,7 @@
 		'id' => $path3,
 		'label' => $path3,
 		'type' => 'double',
-		'operators' => ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal']
+		'operators' => ['equal', 'not_equal', 'greater', 'less', 'less_or_equal', 'greater_or_equal']
 	];
 	is_equal("Test get_filters(path3, value3)", get_filters($path3, $value3), $expected3);
 

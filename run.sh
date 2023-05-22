@@ -156,7 +156,14 @@ function die {
 	exit 1
 }
 
-php -l *.php && echo "Syntax checks for PHP Ok" || die "Syntax Checks for PHP failed"
+SYNTAX_ERRORS=0
+{ for i in $(ls *.php); do if ! php -l $i 2>&1; then SYNTAX_ERRORS=1; fi ; done } | 2>&1 grep -v mongodb
+
+if [[ "$SYNTAX_ERRORS" -ne "0" ]]; then
+	echo "Tests failed";
+	exit 1
+fi
+
 php testing.php && echo "Syntax checks for PHP Ok" || die "Syntax Checks for PHP failed"
 
 sudo docker-compose build && sudo docker-compose up -d || echo "Failed to build container"

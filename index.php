@@ -104,9 +104,9 @@
 		<div id="chart_two"></div>
 <?php
 		include("import.php");
-		$optionsAndFilters = generateQueryBuilderOptions();
-		$options = $optionsAndFilters["options"];
-		$filters = $optionsAndFilters["filters"];
+		$filtersAndFilters = generateQueryBuilderFilter();
+		$rules = $filtersAndFilters["options"];
+		$filters = $filtersAndFilters["filters"];
 
 
 ?>

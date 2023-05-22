@@ -255,9 +255,9 @@ function getMongoOperator(operator) {
 		return '$gt';
 	case 'less':
 		return '$lt';
-	case 'greater_equal':
+	case 'greater_or_equal':
 		return '$gte';
-	case 'less_equal':
+	case 'less_or_equal':
 		return '$lte';
 	case 'in':
 		return '$in';

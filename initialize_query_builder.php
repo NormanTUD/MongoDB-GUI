@@ -3,8 +3,8 @@ if (!defined('INCLUDED_FROM_INDEX')) {
     die('This file must be included from index.php');
 }
 ?>
-			var options = removeDuplicates(<?php echo json_encode($options); ?>);
-			options = [options[0]];
+			var rules = removeDuplicates(<?php echo json_encode($rules); ?>);
+			rules = [rules[0]];
 
 			var filters = removeDuplicates(<?php print json_encode($filters); ?>);
 
@@ -12,7 +12,7 @@ if (!defined('INCLUDED_FROM_INDEX')) {
 				$('#builder-basic').queryBuilder({
 					plugins: ["bt-tooltip-errors"],
 					filters: filters,
-					rules: options
+					rules: rules
 				});
 				$("#search_stuff").show();
 			} else {
@@ -25,7 +25,7 @@ if (!defined('INCLUDED_FROM_INDEX')) {
 			});
 
 			$('#btn-set').on('click', function () {
-				$('#builder-basic').queryBuilder('setRules', JSON.parse(options));
+				$('#builder-basic').queryBuilder('setRules', JSON.parse(rules));
 			});
 
 			$('#btn-get').on('click', function () {

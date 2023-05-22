@@ -109,7 +109,7 @@ function updateEntry($entryId, $newData) {
 	}
 }
 
-function generateQueryBuilderOptions() {
+function generateQueryBuilderFilter() {
 	$query = new MongoDB\Driver\Query([], ['projection' => ['_id' => 0]]);
 	$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
 
@@ -141,7 +141,7 @@ function get_filters ($path, $value) {
 	if ($type === 'string') {
 		$filter['operators'] = ['equal', 'not_equal', 'contains'];
 	} elseif ($type === 'integer' || $type === 'double') {
-		$filter['operators'] = ['equal', 'not_equal', 'greater', 'less', 'less_equal', 'greater_equal'];
+		$filter['operators'] = ['equal', 'not_equal', 'greater', 'less', 'less_or_equal', 'greater_or_equal'];
 	} elseif ($type === 'array') {
 		#$filter['input'] = 'radio';
 		#$filter['operators'] = ['in', 'not_in'];
@@ -191,10 +191,12 @@ function traverseDocument($data, $prefix, &$filters, &$options) {
 
 function getDataType($value) {
 	if (is_numeric($value)) {
-		if (is_int($value)) {
+		if (preg_match('/^[+-]?\d+(?:\.\d+)?$/', $value)) {
 			return 'integer';
 		} elseif (is_float($value)) {
 			return 'double';
+		} else {
+			dier("Unhandled numeric type, >$value<");
 		}
 	} elseif (is_string($value)) {
 		return 'string';
@@ -207,6 +209,8 @@ function getDataType($value) {
 	} elseif (is_array($value)) {
 		return null;
 		//return 'array';
+	} else {
+		die("Something completely out of this world: ".$value);
 	}
 
 	return 'string'; // Default to string if data type cannot be determined

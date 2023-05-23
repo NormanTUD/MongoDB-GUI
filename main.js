@@ -736,13 +736,21 @@ function deleteEntry(entryId, event=null) {
 			try {
 				var data = JSON.parse(response);
 				if (data.success) {
-					toastr.success(data.success);
-					// Remove the deleted entry from the page
-					$('#json_editor_' + entryId).remove();
-					// Remove the deleted entry's JSON Editor instance
-					if('editor_' + entryId in window) {
-						window['editor_' + entryId].destroy();
-						delete window['editor_' + entryId];
+					try {
+						toastr.success(data.success);
+						// Remove the deleted entry from the page
+						var entry_id = 'entry_id' + data.entryId
+						var editor_id = 'json_editor_' + data.entryId
+						log(data.entryId)
+						log('Removing "#' + data.entryId + "'");
+						$('#' + data.entryId).remove();
+						// Remove the deleted entry's JSON Editor instance
+						if('editor_' + data.entryId in window) {
+							window['editor_' + data.entryId].destroy();
+							delete window['editor_' + data.entryId];
+						}
+					} catch (e) {
+						console.error(e);
 					}
 				} else if (data.error) {
 					toastr.error(data.error);
@@ -776,7 +784,7 @@ function addNewEntry(event) {
 			if (data.success) {
 				toastr.success(data.success);
 
-				appendEntry(entry_id);
+				appendEntry(data.entryId);
 
 				const newEditor = new JSONEditor(
 					document.getElementById('jsoneditor_' + data.entryId),

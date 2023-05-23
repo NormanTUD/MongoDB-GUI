@@ -312,6 +312,9 @@ foreach ($class_methods as $method_name) {
 	// Test insertDocument() method
 	$document = ['name' => 'John', 'age' => 30];
 	$result = $mongodbHelper->insertDocument($document);
+	$result = json_decode($result, true);
+	unset($result["entryId"]);
+	$result = json_encode($result);
 	is_equal("Insert Document", '{"success":"Entry created successfully."}', $result);
 
 	// Test getAllEntries() method

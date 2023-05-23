@@ -36,7 +36,7 @@ class MongoDBHelper {
 
 			return json_encode(['success' => 'Entry deleted successfully.', 'entryId' => $entryId]);
 		} catch (Exception $e) {
-			return json_encode(['error' => 'Error deleting entry: ' . $e->getMessage()]);
+			return json_encode(['error' => 'Error deleting entry: ' . $e->getMessage(), 'entryId' => $entryId]);
 		}
 	}
 
@@ -106,11 +106,11 @@ class MongoDBHelper {
 	public function insertDocument($document) {
 		if ($document) {
 			$bulkWrite = $this->newBulkWrite();
-			$bulkWrite->insert($this->convertNumericStrings($document));
+			$entryId = $bulkWrite->insert($this->convertNumericStrings($document));
 
 			try {
 				$this->executeBulkWrite($bulkWrite);
-				return json_encode(['success' => 'Entry created successfully.']);
+				return json_encode(['success' => 'Entry created successfully.', 'entryId' => $entryId]);
 			} catch (Exception $e) {
 				return json_encode(['error' => 'Error creating entry: ' . $e->getMessage()]);
 			}

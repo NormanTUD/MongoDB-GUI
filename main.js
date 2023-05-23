@@ -11,7 +11,7 @@ function l (msg, old_ts=null) {
 	var ct = t();
 
 	if(old_ts) {
-		var delta_t = ct - old_ts;
+		var delta_t = (ct - old_ts) / 1000;
 		msg = msg + ` (took ${delta_t} s)`
 		$("#l").html(msg);
 	}
@@ -264,7 +264,7 @@ function generateVisualization(entries) {
 			'aggregation': 'average',
 			'column': 'age',
 			'analysis': function(values) {
-				return avg(values);
+				return values;
 			}
 		},
 		'age (count)': {
@@ -282,27 +282,36 @@ function generateVisualization(entries) {
 		var column = config.column;
 		var values = entries.map(entry => entry[column]);
 
+		var result = null;
+
 		// Perform aggregation or analysis based on the configuration
 		switch (config.aggregation) {
 			case 'count':
-				var result = values.length;
+				result = values.length;
+				break;
+			case 'average':
+				result = avg(values);
 				break;
 			case 'distinct':
-				var result = [...new Set(values)].length;
+				result = [...new Set(values)].length;
 				break;
 			case 'custom':
-				var result = config.analysis(values);
+				result = config.analysis(values);
 				break;
 			case 'none':
 			default:
-				var result = config.analysis(values);
+				result = config.analysis(values);
 				break;
 		}
 
-		data.push({
-			field: field,
-			result: result
-		});
+		if(result) {
+			data.push({
+				field: field,
+				result: result
+			});
+		} else {
+			l("ERROR: No result could be obtained");
+		}
 	});
 
 	// Plotting logic using Plotly.js
@@ -714,9 +723,10 @@ function updateEntry(entryId, jsonData) {
 }
 
 function findLatLonVariablesRecursive(entry, originalEntry = null) {
-	var old_ts = l("findLatLonVariablesRecursive");
+	var old_ts;
 	if (originalEntry === null) {
 		originalEntry = JSON.parse(JSON.stringify(entry));
+		old_ts = l("findLatLonVariablesRecursive");
 	}
 
 	const latLonVariables = [];
@@ -760,7 +770,9 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 	var no_duplicates = removeDuplicatesFromJSON(latLonVariables);
 	//log("no_duplicates", no_duplicates);
 
-	l("findLatLonVariablesRecursive", old_ts);
+	if(old_ts) {
+		l("findLatLonVariablesRecursive", old_ts);
+	}
 	return no_duplicates;
 }
 

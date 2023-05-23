@@ -100,7 +100,7 @@ function convertNumericStrings($data) {
 
 function generateQueryBuilderFilter() {
 	$query = new MongoDB\Driver\Query([], ['projection' => ['_id' => 0]]);
-	$cursor = $mdh->executeQuery($query);
+	$cursor = $GLOBALS["mdh"]->executeQuery($query);
 
 	$filters = [];
 	$rules = [];
@@ -213,7 +213,7 @@ function getDataType($value, $is_recursion=0) {
 function getAllEntries() {
 	$query = new MongoDB\Driver\Query([]);
 	try {
-		$cursor = $mdh->executeQuery($query);
+		$cursor = $GLOBALS["mdh"]->executeQuery($query);
 		$entries = $cursor->toArray();
 		return $entries;
 	} catch (\Throwable $e) { // For PHP 7
@@ -249,7 +249,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 
 	if (isset($_POST['search_query'])) {
 		$searchQuery = json_decode($_POST['search_query'], true);
-		$matchingEntries = $mdh->searchEntries($searchQuery);
+		$matchingEntries = $GLOBALS["mdh"]->searchEntries($searchQuery);
 		echo json_encode($matchingEntries);
 		exit;
 	}
@@ -267,7 +267,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 		if (isset($_POST['new_entry_data'])) {
 			$newData = json_decode($_POST['new_entry_data'], true);
 			$entryId = (string) new MongoDB\BSON\ObjectID();
-			$response = $mdh->insertDocument($entryId, $newData);
+			$response = $GLOBALS["mdh"]->insertDocument($entryId, $newData);
 			echo $response;
 			exit();
 		}

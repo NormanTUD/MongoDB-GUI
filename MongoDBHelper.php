@@ -161,6 +161,5 @@ class MongoDBHelper {
 	}
 }
 
-$mdh = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);
-dier($mdh)
+$GLOBALS["mdh"] = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);
 ?>

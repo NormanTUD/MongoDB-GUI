@@ -373,7 +373,7 @@ async function generalizedVisualization(entries) {
 				break;
 		}
 
-		if(result) {
+		if(result !== null) {
 			data.push({
 				field: field,
 				result: result

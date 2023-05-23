@@ -24,34 +24,6 @@
 			var PHP_SELF = '<?php echo basename($_SERVER['PHP_SELF']); ?>';
 		</script>
 		<?php include("headers.php"); ?>
-		<script>
-			var focus_log = {};
-
-			$(document).ready(function () {
-				//initJsonEditors();
-
-				// Check if the 'search' parameter exists in the URL
-				var urlParams = new URLSearchParams(window.location.search);
-				if (urlParams.has('search')) {
-					var searchParam = urlParams.get('search');
-					try {
-						var query = JSON.parse(decodeURIComponent(searchParam));
-
-						// Set the query rules in the query builder
-						$("#builder-basic").queryBuilder("setRules", query);
-
-						// Trigger the search
-						searchEntries();
-					} catch (e) {
-						alert("ERROR: Could not parse search string from url");
-						console.error("ERROR: Could not parse search string from url");
-						console.error(e);
-					}
-				} else {
-					resetSearch();
-				}
-			});
-		</script>
 	</head>
 	<body>
 		<div id="map" style="height: 400px;"></div>
@@ -76,11 +48,6 @@
 		<div id="chart_two"></div>
 <?php
 		include("import.php");
-		$filtersAndFilters = generateQueryBuilderFilter();
-		$rules = $filtersAndFilters["options"];
-		$filters = $filtersAndFilters["filters"];
-
-
 ?>
 		<script>
 			"use strict";

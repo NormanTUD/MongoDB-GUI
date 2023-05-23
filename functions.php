@@ -146,16 +146,16 @@ function generateQueryBuilderFilter() {
 	$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
 
 	$filters = [];
-	$options = [];
+	$rules = [];
 
 	foreach ($cursor as $document) {
 		$documentArray = json_decode(json_encode($document), true);
-		traverseDocument($documentArray, '', $filters, $options);
+		traverseDocument($documentArray, '', $filters, $rules);
 	}
 
 	$output = [
 		'filters' => $filters,
-		'options' => $options,
+		'rules' => $rules,
 	];
 
 	return $output;
@@ -189,7 +189,7 @@ function get_filters ($path, $value) {
 	return $filter;
 }
 
-function traverseDocument($data, $prefix, &$filters, &$options) {
+function traverseDocument($data, $prefix, &$filters, &$rules) {
 	foreach ($data as $key => $value) {
 		$path = $prefix . $key;
 
@@ -206,17 +206,17 @@ function traverseDocument($data, $prefix, &$filters, &$options) {
 				'id' => $generalized_path,
 				'label' => $generalized_path
 			];
-			$options[] = $generalized_option;
+			$rules[] = $generalized_option;
 			$filters[] = get_filters($generalized_path, $value); //$filter;
 		}
 
 		
 
 		$filters[] = get_filters($path, $value); //$filter;
-		$options[] = $option;
+		$rules[] = $option;
 
 		if (is_array($value) || is_object($value)) {
-			traverseDocument($value, $path . '.', $filters, $options);
+			traverseDocument($value, $path . '.', $filters, $rules);
 		}
 	}
 }
@@ -274,6 +274,12 @@ function getAllEntries() {
 
 // Handle form submission for updating an entry
 if(isset($_SERVER['REQUEST_METHOD'])) {
+	if (isset($_GET['filters_and_rules'])) {
+		$filtersAndFilters = generateQueryBuilderFilter();
+		echo json_encode($filtersAndFilters);
+		exit;
+	}
+
 	if (isset($_POST['reset_search'])) {
 		$entries = json_decode(json_encode(getAllEntries()), true);
 		echo json_encode(array('success' => 'Search reset successfully.', 'entries' => $entries));
@@ -365,8 +371,8 @@ function insertDocument($document) {
 
 function searchEntries($searchQuery) {
 	$filter = $searchQuery;
-	$options = [];
-	$query = new MongoDB\Driver\Query($filter, $options);
+	$rules = [];
+	$query = new MongoDB\Driver\Query($filter, $rules);
 
 	try {
 		$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);

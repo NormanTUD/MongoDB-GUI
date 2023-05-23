@@ -8,15 +8,15 @@ function getQueryParam(param) {
 	return urlParams.get(param);
 }
 
-function removeDuplicates(options) {
+function removeDuplicates(r) {
 	var uniqueOptions = [];
 
-	for (var i = 0; i < options.length; i++) {
-		var option = options[i];
+	for (var i = 0; i < r.length; i++) {
+		var option = r[i];
 		var isDuplicate = false;
 
-		for (var j = i + 1; j < options.length; j++) {
-			if (option.id === options[j].id && option.label === options[j].label) {
+		for (var j = i + 1; j < r.length; j++) {
+			if (option.id === r[j].id && option.label === r[j].label) {
 				isDuplicate = true;
 				break;
 			}

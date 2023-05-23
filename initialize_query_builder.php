@@ -47,7 +47,12 @@ $(document).ready(function () {
 				var urlParams = new URLSearchParams(window.location.search);
 				if (urlParams.has('search')) {
 					var searchParam = urlParams.get('search');
-					l("found search param from url:" + searchParam)
+					l("found search param from url: " + searchParam)
+					log("searchParam:", searchParam);
+					if(searchParam == "undefined" || searchParam === undefined || !searchParam) {
+						searchParam = "{}";
+					}
+
 					try {
 						var tmp_bq = l("trying to build query");
 						var query = JSON.parse(decodeURIComponent(searchParam));
@@ -55,6 +60,7 @@ $(document).ready(function () {
 
 						// Set the query rules in the query builder
 						var tmp_sr = l("setRules");
+						console.log("QUERY:", query);
 						$("#builder-basic").queryBuilder("setRules", query);
 						l("setRules", tmp_sr);
 
@@ -63,8 +69,7 @@ $(document).ready(function () {
 						searchEntries();
 						l("search entries", tmp_se);
 					} catch (e) {
-						alert("ERROR: Could not parse search string from url");
-						console.error("ERROR: Could not parse search string from url");
+						le("ERROR: Could not parse search string from url");
 						console.error(e);
 					}
 				} else {

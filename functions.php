@@ -574,4 +574,8 @@ function removeDuplicates($r) {
 
     return $uniqueOptions;
 }
+
+function stderr ($msg) {
+	fwrite(STDERR, $msg + "\n");
+}
 ?>

@@ -264,4 +264,30 @@
 
 	is_equal("get_filters(path5, value5)", get_filters($path5, $value5), $expected5);
 	 */
+
+	require_once 'MongoDBHelper.php';
+	// Create an instance of MongoDBHelper
+	$mongodbHelper = new MongoDBHelper();
+
+	// Test getAllEntries() method
+	$entries = $mongodbHelper->getAllEntries();
+	is_unequal("Get All Entries", 0, count($entries));
+
+	// Test insertDocument() method
+	$document = ['name' => 'John', 'age' => 30];
+	$result = $mongodbHelper->insertDocument($document);
+	is_equal("Insert Document", '{"success":"Entry created successfully."}', $result);
+
+	// Test searchEntries() method
+	$searchQuery = ['name' => 'John'];
+	$result = json_decode(json_encode($mongodbHelper->searchEntries($searchQuery)), true);
+	is_unequal("Search Entries", 0, count($result));
+
+	$entryId = $result[0]["_id"]["\$oid"];
+
+	// Test deleteEntry() method
+	$result = $mongodbHelper->deleteEntry($entryId);
+	$expected = "{\"success\":\"Entry deleted successfully.\",\"entryId\":{\"\$oid\":\"$entryId\"}}";
+	$real = json_decode(json_encode($result), true);
+	is_equal("Delete Entry", $expected, $real);
 ?>

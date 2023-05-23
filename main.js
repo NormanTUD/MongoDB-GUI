@@ -741,13 +741,13 @@ function deleteEntry(entryId, event=null) {
 						// Remove the deleted entry from the page
 						var entry_id = 'entry_id' + data.entryId
 						var editor_id = 'json_editor_' + data.entryId
-						log(data.entryId)
-						log('Removing "#' + data.entryId + "'");
-						$('#' + data.entryId).remove();
+						log(data.entryId['$oid'])
+						log('Removing "#entry_' + data.entryId['$oid'] + "'");
+						$('#entry_' + data.entryId['$oid']).remove();
 						// Remove the deleted entry's JSON Editor instance
-						if('editor_' + data.entryId in window) {
-							window['editor_' + data.entryId].destroy();
-							delete window['editor_' + data.entryId];
+						if('editor_' + data.entryId['$oid'] in window) {
+							window['editor_' + data.entryId['$oid']].destroy();
+							delete window['editor_' + data.entryId['$oid']];
 						}
 					} catch (e) {
 						console.error(e);

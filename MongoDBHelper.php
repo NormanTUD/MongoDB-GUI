@@ -106,11 +106,11 @@ class MongoDBHelper {
 	public function insertDocument($document) {
 		if ($document) {
 			$bulkWrite = $this->newBulkWrite();
-			$entryId = $bulkWrite->insert($this->convertNumericStrings($document));
+			$entryId = json_decode(json_encode($bulkWrite->insert($this->convertNumericStrings($document))), true);
 
 			try {
 				$this->executeBulkWrite($bulkWrite);
-				return json_encode(['success' => 'Entry created successfully.', 'entryId' => $entryId]);
+				return json_encode(['success' => 'Entry created successfully.', 'entryId' => $entryId['$oid']]);
 			} catch (Exception $e) {
 				return json_encode(['error' => 'Error creating entry: ' . $e->getMessage()]);
 			}

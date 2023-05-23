@@ -9,10 +9,10 @@ var heatLayer = null;
 function log (...args) { console.log(args); }
 
 function le (msg) {
-	return l (msg, null, console.error);
+	return l (msg, null, "error");
 }
 
-function l (msg, old_ts=null, printer=log) {
+function l (msg, old_ts=null, printer="log") {
 	var ct = t();
 
 	if(old_ts) {
@@ -30,7 +30,14 @@ function l (msg, old_ts=null, printer=log) {
 	}
 
 	$("#l").html(msg);
-	printer(msg);
+	if(printer == "log") {
+		log(msg);
+	} else if (printer == "error") {
+		console.error(msg);
+	} else {
+		console.error("Unknown printer");
+		log(msg);
+	}
 
 	return ct;
 }
@@ -276,16 +283,37 @@ async function groupJSONStructures(entries) {
 async function generalizedVisualization(entries) {
 	var old_ts = l("generalizedVisualization");
 	var analyze_fields = {
-		'age (avg)': {
+		'lat (avg)': {
 			'aggregation': 'average',
-			'column': 'age',
+			'column': 'lat',
 			'analysis': function(values) {
 				return values;
 			}
 		},
-		'age (count)': {
+		'lat (distinct)': {
+			'aggregation': 'distinct',
+			'column': 'lat',
+			'analysis': function(values) {
+				return values;
+			}
+		},
+		'lat (min)': {
+			'aggregation': 'min',
+			'column': 'lat',
+			'analysis': function(values) {
+				return values;
+			}
+		},
+		'lat (max)': {
+			'aggregation': 'max',
+			'column': 'lat',
+			'analysis': function(values) {
+				return values;
+			}
+		},
+		'lon (count)': {
 			'aggregation': 'count',
-			'column': 'age',
+			'column': 'lon',
 			'analysis': function(values) {
 				return values;
 			}
@@ -297,13 +325,18 @@ async function generalizedVisualization(entries) {
 	Object.entries(analyze_fields).forEach(([field, config]) => {
 		var column = config.column;
 		var values = entries.map(entry => entry[column]);
-
 		var result = null;
 
 		// Perform aggregation or analysis based on the configuration
 		switch (config.aggregation) {
 			case 'count':
 				result = values.length;
+				break;
+			case 'max':
+				result = Math.max(...values);
+				break;
+			case 'min':
+				result = Math.min(...values);
 				break;
 			case 'average':
 				result = avg(values);
@@ -316,7 +349,7 @@ async function generalizedVisualization(entries) {
 				break;
 			case 'none':
 			default:
-				result = config.analysis(values);
+				result = null;
 				break;
 		}
 
@@ -326,7 +359,11 @@ async function generalizedVisualization(entries) {
 				result: result
 			});
 		} else {
-			l("ERROR: No result could be obtained");
+			le("No result could be obtained");
+			log("=====")
+			log("values:", values);
+			log("config:", config);
+			log("=====")
 		}
 	});
 

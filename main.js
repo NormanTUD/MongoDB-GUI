@@ -1,5 +1,6 @@
 "use strict";
 var focus_log = {};
+var performance_log = {};
 
 var markerCluster = null;
 var map = null;
@@ -16,8 +17,16 @@ function l (msg, old_ts=null, printer=log) {
 
 	if(old_ts) {
 		var delta_t = (ct - old_ts) / 1000;
+		var original_msg = msg;
 		msg = msg + ` (took ${delta_t} s)`
 		$("#l").html(msg);
+
+		if(!Object.keys(performance_log).includes(original_msg)) {
+			performance_log[original_msg] = [];
+		}
+		performance_log[original_msg].push(delta_t);
+
+		performance_log_table();
 	}
 
 	$("#l").html(msg);
@@ -815,3 +824,26 @@ function t(oldTimestamp) {
 	}
 }
 
+function performance_log_table () {
+	// Convert the data into an array of objects
+	var dataArray = Object.entries(performance_log).map(([key, value]) => ({ key, value }));
+
+	// Sort the array based on the largest values first
+	dataArray.sort((a, b) => b.value - a.value);
+
+	// Generate the table HTML
+	var tableHTML = "<table><thead><tr><th>Function</th><th>Execution Time</th></tr></thead><tbody>";
+
+	dataArray.forEach(function (item) {
+		var functionName = item.key;
+		var executionTimes = item.value;
+
+		tableHTML += "<tr><td>" + functionName + "</td><td>" + executionTimes.join(", ") + "</td></tr>";
+	});
+
+	tableHTML += "</tbody></table>";
+
+	// Append the table to a container element
+	var container = document.getElementById("performance_log");
+	container.innerHTML = tableHTML;
+}

@@ -27,7 +27,7 @@ $(document).ready(function () {
 				return;
 			}
 
-			l("building jqueryquerybuilder")
+			var tmp = l("building jqueryquerybuilder")
 
 			$('#builder-basic').queryBuilder({
 				plugins: ["bt-tooltip-errors"],
@@ -35,34 +35,44 @@ $(document).ready(function () {
 				rules: rules
 			});
 
-			l("showing search")
+			l("building jqueryquerybuilder", tmp);
+
+			tmp = l("showing search")
 			$("#search_stuff").show();
+			l("showing search", tmp);
 
 
 			try {
-				l("trying to find search param from url")
+				var tmp_sp_t = l("trying to find search param from url")
 				var urlParams = new URLSearchParams(window.location.search);
 				if (urlParams.has('search')) {
 					var searchParam = urlParams.get('search');
 					l("found search param from url:" + searchParam)
 					try {
-						l("trying to build query");
+						var tmp_bq = l("trying to build query");
 						var query = JSON.parse(decodeURIComponent(searchParam));
+						l("trying to build query", tmp_bq);
 
 						// Set the query rules in the query builder
+						var tmp_sr = l("setRules");
 						$("#builder-basic").queryBuilder("setRules", query);
+						l("setRules", tmp_sr);
 
 						// Trigger the search
+						var tmp_se = l("search entries");
 						searchEntries();
+						l("search entries", tmp_se);
 					} catch (e) {
 						alert("ERROR: Could not parse search string from url");
 						console.error("ERROR: Could not parse search string from url");
 						console.error(e);
 					}
 				} else {
-					l("no search param found, resetting search");
+					var tmp_sp = l("no search param found, resetting search");
 					resetSearch();
+					l("no search param found, resetting search", tmp_sp);
 				}
+				l("trying to find search param from url", tmp_sp_t)
 			} catch (e) {
 				console.error("ERROR in trying to receive filters and rules:", e);
 			}

@@ -67,6 +67,9 @@ class MongoDBHelper {
 
 	public function insertValue($documentId, $key, $value) {
 		$bulkWrite = $this->newBulkWrite();
+		if($key == '_id') {
+			return json_encode(['warning' => 'Not replacing _id', 'documentId' => $documentId]);
+		}
 		$filter = ['_id' => $this->createId($documentId)];
 		$update = ['$set' => [$key => $value]];
 

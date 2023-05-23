@@ -165,7 +165,6 @@ function searchEntries() {
 					visualizations(matchingEntries);
 				} else {
 					toastr.info('No matching entries found.');
-					load_all_entries();
 				}
 			},
 			error: function() {

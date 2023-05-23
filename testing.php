@@ -391,7 +391,6 @@
 	$realDocumentId = $real['documentId'];
 	is_true("Replace Document - documentId matches expected", isset($realDocumentId['$oid']) && $realDocumentId['$oid'] === $documentId);
 
-	/*
 	// Test find() method after update
 	$searchQuery = ['_id' => $mongodbHelper->createId($documentId)];
 	$result = $mongodbHelper->find($searchQuery);
@@ -401,7 +400,6 @@
 	} else {
 		is_true("Searching failed", false);
 	}
-	 */
 
 	// Test deleteEntry() method after update
 	$result = $mongodbHelper->deleteEntry($documentId);

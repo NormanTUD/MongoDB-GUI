@@ -9,8 +9,8 @@ $(document).ready(function () {
 		url: 'index.php?filters_and_rules=1',
 		dataType: 'json',
 		success: function(data) {
-			var filters = removeDuplicates(data.filters);
-			var rules = removeDuplicates(data.rules);
+			var filters = data.filters;
+			var rules = data.rules;
 
 
 			if (filters.length) {

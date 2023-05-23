@@ -19,3 +19,21 @@
 	color: blue;
 	text-decoration: underline;
 }
+
+/* Set the position and dimensions of the status bar */
+#status-bar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background-color: #f0f0f0;
+	padding: 10px;
+	box-sizing: border-box;
+}
+
+/* Style the status text */
+#l {
+	margin: 0;
+	color: #333;
+	font-weight: bold;
+}

@@ -153,6 +153,9 @@ function generateQueryBuilderFilter() {
 		traverseDocument($documentArray, '', $filters, $rules);
 	}
 
+	$filters = removeDuplicates($filters);
+	$rules = removeDuplicates($rules);
+
 	$output = [
 		'filters' => $filters,
 		'rules' => $rules,
@@ -545,4 +548,25 @@ function avg($numbers) {
     return $sum / $count;
 }
 
+function removeDuplicates($r) {
+    $uniqueOptions = [];
+
+    for ($i = 0; $i < count($r); $i++) {
+        $option = $r[$i];
+        $isDuplicate = false;
+
+        for ($j = $i + 1; $j < count($r); $j++) {
+            if ($option['id'] === $r[$j]['id'] && $option['label'] === $r[$j]['label']) {
+                $isDuplicate = true;
+                break;
+            }
+        }
+
+        if (!$isDuplicate) {
+            $uniqueOptions[] = $option;
+        }
+    }
+
+    return $uniqueOptions;
+}
 ?>

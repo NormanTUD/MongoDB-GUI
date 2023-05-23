@@ -8,12 +8,20 @@ var heatLayer = null;
 
 function log (...args) { console.log(args); }
 
+function l (msg) {
+	log(msg);
+	$("#l").html(msg);
+
+}
+
 function getQueryParam(param) {
+	l("getQueryParam");
 	const urlParams = new URLSearchParams(window.location.search);
 	return urlParams.get(param);
 }
 
 function removeDuplicates(r) {
+	l("removeDuplicates");
 	var uniqueOptions = [];
 
 	for (var i = 0; i < r.length; i++) {
@@ -37,6 +45,7 @@ function removeDuplicates(r) {
 
 
 function load_all_entries () {
+	l("load_all_entries");
 	$.ajax({
 		url: PHP_SELF,
 		type: 'POST',
@@ -75,6 +84,7 @@ function load_all_entries () {
 }
 
 function searchEntries() {
+	l("searchEntries");
 	var rules = $("#builder-basic").queryBuilder("getRules");
 
 	if (rules !== null) {
@@ -117,7 +127,9 @@ function searchEntries() {
 					generateVisualization(matchingEntries);
 					generatePlotlyData(matchingEntries);
 					var groups = groupJSONStructures(matchingEntries);
-					log("groups:", groups);
+					if(groups) {
+						l("groups: " + groups);
+					}
 				} else {
 					toastr.info('No matching entries found.');
 					load_all_entries();
@@ -133,6 +145,7 @@ function searchEntries() {
 }
 
 function avg(values) {
+	l("avg");
 	if (values.length === 0) {
 		return 0;
 	}
@@ -145,6 +158,7 @@ function avg(values) {
 }
 
 function generatePlotlyData(entries) {
+	l("generatePlotlyData");
 	// Calculate the total number of entries
 	var totalEntries = entries.length;
 
@@ -185,6 +199,7 @@ function generatePlotlyData(entries) {
 
 // Group JSON structures by nested structure
 function groupJSONStructures(entries) {
+	l("groupJSONStructures");
 	var groups = {};
 
 	// Helper function to recursively traverse the data and build grouping keys
@@ -227,6 +242,7 @@ function groupJSONStructures(entries) {
 
 
 function generateVisualization(entries) {
+	l("generateVisualization");
 	var analyze_fields = {
 		'age (avg)': {
 			'aggregation': 'average',
@@ -302,6 +318,7 @@ function generateVisualization(entries) {
 
 // Initialize JSON Editor for each entry
 function initJsonEditor(entry) {
+	l("initJsonEditor");
 	var entry_id = entry["_id"]["oid"];
 	if(!entry_id) {
 		entry_id = entry["_id"]["$oid"];
@@ -348,6 +365,7 @@ function initJsonEditor(entry) {
 }
 
 function updateMap(entries) {
+	l("updateMap");
 	// Create an array to store heatmap data
 	var heatmapData = [];
 
@@ -436,6 +454,7 @@ function updateMap(entries) {
 }
 
 function updateQueryStringParameter(url, key, value) {
+	l("updateQueryStringParameter");
 	var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
 	var separator = url.indexOf('?') !== -1 ? "&" : "?";
 
@@ -447,7 +466,7 @@ function updateQueryStringParameter(url, key, value) {
 }
 
 function resetSearch(e=false) {
-	log("resetSearch");
+	l("resetSearch");
 	if(e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -464,45 +483,49 @@ function resetSearch(e=false) {
 }
 
 function getMongoOperator(operator) {
+	l("getMongoOperator");
 	switch (operator) {
-	case 'equal':
-		return '$eq';
-	case 'not_equal':
-		return '$ne';
-	case 'contains':
-		return '$regex';
-	case 'greater':
-		return '$gt';
-	case 'less':
-		return '$lt';
-	case 'greater_or_equal':
-		return '$gte';
-	case 'less_or_equal':
-		return '$lte';
-	case 'in':
-		return '$in';
-	case 'and':
-		return '$and';
-	case 'or':
-		return '$or';
-	case 'not':
-		return '$not';
-	case 'exists':
-		return '$exists';
-	case 'type':
-		return '$type';
-	case 'elem_match':
-		return '$elemMatch';
-	case 'size':
-		return '$size';
-	default:
-		return operator;
+		case 'equal':
+			return '$eq';
+		case 'not_equal':
+			return '$ne';
+		case 'contains':
+			return '$regex';
+		case 'greater':
+			return '$gt';
+		case 'less':
+			return '$lt';
+		case 'greater_or_equal':
+			return '$gte';
+		case 'less_or_equal':
+			return '$lte';
+		case 'in':
+			return '$in';
+		case 'and':
+			return '$and';
+		case 'or':
+			return '$or';
+		case 'not':
+			return '$not';
+		case 'exists':
+			return '$exists';
+		case 'type':
+			return '$type';
+		case 'elem_match':
+			return '$elemMatch';
+		case 'size':
+			return '$size';
+		default:
+			return operator;
 	}
 }
 
-function update_current_query(e) {
-	e.preventDefault();
-	e.stopPropagation();
+function update_current_query(e=null) {
+	l("update_current_query");
+	if(e) {
+		e.preventDefault();
+		e.stopPropagation();
+	}
 
 	var rules = $("#builder-basic").queryBuilder("getRules");
 
@@ -516,6 +539,7 @@ function update_current_query(e) {
 }
 
 function convertRulesToMongoQuery(rules) {
+	l("convertRulesToMongoQuery");
 	var condition = rules.condition.toUpperCase();
 	var query = {};
 
@@ -566,6 +590,7 @@ function convertRulesToMongoQuery(rules) {
 }
 
 function deleteEntry(entryId, event=null) {
+	l("deleteEntry");
 	if(event) {
 		event.stopPropagation();
 	}
@@ -600,6 +625,7 @@ function deleteEntry(entryId, event=null) {
 }
 
 function addNewEntry(event) {
+	l("addNewEntry");
 	event.stopPropagation();
 	const jsonData = {}; // Set your initial data here
 	$.ajax({
@@ -635,6 +661,7 @@ function addNewEntry(event) {
 }
 
 function updateEntry(entryId, jsonData) {
+	l("updateEntry");
 	$.ajax({
 		url: PHP_SELF,
 			type: 'POST',
@@ -657,6 +684,7 @@ function updateEntry(entryId, jsonData) {
 }
 
 function findLatLonVariablesRecursive(entry, originalEntry = null) {
+	l("findLatLonVariablesRecursive");
 	if (originalEntry === null) {
 		originalEntry = JSON.parse(JSON.stringify(entry));
 	}
@@ -706,6 +734,7 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 }
 
 function removeDuplicatesFromJSON(arr) {
+	log("removeDuplicatesFromJSON");
 	const uniqueEntries = [];
 	const seenIds = new Set();
 

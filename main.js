@@ -5,23 +5,32 @@ var markerCluster = null;
 var map = null;
 var heatLayer = null;
 
-
 function log (...args) { console.log(args); }
 
-function l (msg) {
-	log(msg);
-	$("#l").html(msg);
+function l (msg, old_ts=null) {
+	var ct = t();
 
+	if(old_ts) {
+		var delta_t = ct - old_ts;
+		msg = msg + ` (took ${delta_t} s)`
+		$("#l").html(msg);
+	}
+
+	$("#l").html(msg);
+	log(msg);
+
+	return ct;
 }
 
 function getQueryParam(param) {
-	l("getQueryParam");
+	var old_ts = l("getQueryParam");
 	const urlParams = new URLSearchParams(window.location.search);
+	l("getQueryParam", old_ts);
 	return urlParams.get(param);
 }
 
 function removeDuplicates(r) {
-	l("removeDuplicates");
+	var old_ts = l("removeDuplicates");
 	var uniqueOptions = [];
 
 	for (var i = 0; i < r.length; i++) {
@@ -40,12 +49,13 @@ function removeDuplicates(r) {
 		}
 	}
 
+	l("removeDuplicates", old_ts);
 	return uniqueOptions;
 }
 
 
 function load_all_entries () {
-	l("load_all_entries");
+	var old_ts = l("load_all_entries");
 	$.ajax({
 		url: PHP_SELF,
 		type: 'POST',
@@ -81,10 +91,11 @@ function load_all_entries () {
 		}
 	});
 
+	l("load_all_entries", old_ts);
 }
 
 function searchEntries() {
-	l("searchEntries");
+	var old_ts = l("searchEntries");
 	var rules = $("#builder-basic").queryBuilder("getRules");
 
 	if (rules !== null) {
@@ -128,7 +139,7 @@ function searchEntries() {
 					generatePlotlyData(matchingEntries);
 					var groups = groupJSONStructures(matchingEntries);
 					if(groups) {
-						l("groups: " + groups);
+						var old_ts = l("groups: " + groups);
 					}
 				} else {
 					toastr.info('No matching entries found.');
@@ -142,10 +153,12 @@ function searchEntries() {
 	} else {
 		toastr.info('Could not get search rules.');
 	}
+
+	l("searchEntries", old_ts);
 }
 
 function avg(values) {
-	l("avg");
+	var old_ts = l("avg");
 	if (values.length === 0) {
 		return 0;
 	}
@@ -154,11 +167,12 @@ function avg(values) {
 		return accumulator + currentValue;
 	}, 0);
 
+	l("avg", old_ts);
 	return sum / values.length;
 }
 
 function generatePlotlyData(entries) {
-	l("generatePlotlyData");
+	var old_ts = l("generatePlotlyData");
 	// Calculate the total number of entries
 	var totalEntries = entries.length;
 
@@ -194,12 +208,13 @@ function generatePlotlyData(entries) {
 		type: 'bar'
 	}];
 
+	l("generatePlotlyData", old_ts);
 	return data;
 }
 
 // Group JSON structures by nested structure
 function groupJSONStructures(entries) {
-	l("groupJSONStructures");
+	var old_ts = l("groupJSONStructures");
 	var groups = {};
 
 	// Helper function to recursively traverse the data and build grouping keys
@@ -237,12 +252,13 @@ function groupJSONStructures(entries) {
 	// Count the number of different groups
 	var groupCount = Object.keys(groups).length;
 
+	l("groupJSONStructures", old_ts);
 	return groupCount;
 }
 
 
 function generateVisualization(entries) {
-	l("generateVisualization");
+	var old_ts = l("generateVisualization");
 	var analyze_fields = {
 		'age (avg)': {
 			'aggregation': 'average',
@@ -313,12 +329,13 @@ function generateVisualization(entries) {
 	};
 
 	Plotly.newPlot('chart_two', [trace], layout);
+	l("generateVisualization", old_ts);
 }
 
 
 // Initialize JSON Editor for each entry
 function initJsonEditor(entry) {
-	l("initJsonEditor");
+	var old_ts = l("initJsonEditor");
 	var entry_id = entry["_id"]["oid"];
 	if(!entry_id) {
 		entry_id = entry["_id"]["$oid"];
@@ -362,10 +379,11 @@ function initJsonEditor(entry) {
 
 
 	editor.set(entry);
+	l("initJsonEditor", old_ts);
 }
 
 function updateMap(entries) {
-	l("updateMap");
+	var old_ts = l("updateMap");
 	// Create an array to store heatmap data
 	var heatmapData = [];
 
@@ -451,10 +469,11 @@ function updateMap(entries) {
 	} catch (e) {
 		$("#map").hide();
 	}
+	l("updateMap", old_ts);
 }
 
 function updateQueryStringParameter(url, key, value) {
-	l("updateQueryStringParameter");
+	var old_ts = l("updateQueryStringParameter");
 	var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
 	var separator = url.indexOf('?') !== -1 ? "&" : "?";
 
@@ -463,10 +482,11 @@ function updateQueryStringParameter(url, key, value) {
 	} else {
 		return url + separator + key + "=" + value;
 	}
+	l("updateQueryStringParameter", old_ts);
 }
 
 function resetSearch(e=false) {
-	l("resetSearch");
+	var old_ts = l("resetSearch");
 	if(e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -480,10 +500,11 @@ function resetSearch(e=false) {
 
 	// Load all entries
 	load_all_entries();
+	l("resetSearch", old_ts);
 }
 
 function getMongoOperator(operator) {
-	l("getMongoOperator");
+	var old_ts = l("getMongoOperator");
 	switch (operator) {
 		case 'equal':
 			return '$eq';
@@ -518,10 +539,11 @@ function getMongoOperator(operator) {
 		default:
 			return operator;
 	}
+	l("getMongoOperator", old_ts);
 }
 
 function update_current_query(e=null) {
-	l("update_current_query");
+	var old_ts = l("update_current_query");
 	if(e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -536,10 +558,11 @@ function update_current_query(e=null) {
 	} else {
 		$("#current_query").html("<pre>Could not get rules. Some search settings are probably missing. Look out for red highlighted lines.</pre>");
 	} 
+	l("update_current_query", old_ts);
 }
 
 function convertRulesToMongoQuery(rules) {
-	l("convertRulesToMongoQuery");
+	var old_ts = l("convertRulesToMongoQuery");
 	var condition = rules.condition.toUpperCase();
 	var query = {};
 
@@ -586,11 +609,12 @@ function convertRulesToMongoQuery(rules) {
 		}
 	}
 
+	l("convertRulesToMongoQuery", old_ts);
 	return query;
 }
 
 function deleteEntry(entryId, event=null) {
-	l("deleteEntry");
+	var old_ts = l("deleteEntry");
 	if(event) {
 		event.stopPropagation();
 	}
@@ -622,10 +646,12 @@ function deleteEntry(entryId, event=null) {
 			toastr.error('Error deleting entry.');
 		}
 	});
+	
+	l("deleteEntry", old_ts);
 }
 
 function addNewEntry(event) {
-	l("addNewEntry");
+	var old_ts = l("addNewEntry");
 	event.stopPropagation();
 	const jsonData = {}; // Set your initial data here
 	$.ajax({
@@ -658,10 +684,12 @@ function addNewEntry(event) {
 			toastr.error('Error adding new entry.');
 		}
 	});
+
+	l("addNewEntry", old_ts);
 }
 
 function updateEntry(entryId, jsonData) {
-	l("updateEntry");
+	var old_ts = l("updateEntry");
 	$.ajax({
 		url: PHP_SELF,
 			type: 'POST',
@@ -681,10 +709,12 @@ function updateEntry(entryId, jsonData) {
 			toastr.error('Error updating entry.');
 		}
 	});
+
+	l("updateEntry", old_ts);
 }
 
 function findLatLonVariablesRecursive(entry, originalEntry = null) {
-	l("findLatLonVariablesRecursive");
+	var old_ts = l("findLatLonVariablesRecursive");
 	if (originalEntry === null) {
 		originalEntry = JSON.parse(JSON.stringify(entry));
 	}
@@ -730,11 +760,12 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 	var no_duplicates = removeDuplicatesFromJSON(latLonVariables);
 	//log("no_duplicates", no_duplicates);
 
+	l("findLatLonVariablesRecursive", old_ts);
 	return no_duplicates;
 }
 
 function removeDuplicatesFromJSON(arr) {
-	log("removeDuplicatesFromJSON");
+	var old_ts = l("removeDuplicatesFromJSON");
 	const uniqueEntries = [];
 	const seenIds = new Set();
 
@@ -747,5 +778,19 @@ function removeDuplicatesFromJSON(arr) {
 		}
 	}
 
+	l("removeDuplicatesFromJSON", old_ts);
+
 	return uniqueEntries;
 }
+
+function t(oldTimestamp) {
+	var currentTimestamp = Date.now();
+
+	if (oldTimestamp) {
+		var difference = currentTimestamp - oldTimestamp;
+		return difference;
+	} else {
+		return currentTimestamp;
+	}
+}
+

@@ -49,20 +49,10 @@ class MongoDBHelper {
 
 			// Delete the existing document
 			$filter = ['_id' => $documentId];
-			$bulkWrite->delete($filter);
+			$bulkWrite->update($filter, $newDocument);
 			$this->executeBulkWrite($bulkWrite);
 
-			$bulkWrite = $this->newBulkWrite();
-			// Insert the new document with the same ID
-			$newDocument['_id'] = $documentId;
-			$bulkWrite->insert($this->convertNumericStrings($newDocument));
-
-			try {
-				$this->executeBulkWrite($bulkWrite);
-				return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
-			} catch (Exception $e) {
-				return json_encode(['error' => 'Error 1 replacing document: ' . $e->getMessage()]);
-			}
+			return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
 		} catch (Exception $e) {
 			return json_encode(['error' => 'Error 2 replacing document: ' . $e->getMessage()]);
 		}

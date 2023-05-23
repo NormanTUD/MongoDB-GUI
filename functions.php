@@ -3,7 +3,6 @@ if (!defined('INCLUDED_FROM_INDEX')) {
     die('This file must be included from index.php');
 }
 
-require_once 'MongoDBHelper.php';
 
 function exception_error_handler($errno, $errstr, $errfile, $errline ) {
 	print "<pre>\n";
@@ -27,12 +26,12 @@ $GLOBALS["namespace"] = $GLOBALS["databaseName"].".".$GLOBALS['collectionName'];
 // Connect to MongoDB
 $GLOBALS["mongoClient"] = new MongoDB\Driver\Manager("mongodb://".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]);
 
-$mongodbHelper = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);
-
 if (!isset($GLOBALS["mongoClient"]) || !isset($GLOBALS["databaseName"]) || !isset($GLOBALS["collectionName"]) || !isset($GLOBALS["namespace"])) {
 	echo "Incomplete or missing $GLOBALS variables.";
 	return;
 }
+
+require_once 'MongoDBHelper.php';
 
 $connection = fsockopen($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $errno, $errstr, 5);
 if (!$connection) {
@@ -101,7 +100,7 @@ function convertNumericStrings($data) {
 
 function generateQueryBuilderFilter() {
 	$query = new MongoDB\Driver\Query([], ['projection' => ['_id' => 0]]);
-	$cursor = $mongodbHelper->executeQuery($GLOBALS["namespace"], $query);
+	$cursor = $mdh->executeQuery($query);
 
 	$filters = [];
 	$rules = [];
@@ -214,7 +213,7 @@ function getDataType($value, $is_recursion=0) {
 function getAllEntries() {
 	$query = new MongoDB\Driver\Query([]);
 	try {
-		$cursor = $mongodbHelper->executeQuery($GLOBALS["namespace"], $query);
+		$cursor = $mdh->executeQuery($query);
 		$entries = $cursor->toArray();
 		return $entries;
 	} catch (\Throwable $e) { // For PHP 7
@@ -250,7 +249,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 
 	if (isset($_POST['search_query'])) {
 		$searchQuery = json_decode($_POST['search_query'], true);
-		$matchingEntries = $mongodbHelper->searchEntries($searchQuery);
+		$matchingEntries = $mdh->searchEntries($searchQuery);
 		echo json_encode($matchingEntries);
 		exit;
 	}
@@ -268,7 +267,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 		if (isset($_POST['new_entry_data'])) {
 			$newData = json_decode($_POST['new_entry_data'], true);
 			$entryId = (string) new MongoDB\BSON\ObjectID();
-			$response = $mongodbHelper->insertDocument($entryId, $newData);
+			$response = $mdh->insertDocument($entryId, $newData);
 			echo $response;
 			exit();
 		}

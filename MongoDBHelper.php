@@ -110,7 +110,7 @@ class MongoDBHelper {
 		return $this->mongoClient->find(['_id'=> $this->createId($id)]);
 	}
 
-	private function executeQuery($query) {
+	public function executeQuery($query) {
 		return $this->mongoClient->executeQuery($this->namespace, $query);
 	}
 
@@ -161,4 +161,6 @@ class MongoDBHelper {
 	}
 }
 
+$mdh = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);
+dier($mdh)
 ?>

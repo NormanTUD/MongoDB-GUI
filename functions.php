@@ -76,6 +76,11 @@ function deleteEntry($entryId) {
 		if(is_array($entryId) && isset($entryId['oid'])) {
 			$entryId = $entryId['oid'];
 		}
+
+		if(!$entryId && is_array($entryId) && isset($entryId['$oid'])) {
+			$entryId = $entryId['$oid'];
+		}
+
 		$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
 
 		$bulkWrite->delete($filter);
@@ -411,7 +416,7 @@ function deleteValue($documentId, $key)
 {
 	$bulkWrite = new MongoDB\Driver\BulkWrite();
 	$filter = ['_id' => new MongoDB\BSON\ObjectID($documentId)];
-	$update = ['$unset' => [$key => '']];
+	$update = ['$unset' => [$documentId => '']];
 
 	$bulkWrite->update($filter, $update);
 

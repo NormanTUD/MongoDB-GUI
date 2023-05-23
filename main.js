@@ -731,20 +731,24 @@ function deleteEntry(entryId, event=null) {
 			delete_entry_id: entryId
 		},
 		success: function (response) {
-			var data = JSON.parse(response);
-			if (data.success) {
-				toastr.success(data.success);
-				// Remove the deleted entry from the page
-				$('#json_editor_' + entryId).remove();
-				// Remove the deleted entry's JSON Editor instance
-				if('editor_' + entryId in window) {
-					window['editor_' + entryId].destroy();
-					delete window['editor_' + entryId];
+			try {
+				var data = JSON.parse(response);
+				if (data.success) {
+					toastr.success(data.success);
+					// Remove the deleted entry from the page
+					$('#json_editor_' + entryId).remove();
+					// Remove the deleted entry's JSON Editor instance
+					if('editor_' + entryId in window) {
+						window['editor_' + entryId].destroy();
+						delete window['editor_' + entryId];
+					}
+				} else if (data.error) {
+					toastr.error(data.error);
+				} else {
+					console.error("??? case ???", data);
 				}
-			} else if (data.error) {
-				toastr.error(data.error);
-			} else {
-				console.error("??? case ???", data);
+			} catch (e) {
+				toastr.error(e);
 			}
 		},
 		error: function () {

@@ -202,10 +202,12 @@ function countKeys(entries) {
 	var propertyCounts = {};
 	entries.forEach(function(entry) {
 		Object.keys(entry).forEach(function(property) {
-			if (!propertyCounts.hasOwnProperty(property)) {
-				propertyCounts[property] = 0;
+			if(property != "_id") {
+				if (!propertyCounts.hasOwnProperty(property)) {
+					propertyCounts[property] = 0;
+				}
+				propertyCounts[property]++;
 			}
-			propertyCounts[property]++;
 		});
 	});
 

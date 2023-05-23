@@ -372,7 +372,7 @@ foreach ($class_methods as $method_name) {
 
 	// Check success message
 	if(isset($real["success"])) {
-		is_equal("Replace Document - Success", "Document replaced successfully.", $real['success']);
+		is_equal("Replace Document - Success", "Document updated successfully.", $real['success']);
 	} else {
 		dier($real["error"]);
 	}

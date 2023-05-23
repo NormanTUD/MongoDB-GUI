@@ -48,9 +48,9 @@ class MongoDBHelper {
 			$filter = ['_id' => $this->createId($documentId)];
 			$this->updateIterateDocument($documentId, $newDocument);
 
-			return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
+			return json_encode(['success' => 'Document updated successfully.', 'documentId' => $documentId]);
 		} catch (Exception $e) {
-			return json_encode(['error' => 'Error replacing document: ' . $e->getMessage()]);
+			return json_encode(['error' => 'Error updating document: ' . $e->getMessage()]);
 		}
 	}
 

@@ -280,6 +280,14 @@ async function groupJSONStructures(entries) {
 	return groupCount;
 }
 
+function sumArrayElements(arr) {
+	var sum = 0;
+	for (var i = 0; i < arr.length; i++) {
+		sum += arr[i];
+	}
+	return sum;
+}
+
 function filterUndefinedAndNull(arr) {
 	return arr.filter(element => element !== undefined && element !== null);
 }
@@ -289,38 +297,32 @@ async function generalizedVisualization(entries) {
 	var analyze_fields = {
 		'lat (avg)': {
 			'aggregation': 'average',
-			'column': 'lat',
+			'column': 'lat'
+			/*
 			'analysis': function(values) {
 				return values;
 			}
+			*/
 		},
 		'lat (distinct)': {
 			'aggregation': 'distinct',
-			'column': 'lat',
-			'analysis': function(values) {
-				return values;
-			}
+			'column': 'lat'
 		},
 		'lat (min)': {
 			'aggregation': 'min',
-			'column': 'lat',
-			'analysis': function(values) {
-				return values;
-			}
+			'column': 'lat'
+		},
+		'lat (sum)': {
+			'aggregation': 'sum',
+			'column': 'lat'
 		},
 		'lat (max)': {
 			'aggregation': 'max',
-			'column': 'lat',
-			'analysis': function(values) {
-				return values;
-			}
+			'column': 'lat'
 		},
-		'lon (count)': {
+		'lat (count)': {
 			'aggregation': 'count',
-			'column': 'lon',
-			'analysis': function(values) {
-				return values;
-			}
+			'column': 'lat'
 		}
 		// Add more fields and analysis functions as needed
 	};
@@ -342,6 +344,9 @@ async function generalizedVisualization(entries) {
 				break;
 			case 'min':
 				result = Math.min(...values);
+				break;
+			case 'sum':
+				result = sumArrayElements(values);
 				break;
 			case 'average':
 				result = avg(values);

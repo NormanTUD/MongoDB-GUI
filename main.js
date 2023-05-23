@@ -280,6 +280,10 @@ async function groupJSONStructures(entries) {
 	return groupCount;
 }
 
+function filterUndefinedAndNull(arr) {
+	return arr.filter(element => element !== undefined && element !== null);
+}
+
 async function generalizedVisualization(entries) {
 	var old_ts = l("generalizedVisualization");
 	var analyze_fields = {
@@ -325,6 +329,7 @@ async function generalizedVisualization(entries) {
 	Object.entries(analyze_fields).forEach(([field, config]) => {
 		var column = config.column;
 		var values = entries.map(entry => entry[column]);
+		values = filterUndefinedAndNull(values);
 		var result = null;
 
 		// Perform aggregation or analysis based on the configuration

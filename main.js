@@ -558,6 +558,9 @@ function resetSearch(e=false) {
 		e.stopPropagation();
 	}
 
+	var newUrl = updateQueryStringParameter(window.location.href, 'search');
+	history.pushState({ path: newUrl }, '', newUrl);
+
 	// Reset the query builder
 	$('#builder-basic').queryBuilder('reset');
 
@@ -566,6 +569,7 @@ function resetSearch(e=false) {
 
 	// Load all entries
 	load_all_entries();
+
 	l("resetSearch", old_ts);
 }
 

@@ -9,7 +9,7 @@ $(document).ready(function () {
 	$.ajax({
 		url: 'index.php?filters_and_rules=1',
 		dataType: 'json',
-		success: function(data) {
+		success: async function(data) {
 			var old_t = l("receiving filters and rules");
 			var filters = data.filters;
 			var rules = data.rules;

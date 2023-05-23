@@ -230,7 +230,17 @@ function countKeys(entries) {
 		type: 'bar'
 	}];
 
-	Plotly.newPlot('countKeysChart', data);
+	var layout = {
+		title: 'Occurency of keys',
+		xaxis: {
+			title: 'Fields'
+		},
+		yaxis: {
+			title: 'Results'
+		}
+	};
+
+	Plotly.newPlot('countKeysChart', data, layout);
 
 	l("countKeys", old_ts);
 	return data;
@@ -391,7 +401,7 @@ async function generalizedVisualization(entries) {
 	};
 
 	var layout = {
-		title: 'General Statistics',
+		title: 'Customizable stats',
 		xaxis: {
 			title: 'Fields'
 		},

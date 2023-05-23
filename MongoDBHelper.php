@@ -36,6 +36,29 @@ class MongoDBHelper {
 		}
 	}
 
+public function replaceDocument($documentId, $newDocument) {
+    $bulkWrite = new MongoDB\Driver\BulkWrite();
+
+    // Convert the document ID to MongoDB\BSON\ObjectID if needed
+    $documentId = $this->createId($documentId);
+
+    // Delete the existing document
+    $filter = ['_id' => $documentId];
+    $bulkWrite->delete($filter);
+
+    // Insert the new document with the same ID
+    $bulkWrite->insert($this->convertNumericStrings($newDocument));
+
+    try {
+        $this->executeBulkWrite($bulkWrite);
+        return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
+    } catch (Exception $e) {
+        return json_encode(['error' => 'Error replacing document: ' . $e->getMessage()]);
+    }
+}
+
+
+
 	public function insertValue($documentId, $key, $value) {
 		$bulkWrite = new MongoDB\Driver\BulkWrite();
 		$filter = ['_id' => $this->createId($documentId)];

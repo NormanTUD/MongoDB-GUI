@@ -276,7 +276,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			$entryId = $_POST['entry_id'];
 			$newData = json_decode($_POST['json_data'], true);
 
-			$response = $GLOBALS["mdh"]->updateEntry($entryId, $newData);
+			$response = $GLOBALS["mdh"]->insertValue($entryId, "hallo", $newData);
 			echo $response;
 			exit();
 		}

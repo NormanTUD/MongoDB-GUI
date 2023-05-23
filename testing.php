@@ -370,6 +370,50 @@
 	// Check if entryId exists in the real result
 	is_true("Delete Entry - entryId exists", isset($real['entryId']));
 
+	$newDocument = [
+		'name' => 'John Doe',
+		'age' => 30,
+		'email' => 'john.doe@example.com'
+	];
+
+	// Test replaceDocument() method
+	$result = $mongodbHelper->replaceDocument($documentId, $newDocument);
+	$expected = '{"success":"Document replaced successfully.","documentId":{"$oid":"'.$documentId.'"}}';
+	$real = json_decode($result, true);
+
+	// Check success message
+	is_equal("Replace Document - Success", "Document replaced successfully.", $real['success']);
+
+	// Check if documentId exists in the real result
+	is_true("Replace Document - documentId exists", isset($real['documentId']));
+
+	// Check if the documentId matches the expected value
+	$realDocumentId = $real['documentId'];
+	is_true("Replace Document - documentId matches expected", isset($realDocumentId['$oid']) && $realDocumentId['$oid'] === $documentId);
+
+	/*
+	// Test find() method after update
+	$searchQuery = ['_id' => $mongodbHelper->createId($documentId)];
+	$result = $mongodbHelper->find($searchQuery);
+	if (count($result)) {
+		$updatedEntry = $result[0];
+		is_equal("Search Entries after Update", $newDocument['age'], $updatedEntry['age']);
+	} else {
+		is_true("Searching failed", false);
+	}
+	 */
+
+	// Test deleteEntry() method after update
+	$result = $mongodbHelper->deleteEntry($documentId);
+	$expected = '{"success":"Entry deleted successfully.","entryId":{"$oid":"'.$documentId.'"}}';
+	$real = json_decode($result, true);
+
+	// Check success message
+	is_equal("Delete Entry - Success", "Entry deleted successfully.", $real['success']);
+
+	// Check if entryId exists in the real result
+	is_true("Delete Entry - entryId exists", isset($real['entryId']));
+
 	// Check if the entryId matches the expected value
 	$realEntryId = $real['entryId'];
 	is_true("Delete Entry - entryId matches expected", isset($realEntryId['$oid']) && $realEntryId['$oid'] === $documentId);

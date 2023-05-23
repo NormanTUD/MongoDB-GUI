@@ -374,7 +374,6 @@
 
 	// Test find() method after update
 	$result = $mongodbHelper->findById($documentId);
-	dier($result);
 	if (count($result)) {
 		$updatedEntry = $result[0];
 		is_equal("Search Entries after Update", $newDocument['age'], $updatedEntry['age']);

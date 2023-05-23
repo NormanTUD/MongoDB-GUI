@@ -35,6 +35,38 @@
 	}
 
 	// Function to check if two values are equal and perform appropriate actions
+	function is_false($name, $expected)
+	{
+		increase_started_tests();
+
+		if ($expected === false) {
+			echo "OK: $name\n";
+			return true;
+		} else {
+			$message = "Is true, should be false";
+			trigger_error($message, E_USER_WARNING);
+			test_failed();
+			return false;
+		}
+	}
+
+	// Function to check if two values are equal and perform appropriate actions
+	function is_true($name, $expected)
+	{
+		increase_started_tests();
+
+		if ($expected === true) {
+			echo "OK: $name\n";
+			return true;
+		} else {
+			$message = "Is false, should be true";
+			trigger_error($message, E_USER_WARNING);
+			test_failed();
+			return false;
+		}
+	}
+
+	// Function to check if two values are equal and perform appropriate actions
 	function is_equal($name, $expected, $actual)
 	{
 		increase_started_tests();
@@ -269,14 +301,15 @@
 	// Create an instance of MongoDBHelper
 	$mongodbHelper = new MongoDBHelper();
 
-	// Test getAllEntries() method
-	$entries = $mongodbHelper->getAllEntries();
-	is_unequal("Get All Entries", 0, count($entries));
 
 	// Test insertDocument() method
 	$document = ['name' => 'John', 'age' => 30];
 	$result = $mongodbHelper->insertDocument($document);
 	is_equal("Insert Document", '{"success":"Entry created successfully."}', $result);
+
+	// Test getAllEntries() method
+	$entries = $mongodbHelper->getAllEntries();
+	is_unequal("Get All Entries", 0, count($entries));
 
 	// Test searchEntries() method
 	$searchQuery = ['name' => 'John'];
@@ -286,8 +319,60 @@
 	$entryId = $result[0]["_id"]["\$oid"];
 
 	// Test deleteEntry() method
+	/*
 	$result = $mongodbHelper->deleteEntry($entryId);
 	$expected = "{\"success\":\"Entry deleted successfully.\",\"entryId\":{\"\$oid\":\"$entryId\"}}";
 	$real = json_decode(json_encode($result), true);
 	is_equal("Delete Entry", $expected, $real);
+	 */
+
+
+
+
+
+
+
+	// Test insertValue() method
+	$documentId = $entryId; // Use the entryId obtained from the previous test
+	$key = 'age';
+	$value = 35;
+	$result = $mongodbHelper->insertValue($documentId, $key, $value);
+	$expected = '{"success":"Value inserted successfully.","documentId":{"$oid":"' . $documentId . '"}}';
+	$real = json_decode($result, true);
+	$realDocumentId = $real['documentId'];
+
+	// Check success message
+	is_equal("Insert Value - Success", "Value inserted successfully.", $real['success']);
+
+	// Check if documentId exists in the real result
+	is_true("Insert Value - documentId exists", isset($real['documentId']));
+
+	// Check if the documentId matches the expected value
+	is_true("Insert Value - documentId matches expected", $realDocumentId === $documentId);
+
+	// Test searchEntries() method after update
+	$searchQuery = ['_id' => $mongodbHelper->createId($documentId )];
+	$result = $mongodbHelper->searchEntries($searchQuery);
+	if(count($result)) {
+		$updatedEntry = $result[0];
+		is_equal("Search Entries after Update", $value, $updatedEntry['age']);
+	} else {
+		is_true("Searching failed", false);
+	}
+
+	// Test deleteEntry() method after update
+	$result = $mongodbHelper->deleteEntry($documentId);
+	$expected = '{"success":"Entry deleted successfully.","entryId":{"$oid":"'.$documentId.'"}}';
+	$real = json_decode($result, true);
+
+	// Check success message
+	is_equal("Delete Entry - Success", "Entry deleted successfully.", $real['success']);
+
+	// Check if entryId exists in the real result
+	is_true("Delete Entry - entryId exists", isset($real['entryId']));
+
+	// Check if the entryId matches the expected value
+	$realEntryId = $real['entryId'];
+	is_true("Delete Entry - entryId matches expected", isset($realEntryId['$oid']) && $realEntryId['$oid'] === $documentId);
+
 ?>

@@ -372,11 +372,12 @@
 
 	$newDocument = [
 		'name' => 'John Doe',
-		'age' => 30,
+		'age' => 350,
 		'email' => 'john.doe@example.com'
 	];
 
 	// Test replaceDocument() method
+	print ">>>>>$documentId<!!!!!\n";
 	$result = $mongodbHelper->replaceDocument($documentId, $newDocument);
 	$expected = '{"success":"Document replaced successfully.","documentId":{"$oid":"'.$documentId.'"}}';
 	$real = json_decode($result, true);

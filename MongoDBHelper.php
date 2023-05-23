@@ -9,9 +9,13 @@ class MongoDBHelper {
 		$this->namespace = "{$databaseName}.{$collectionName}";
 	}
 
+	private function newBulkWrite () {
+		return new MongoDB\Driver\BulkWrite();
+	}
+
 	public function deleteEntry($entryId) {
 		try {
-			$bulkWrite = new MongoDB\Driver\BulkWrite();
+			$bulkWrite = $this->newBulkWrite();
 			try {
 				$entryId = $this->createId($entryId);
 			} catch (\Throwable $e) {
@@ -36,31 +40,34 @@ class MongoDBHelper {
 		}
 	}
 
-public function replaceDocument($documentId, $newDocument) {
-    $bulkWrite = new MongoDB\Driver\BulkWrite();
+	public function replaceDocument($documentId, $newDocument) {
+		$bulkWrite = $this->newBulkWrite();
 
-    // Convert the document ID to MongoDB\BSON\ObjectID if needed
-    $documentId = $this->createId($documentId);
+		// Convert the document ID to MongoDB\BSON\ObjectID if needed
+		$documentId = $this->createId($documentId);
 
-    // Delete the existing document
-    $filter = ['_id' => $documentId];
-    $bulkWrite->delete($filter);
+		// Retrieve the existing document
+		$existingDocument = $this->findById($documentId);
+		if (!$existingDocument) {
+			return json_encode(['error' => 'Document not found.']);
+		}
 
-    // Insert the new document with the same ID
-    $bulkWrite->insert($this->convertNumericStrings($newDocument));
+		// Replace the document with the same ID
+		$bulkWrite->replace(['_id' => $documentId], $this->convertNumericStrings($newDocument));
 
-    try {
-        $this->executeBulkWrite($bulkWrite);
-        return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
-    } catch (Exception $e) {
-        return json_encode(['error' => 'Error replacing document: ' . $e->getMessage()]);
-    }
-}
+		try {
+			$this->executeBulkWrite($bulkWrite);
+			return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
+		} catch (Exception $e) {
+			return json_encode(['error' => 'Error replacing document: ' . $e->getMessage()]);
+		}
+	}
+
 
 
 
 	public function insertValue($documentId, $key, $value) {
-		$bulkWrite = new MongoDB\Driver\BulkWrite();
+		$bulkWrite = $this->newBulkWrite();
 		$filter = ['_id' => $this->createId($documentId)];
 		$update = ['$set' => [$key => $value]];
 
@@ -89,7 +96,7 @@ public function replaceDocument($documentId, $newDocument) {
 
 	public function insertDocument($document) {
 		if ($document) {
-			$bulkWrite = new MongoDB\Driver\BulkWrite();
+			$bulkWrite = $this->newBulkWrite();
 			$bulkWrite->insert($this->convertNumericStrings($document));
 
 			try {
@@ -130,7 +137,8 @@ public function replaceDocument($documentId, $newDocument) {
 	}
 
 	public function findById($id) {
-		return $this->mongoClient->find(['_id'=> $this->createId($id)]);
+		$query = new MongoDB\Driver\Query(['_id' => $this->createId($id)]);
+		return $this->executeQuery($query);
 	}
 
 	public function executeQuery($query) {

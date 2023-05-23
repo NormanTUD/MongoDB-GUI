@@ -42,15 +42,11 @@ class MongoDBHelper {
 
 	public function replaceDocument($documentId, $newDocument) {
 		try {
-			$bulkWrite = $this->newBulkWrite();
-
 			// Convert the document ID to MongoDB\BSON\ObjectID if needed
 
 			// Delete the existing document
 			$filter = ['_id' => $this->createId($documentId)];
-			$this->updateIterateDocument($bulkWrite, $documentId, $newDocument);
-
-			$this->executeBulkWrite($bulkWrite);
+			$this->updateIterateDocument($documentId, $newDocument);
 
 			return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
 		} catch (Exception $e) {
@@ -58,12 +54,12 @@ class MongoDBHelper {
 		}
 	}
 
-	private function updateIterateDocument(&$bulkWrite, $documentId, $document, $path = '') {
+	private function updateIterateDocument($documentId, $document, $path = '') {
 		foreach ($document as $key => $value) {
 			if (is_array($value)) {
-				$this->updateIterateDocument($bulkWrite, $documentId, $value, $path . $key . '.');
+				$this->updateIterateDocument($documentId, $value, $path . $key . '.');
 			} else {
-				$this->insertValue($bulkWrite, $documentId, $path . $key, $value);
+				$this->insertValue($documentId, $path . $key, $value);
 			}
 		}
 	}
@@ -90,9 +86,6 @@ class MongoDBHelper {
 	}
 
 	public function find($filter=[], $projection=[]) {
-		print "======\n";
-		print_r($filter);
-		print "======\n";
 		$query = $this->query($filter, $projection);
 
 		try {
@@ -147,10 +140,14 @@ class MongoDBHelper {
 	}
 
 	public function findById($id) {
-		$query = $this->query(['_id' => $id]);
+		$id = $this->createId($id);
+		$filter = ['_id' => $id];
+		$query = $this->query($filter);
 		$cursor = $this->executeQuery($query);
 
-		return $cursor->toArray();
+		$res = $cursor->toArray();
+		dier($res);
+		return $res;
 	}
 
 	public function executeQuery($query) {

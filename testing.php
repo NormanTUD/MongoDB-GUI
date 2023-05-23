@@ -356,7 +356,7 @@ foreach ($class_methods as $method_name) {
 		$updatedEntry = $result[0];
 		is_equal("Search Entries after inserting", $value, $updatedEntry['age']);
 	} else {
-		is_true("Searching after inserting failed", false);
+		dier("Searching after inserting failed, id: $documentId");
 	}
 
 	$newDocument = [
@@ -390,7 +390,8 @@ foreach ($class_methods as $method_name) {
 		$updatedEntry = $result[0];
 		is_equal("Search Entries after Update", $newDocument['age'], $updatedEntry['age']);
 	} else {
-		is_true("!!! Searching after update failed, not found: $documentId", false);
+		print(">>$documentId");
+		dier("!!! Searching after update failed, not found: $documentId");
 	}
 
 	$result = $mongodbHelper->deleteEntry($entryId);

@@ -49,7 +49,8 @@ class MongoDBHelper {
 
 			// Delete the existing document
 			$filter = ['_id' => $documentId];
-			$bulkWrite->update($filter, $newDocument);
+			$update = ['$set' => $newDocument];
+			$bulkWrite->update($filter, $update);
 			$this->executeBulkWrite($bulkWrite);
 
 			return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
@@ -57,12 +58,6 @@ class MongoDBHelper {
 			return json_encode(['error' => 'Error 2 replacing document: ' . $e->getMessage()]);
 		}
 	}
-
-
-
-
-
-
 
 	public function insertValue($documentId, $key, $value) {
 		$bulkWrite = $this->newBulkWrite();

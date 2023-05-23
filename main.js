@@ -767,7 +767,7 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 	}
 	
 	//log("latLonVariables", latLonVariables);
-	var no_duplicates = removeDuplicatesFromJSON(latLonVariables);
+	var no_duplicates = removeDuplicatesFromJSON(latLonVariables, !!old_ts);
 	//log("no_duplicates", no_duplicates);
 
 	if(old_ts) {
@@ -776,8 +776,11 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 	return no_duplicates;
 }
 
-function removeDuplicatesFromJSON(arr) {
-	var old_ts = l("removeDuplicatesFromJSON");
+function removeDuplicatesFromJSON(arr, enable_log=0) {
+	var old_ts;
+	if(enable_log) {
+		old_ts = l("removeDuplicatesFromJSON");
+	}
 	const uniqueEntries = [];
 	const seenIds = new Set();
 
@@ -790,7 +793,9 @@ function removeDuplicatesFromJSON(arr) {
 		}
 	}
 
-	l("removeDuplicatesFromJSON", old_ts);
+	if(enable_log) {
+		l("removeDuplicatesFromJSON", old_ts);
+	}
 
 	return uniqueEntries;
 }

@@ -48,17 +48,26 @@ class MongoDBHelper {
 
 			// Delete the existing document
 			$filter = ['_id' => $this->createId($documentId)];
-			$update = ['$set' => [$newDocument]];
-			print_r($filter);
-			print_r($update);
-			$bulkWrite->update($filter, $update);
+			$this->updateIterateDocument($bulkWrite, $documentId, $newDocument);
+
 			$this->executeBulkWrite($bulkWrite);
 
 			return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
 		} catch (Exception $e) {
-			return json_encode(['error' => 'Error 2 replacing document: ' . $e->getMessage()]);
+			return json_encode(['error' => 'Error replacing document: ' . $e->getMessage()]);
 		}
 	}
+
+	private function updateIterateDocument(&$bulkWrite, $documentId, $document, $path = '') {
+		foreach ($document as $key => $value) {
+			if (is_array($value)) {
+				$this->updateIterateDocument($bulkWrite, $documentId, $value, $path . $key . '.');
+			} else {
+				$this->insertValue($bulkWrite, $documentId, $path . $key, $value);
+			}
+		}
+	}
+
 
 	public function insertValue($documentId, $key, $value) {
 		$bulkWrite = $this->newBulkWrite();

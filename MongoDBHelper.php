@@ -56,10 +56,12 @@ class MongoDBHelper {
 
 	private function updateIterateDocument($documentId, $document, $path = '') {
 		foreach ($document as $key => $value) {
-			if (is_array($value)) {
-				$this->updateIterateDocument($documentId, $value, $path . $key . '.');
+			$currentPath = $path . $key;
+
+			if (is_array($value) || is_object($value)) {
+				$this->updateIterateDocument($documentId, $value, $currentPath . '.');
 			} else {
-				$this->insertValue($documentId, $path . $key, $value);
+				$this->insertValue($documentId, $currentPath, $value);
 			}
 		}
 	}
@@ -67,9 +69,14 @@ class MongoDBHelper {
 
 	public function insertValue($documentId, $key, $value) {
 		$bulkWrite = $this->newBulkWrite();
-		if($key == '_id') {
+		if($key == '_id' || $key == '$oid') {
 			return json_encode(['warning' => 'Not replacing _id', 'documentId' => $documentId]);
 		}
+
+		print "<pre>";
+		print "$key\n";
+		print_r($value);
+		print "</pre>";
 		$filter = ['_id' => $this->createId($documentId)];
 		$update = ['$set' => [$key => $value]];
 

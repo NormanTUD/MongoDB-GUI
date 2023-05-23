@@ -390,7 +390,6 @@ foreach ($class_methods as $method_name) {
 		$updatedEntry = $result[0];
 		is_equal("Search Entries after Update", $newDocument['age'], $updatedEntry['age']);
 	} else {
-		print(">>$documentId");
 		dier("!!! Searching after update failed, not found: $documentId");
 	}
 

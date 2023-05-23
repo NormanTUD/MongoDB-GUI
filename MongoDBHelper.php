@@ -145,8 +145,7 @@ class MongoDBHelper {
 		$query = $this->query($filter);
 		$cursor = $this->executeQuery($query);
 
-		$res = $cursor->toArray();
-		dier($res);
+		$res = json_decode(json_encode($cursor->toArray()), true);
 		return $res;
 	}
 

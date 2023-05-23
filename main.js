@@ -223,6 +223,8 @@ function generatePlotlyData(entries) {
 		type: 'bar'
 	}];
 
+	Plotly.newPlot('chart', data);
+
 	l("generatePlotlyData", old_ts);
 	return data;
 }

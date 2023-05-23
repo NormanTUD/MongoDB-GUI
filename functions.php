@@ -250,7 +250,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 
 		if (isset($_POST['search_query'])) {
 			$searchQuery = json_decode($_POST['search_query'], true);
-			$matchingEntries = $GLOBALS["mdh"]->searchEntries($searchQuery);
+			$matchingEntries = $GLOBALS["mdh"]->find($searchQuery);
 			echo json_encode($matchingEntries);
 			exit;
 		}

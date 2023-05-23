@@ -395,17 +395,14 @@ foreach ($class_methods as $method_name) {
 
 	$result = $mongodbHelper->deleteEntry($entryId);
 	$expected = "{\"success\":\"Entry deleted successfully.\",\"entryId\":{\"\$oid\":\"$entryId\"}}";
-	$real = json_decode(json_encode($result), true);
-	is_equal("Delete Entry", $expected, $real);
+	$real = json_decode($result, true);
+	is_equal("Delete Entry", $expected, json_encode($real));
 
 	// Check success message
 	is_equal("Delete Entry - Success", "Entry deleted successfully.", $real['success']);
 
 	// Check if entryId exists in the real result
 	is_true("Delete Entry - entryId exists", isset($real['entryId']));
-
-	// Check success message
-	is_equal("Delete Entry - Success", "Entry deleted successfully.", $real['success']);
 
 	// Check if entryId exists in the real result
 	is_true("Delete Entry - entryId exists", isset($real['entryId']));

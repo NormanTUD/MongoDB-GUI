@@ -88,7 +88,7 @@ function searchEntries() {
 			data: {
 				search_query: JSON.stringify(query)
 			},
-			success: function (response) {
+			success: function(response) {
 				var matchingEntries = JSON.parse(response);
 
 				if (matchingEntries.length > 0) {
@@ -96,27 +96,26 @@ function searchEntries() {
 					$('#entry_list').empty();
 
 					// Update JSON editors for matching entries
-					matchingEntries.forEach(function (entry) {
+					matchingEntries.forEach(function(entry) {
 						// Append the updated entry to the container
 						var entry_id = entry._id;
-
 
 						// Initialize JSON Editor for the updated entry
 						initJsonEditor(entry);
 					});
 
 					// Update the map with the new matching entries
-
 					var entries_with_geo_coords = findLatLonVariablesRecursive(matchingEntries);
-
 					updateMap(entries_with_geo_coords);
 
+					// Generate the visualization
+					generateVisualization(matchingEntries);
 				} else {
 					toastr.info('No matching entries found.');
 					load_all_entries();
 				}
 			},
-			error: function () {
+			error: function() {
 				toastr.error('Error searching entries.');
 			}
 		});
@@ -124,6 +123,93 @@ function searchEntries() {
 		toastr.info('Could not get search rules.');
 	}
 }
+
+function avg(values) {
+	if (values.length === 0) {
+		return 0;
+	}
+
+	var sum = values.reduce(function (accumulator, currentValue) {
+		return accumulator + currentValue;
+	}, 0);
+
+	return sum / values.length;
+}
+
+
+function generateVisualization(entries) {
+	var analyze_fields = {
+		'age (avg)': {
+			'aggregation': 'average',
+			'column': 'age',
+			'analysis': function(values) {
+				return avg(values);
+			}
+		},
+		'age (count)': {
+			'aggregation': 'count',
+			'column': 'age',
+			'analysis': function(values) {
+				return values;
+			}
+		}
+		// Add more fields and analysis functions as needed
+	};
+
+	var data = [];
+	Object.entries(analyze_fields).forEach(([field, config]) => {
+		var column = config.column;
+		var values = entries.map(entry => entry[column]);
+
+		// Perform aggregation or analysis based on the configuration
+		switch (config.aggregation) {
+			case 'count':
+				var result = values.length;
+				break;
+			case 'distinct':
+				var result = [...new Set(values)].length;
+				break;
+			case 'custom':
+				var result = config.analysis(values);
+				break;
+			case 'none':
+			default:
+				var result = config.analysis(values);
+				break;
+		}
+
+		data.push({
+			field: field,
+			result: result
+		});
+	});
+
+	// Plotting logic using Plotly.js
+	// Customize this part to generate the desired visualization
+
+	// Example: Generate a bar chart
+	var x = data.map(entry => entry.field);
+	var y = data.map(entry => entry.result);
+
+	var trace = {
+		x: x,
+		y: y,
+		type: 'bar'
+	};
+
+	var layout = {
+		title: 'General Statistics',
+		xaxis: {
+			title: 'Fields'
+		},
+		yaxis: {
+			title: 'Results'
+		}
+	};
+
+	Plotly.newPlot('chart_two', [trace], layout);
+}
+
 
 // Initialize JSON Editor for each entry
 function initJsonEditor(entry) {

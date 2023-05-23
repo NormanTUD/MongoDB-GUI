@@ -371,13 +371,17 @@ foreach ($class_methods as $method_name) {
 	$real = json_decode($result, true);
 
 	// Check success message
-	is_equal("Replace Document - Success", "Document replaced successfully.", $real['success']);
+	if(isset($real["success"])) {
+		is_equal("Replace Document - Success", "Document replaced successfully.", $real['success']);
+	} else {
+		dier($real["error"]);
+	}
 
 	// Check if documentId exists in the real result
 	is_true("Replace Document - documentId exists", isset($real['documentId']));
 
 	// Check if the documentId matches the expected value
-	$realDocumentId = $real['documentId']['$oid'];
+	$realDocumentId = $real['documentId'];
 	is_true("Replace Document - documentId matches expected", $realDocumentId === $documentId);
 
 	// Test find() method after update
@@ -386,7 +390,7 @@ foreach ($class_methods as $method_name) {
 		$updatedEntry = $result[0];
 		is_equal("Search Entries after Update", $newDocument['age'], $updatedEntry['age']);
 	} else {
-		is_true("Searching failed, not found: $documentId", false);
+		is_true("!!! Searching after update failed, not found: $documentId", false);
 	}
 
 	$result = $mongodbHelper->deleteEntry($entryId);

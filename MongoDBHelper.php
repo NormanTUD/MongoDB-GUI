@@ -45,11 +45,12 @@ class MongoDBHelper {
 			$bulkWrite = $this->newBulkWrite();
 
 			// Convert the document ID to MongoDB\BSON\ObjectID if needed
-			$documentId = $this->createId($documentId);
 
 			// Delete the existing document
-			$filter = ['_id' => $documentId];
-			$update = ['$set' => $newDocument];
+			$filter = ['_id' => $this->createId($documentId)];
+			$update = ['$set' => [$newDocument]];
+			print_r($filter);
+			print_r($update);
 			$bulkWrite->update($filter, $update);
 			$this->executeBulkWrite($bulkWrite);
 

@@ -31,8 +31,8 @@
 		</div>
 		<button onclick="addNewEntry(event)">Add New Entry</button>
 
-		<div id="chart"></div>
-		<div id="chart_two"></div>
+		<div id="countKeysChart"></div>
+		<div id="generalizedVisualizationChart"></div>
 <?php
 		include("import.php");
 ?>

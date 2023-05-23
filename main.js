@@ -109,8 +109,8 @@ async function visualizations (entries) {
 	var entries_with_geo_coords = findLatLonVariablesRecursive(entries);
 	updateMap(entries_with_geo_coords);
 
-	generateVisualization(entries);
-	generatePlotlyData(entries);
+	generalizedVisualization(entries);
+	countKeys(entries);
 	var groups = await groupJSONStructures(entries);
 	if(groups) {
 		var old_ts = l("groups: " + groups);
@@ -186,8 +186,8 @@ function avg(values) {
 	return sum / values.length;
 }
 
-function generatePlotlyData(entries) {
-	var old_ts = l("generatePlotlyData");
+function countKeys(entries) {
+	var old_ts = l("countKeys");
 	// Calculate the total number of entries
 	var totalEntries = entries.length;
 
@@ -223,9 +223,9 @@ function generatePlotlyData(entries) {
 		type: 'bar'
 	}];
 
-	Plotly.newPlot('chart', data);
+	Plotly.newPlot('countKeysChart', data);
 
-	l("generatePlotlyData", old_ts);
+	l("countKeys", old_ts);
 	return data;
 }
 
@@ -273,8 +273,8 @@ async function groupJSONStructures(entries) {
 	return groupCount;
 }
 
-async function generateVisualization(entries) {
-	var old_ts = l("generateVisualization");
+async function generalizedVisualization(entries) {
+	var old_ts = l("generalizedVisualization");
 	var analyze_fields = {
 		'age (avg)': {
 			'aggregation': 'average',
@@ -353,8 +353,22 @@ async function generateVisualization(entries) {
 		}
 	};
 
-	Plotly.newPlot('chart_two', [trace], layout);
-	l("generateVisualization", old_ts);
+	Plotly.newPlot('generalizedVisualizationChart', [trace], layout);
+	l("generalizedVisualization", old_ts);
+}
+
+function appendEntry (entry_id) {
+	var id = "entry_" + entry_id;
+	if(!$("#" + id).length) {
+		var full_entry = '<div id="' + id + '">' +
+				'<div id="jsoneditor_' + entry_id + '"></div>' +
+				'<button onclick="deleteEntry(\'' + entry_id + '\')">Delete</button>' +
+			'</div>'
+
+		$('#entry_list').append(full_entry);
+	}
+
+	return $("#" + id)[0];
 }
 
 
@@ -366,22 +380,7 @@ function initJsonEditor(entry) {
 		entry_id = entry["_id"]["$oid"];
 	}
 
-	const containerId = 'jsoneditor_' + entry_id;
-	let container = document.getElementById(containerId);
-
-	if (!container) {
-		// Create the container element if it doesn't exist
-		container = document.createElement('div');
-		container.id = containerId;
-		document.getElementById('entry_list').appendChild(container);
-	}
-
-	var full_entry = '<div id="entry_' + entry_id + '">' +
-			'<div id="jsoneditor_' + entry_id + '"></div>' +
-			'<button onclick="deleteEntry(\'' + entry_id + '\')">Delete</button>' +
-		'</div>'
-
-	$('#entry_list').append(full_entry);
+	var container = appendEntry(entry_id);
 
 	const editor = new JSONEditor(
 		container,
@@ -689,6 +688,9 @@ function addNewEntry(event) {
 			var data = JSON.parse(response);
 			if (data.success) {
 				toastr.success(data.success);
+
+				appendEntry(entry_id);
+
 				const newEditor = new JSONEditor(
 					document.getElementById('jsoneditor_' + data.entryId),
 					{

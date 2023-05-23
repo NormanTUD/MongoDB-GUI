@@ -43,8 +43,10 @@ class MongoDBHelper {
 	public function replaceDocument($documentId, $newDocument) {
 		$bulkWrite = $this->newBulkWrite();
 
+
 		// Convert the document ID to MongoDB\BSON\ObjectID if needed
 		$documentId = $this->createId($documentId);
+
 
 		// Retrieve the existing document
 		$existingDocument = $this->findById($documentId);
@@ -52,8 +54,18 @@ class MongoDBHelper {
 			return json_encode(['error' => 'Document not found.']);
 		}
 
-		// Replace the document with the same ID
-		$bulkWrite->replace(['_id' => $documentId], $this->convertNumericStrings($newDocument));
+
+		// Delete the existing document
+		$filter = ['_id' => $documentId];
+		$bulkWrite->delete($filter);
+
+
+		// Insert the new document with the same ID
+		#$existingDocument = $existingDocument->toArray();
+
+		$existingDocument = json_decode(json_encode($existingDocument), true);
+		$newDocument['_id'] = $existingDocument[0]['_id']['$oid'];
+		$bulkWrite->insert($this->convertNumericStrings($newDocument));
 
 		try {
 			$this->executeBulkWrite($bulkWrite);
@@ -62,6 +74,7 @@ class MongoDBHelper {
 			return json_encode(['error' => 'Error replacing document: ' . $e->getMessage()]);
 		}
 	}
+
 
 
 
@@ -82,8 +95,11 @@ class MongoDBHelper {
 		}
 	}
 
-	public function find($filter=[], $rules=[]) {
-		$query = new MongoDB\Driver\Query($filter, $rules);
+	public function find($filter=[], $projection=[]) {
+		print "======\n";
+		print_r($filter);
+		print "======\n";
+		$query = new MongoDB\Driver\Query($filter, $projection);
 
 		try {
 			$cursor = $this->executeQuery($query);
@@ -138,7 +154,9 @@ class MongoDBHelper {
 
 	public function findById($id) {
 		$query = new MongoDB\Driver\Query(['_id' => $this->createId($id)]);
-		return $this->executeQuery($query);
+		$cursor = $this->executeQuery($query);
+
+		return $cursor->toArray();
 	}
 
 	public function executeQuery($query) {

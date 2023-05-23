@@ -317,14 +317,6 @@
 
 	$entryId = $result[0]["_id"]["\$oid"];
 
-	// Test deleteEntry() method
-	/*
-	$result = $mongodbHelper->deleteEntry($entryId);
-	$expected = "{\"success\":\"Entry deleted successfully.\",\"entryId\":{\"\$oid\":\"$entryId\"}}";
-	$real = json_decode(json_encode($result), true);
-	is_equal("Delete Entry", $expected, $real);
-	 */
-
 
 
 
@@ -359,17 +351,6 @@
 		is_true("Searching failed", false);
 	}
 
-	// Test deleteEntry() method after update
-	$result = $mongodbHelper->deleteEntry($documentId);
-	$expected = '{"success":"Entry deleted successfully.","entryId":{"$oid":"'.$documentId.'"}}';
-	$real = json_decode($result, true);
-
-	// Check success message
-	is_equal("Delete Entry - Success", "Entry deleted successfully.", $real['success']);
-
-	// Check if entryId exists in the real result
-	is_true("Delete Entry - entryId exists", isset($real['entryId']));
-
 	$newDocument = [
 		'name' => 'John Doe',
 		'age' => 350,
@@ -389,8 +370,8 @@
 	is_true("Replace Document - documentId exists", isset($real['documentId']));
 
 	// Check if the documentId matches the expected value
-	$realDocumentId = $real['documentId'];
-	is_true("Replace Document - documentId matches expected", isset($realDocumentId['$oid']) && $realDocumentId['$oid'] === $documentId);
+	$realDocumentId = $real['documentId']['$oid'];
+	is_true("Replace Document - documentId matches expected", $realDocumentId === $documentId);
 
 	// Test find() method after update
 	$searchQuery = ['_id' => $mongodbHelper->createId($documentId)];
@@ -402,10 +383,16 @@
 		is_true("Searching failed", false);
 	}
 
-	// Test deleteEntry() method after update
-	$result = $mongodbHelper->deleteEntry($documentId);
-	$expected = '{"success":"Entry deleted successfully.","entryId":{"$oid":"'.$documentId.'"}}';
-	$real = json_decode($result, true);
+	$result = $mongodbHelper->deleteEntry($entryId);
+	$expected = "{\"success\":\"Entry deleted successfully.\",\"entryId\":{\"\$oid\":\"$entryId\"}}";
+	$real = json_decode(json_encode($result), true);
+	is_equal("Delete Entry", $expected, $real);
+
+	// Check success message
+	is_equal("Delete Entry - Success", "Entry deleted successfully.", $real['success']);
+
+	// Check if entryId exists in the real result
+	is_true("Delete Entry - entryId exists", isset($real['entryId']));
 
 	// Check success message
 	is_equal("Delete Entry - Success", "Entry deleted successfully.", $real['success']);

@@ -91,10 +91,7 @@ function load_all_entries () {
 				});
 
 				var entries = data.entries;
-
-				var entries_with_geo_coords = findLatLonVariablesRecursive(entries);
-
-				updateMap(entries_with_geo_coords);
+				visualizations(entries)
 			} else if (data.error) {
 				toastr.error(data.error);
 			}
@@ -105,6 +102,19 @@ function load_all_entries () {
 	});
 
 	l("load_all_entries", old_ts);
+}
+
+async function visualizations (entries) {
+	// Update the map with the new matching entries
+	var entries_with_geo_coords = findLatLonVariablesRecursive(entries);
+	updateMap(entries_with_geo_coords);
+
+	generateVisualization(entries);
+	generatePlotlyData(entries);
+	var groups = await groupJSONStructures(entries);
+	if(groups) {
+		var old_ts = l("groups: " + groups);
+	}
 }
 
 function searchEntries() {
@@ -143,17 +153,9 @@ function searchEntries() {
 						initJsonEditor(entry);
 					});
 
-					// Update the map with the new matching entries
-					var entries_with_geo_coords = findLatLonVariablesRecursive(matchingEntries);
-					updateMap(entries_with_geo_coords);
 
 					// Generate the visualization
-					generateVisualization(matchingEntries);
-					generatePlotlyData(matchingEntries);
-					var groups = groupJSONStructures(matchingEntries);
-					if(groups) {
-						var old_ts = l("groups: " + groups);
-					}
+					visualizations(matchingEntries);
 				} else {
 					toastr.info('No matching entries found.');
 					load_all_entries();
@@ -226,7 +228,7 @@ function generatePlotlyData(entries) {
 }
 
 // Group JSON structures by nested structure
-function groupJSONStructures(entries) {
+async function groupJSONStructures(entries) {
 	var old_ts = l("groupJSONStructures");
 	var groups = {};
 
@@ -268,7 +270,6 @@ function groupJSONStructures(entries) {
 	l("groupJSONStructures", old_ts);
 	return groupCount;
 }
-
 
 async function generateVisualization(entries) {
 	var old_ts = l("generateVisualization");

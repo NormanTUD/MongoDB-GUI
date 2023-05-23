@@ -1,19 +1,6 @@
 <?php
 	define('INCLUDED_FROM_INDEX', true);
 	include("functions.php");
-
-	// Retrieve all entries
-	$entries = getAllEntries();
-
-	$latlng = [];
-	foreach ($entries as $entry) {
-		$n = find_lat_lon_variables_recursive($entry);
-		if(count($n)) {
-			$latlng[] = $n;
-		}
-	}
-
-	#dier($latlng);
 ?>
 
 <!DOCTYPE html>
@@ -52,9 +39,6 @@
 		<script>
 			"use strict";
 			<?php include("initialize_query_builder.php"); ?>
-			<?php include("sample_map.php"); ?>
-			<?php include("sample_analyze.php"); ?>
 		</script>
-		<?php include("sample_test.php"); ?>
 	</body>
 </html>

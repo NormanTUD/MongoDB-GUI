@@ -1,6 +1,11 @@
 "use strict";
 var focus_log = {};
 
+var markerCluster = null;
+var map = null;
+var heatLayer = null;
+
+
 function log (...args) { console.log(args); }
 
 function getQueryParam(param) {
@@ -110,6 +115,9 @@ function searchEntries() {
 
 					// Generate the visualization
 					generateVisualization(matchingEntries);
+					generatePlotlyData(matchingEntries);
+					var groups = groupJSONStructures(matchingEntries);
+					log("groups:", groups);
 				} else {
 					toastr.info('No matching entries found.');
 					load_all_entries();
@@ -134,6 +142,87 @@ function avg(values) {
 	}, 0);
 
 	return sum / values.length;
+}
+
+function generatePlotlyData(entries) {
+	// Calculate the total number of entries
+	var totalEntries = entries.length;
+
+	// Count the occurrence of each property
+	var propertyCounts = {};
+	entries.forEach(function(entry) {
+		Object.keys(entry).forEach(function(property) {
+			if (!propertyCounts.hasOwnProperty(property)) {
+				propertyCounts[property] = 0;
+			}
+			propertyCounts[property]++;
+		});
+	});
+
+	// Identify properties with numerical values
+	var numericProperties = [];
+	entries.forEach(function(entry) {
+		Object.keys(entry).forEach(function(property) {
+			if (typeof entry[property] === 'number' && !numericProperties.includes(property)) {
+				numericProperties.push(property);
+			}
+		});
+	});
+
+	// Generate data for plotting
+	var propertyLabels = Object.keys(propertyCounts);
+	var propertyOccurrences = Object.values(propertyCounts);
+
+	// Create the Plotly data array
+	var data = [{
+		x: propertyLabels,
+		y: propertyOccurrences,
+		type: 'bar'
+	}];
+
+	return data;
+}
+
+// Group JSON structures by nested structure
+function groupJSONStructures(entries) {
+	var groups = {};
+
+	// Helper function to recursively traverse the data and build grouping keys
+	function buildGroupingKey(data, path = '') {
+		var keyValuePairs = [];
+
+		if (Array.isArray(data)) {
+			data.forEach(function(value, index) {
+				var subPath = path + '[' + index + ']';
+				var subKey = buildGroupingKey(value, subPath);
+				keyValuePairs.push(subKey);
+			});
+		} else if (typeof data === 'object' && data !== null) {
+			Object.keys(data).forEach(function(key) {
+				var subPath = path + "['" + key + "']";
+				var subKey = buildGroupingKey(data[key], subPath);
+				keyValuePairs.push(subKey);
+			});
+		} else {
+			keyValuePairs.push(path + '=' + data);
+		}
+
+		return keyValuePairs.join('-');
+	}
+
+	// Group JSON structures by nested structure
+	entries.forEach(function(data) {
+		var groupingKey = buildGroupingKey(data);
+		if (!groups.hasOwnProperty(groupingKey)) {
+			groups[groupingKey] = [];
+		}
+		groups[groupingKey].push(data);
+	});
+
+	// Count the number of different groups
+	var groupCount = Object.keys(groups).length;
+
+	return groupCount;
 }
 
 
@@ -273,6 +362,39 @@ function updateMap(entries) {
 	}
 
 	// Clear the existing map markers and heatmap layer
+
+
+
+	if(markerCluster === null) {
+		markerCluster = L.markerClusterGroup();
+		map = L.map('map').setView([0, 0], 2); // Set initial center and zoom level
+		heatLayer = L.heatLayer(heatmapData, {
+			radius: 25, // Adjust the radius as per your preference
+			blur: 15, // Adjust the blur as per your preference
+			gradient: {
+				0.4: 'blue', // Define the colors and positions in the gradient
+				0.6: 'cyan',
+				0.7: 'lime',
+				0.8: 'yellow',
+				1.0: 'red'
+			}
+		});
+		// Add OpenStreetMap tile layer
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+			maxZoom: 18
+		}).addTo(map);
+	}
+
+
+
+
+
+
+
+
+
+
 	markerCluster.clearLayers();
 	map.removeLayer(heatLayer);
 

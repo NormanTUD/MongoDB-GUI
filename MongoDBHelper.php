@@ -73,10 +73,6 @@ class MongoDBHelper {
 			return json_encode(['warning' => 'Not replacing _id', 'documentId' => $documentId]);
 		}
 
-		print "<pre>";
-		print "$key\n";
-		print_r($value);
-		print "</pre>";
 		$filter = ['_id' => $this->createId($documentId)];
 		$update = ['$set' => [$key => $value]];
 

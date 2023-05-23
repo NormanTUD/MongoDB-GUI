@@ -241,20 +241,20 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 		exit;
 	}
 
-	if (isset($_POST['reset_search'])) {
-		$entries = json_decode(json_encode(getAllEntries()), true);
-		echo json_encode(array('success' => 'Search reset successfully.', 'entries' => $entries));
-		exit;
-	}
-
-	if (isset($_POST['search_query'])) {
-		$searchQuery = json_decode($_POST['search_query'], true);
-		$matchingEntries = $GLOBALS["mdh"]->searchEntries($searchQuery);
-		echo json_encode($matchingEntries);
-		exit;
-	}
-
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		if (isset($_POST['reset_search'])) {
+			$entries = json_decode(json_encode(getAllEntries()), true);
+			echo json_encode(array('success' => 'Search reset successfully.', 'entries' => $entries));
+			exit;
+		}
+
+		if (isset($_POST['search_query'])) {
+			$searchQuery = json_decode($_POST['search_query'], true);
+			$matchingEntries = $GLOBALS["mdh"]->searchEntries($searchQuery);
+			echo json_encode($matchingEntries);
+			exit;
+		}
+
 		// Handle form submission for deleting an entry
 		if (isset($_POST['delete_entry_id'])) {
 			$entryId = $_POST['delete_entry_id'];
@@ -276,7 +276,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			$entryId = $_POST['entry_id'];
 			$newData = json_decode($_POST['json_data'], true);
 
-			$response = $GLOBALS["mdh"]->insertValue($entryId, "hallo", $newData);
+			$response = $GLOBALS["mdh"]->replaceDocument($entryId, $newData);
 			echo $response;
 			exit();
 		}

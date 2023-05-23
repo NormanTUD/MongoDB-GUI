@@ -7,7 +7,11 @@ var heatLayer = null;
 
 function log (...args) { console.log(args); }
 
-function l (msg, old_ts=null) {
+function le (msg) {
+	return l (msg, null, console.error);
+}
+
+function l (msg, old_ts=null, printer=log) {
 	var ct = t();
 
 	if(old_ts) {
@@ -17,7 +21,7 @@ function l (msg, old_ts=null) {
 	}
 
 	$("#l").html(msg);
-	log(msg);
+	printer(msg);
 
 	return ct;
 }

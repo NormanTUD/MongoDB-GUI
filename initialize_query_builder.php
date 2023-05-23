@@ -5,49 +5,77 @@ if (!defined('INCLUDED_FROM_INDEX')) {
 ?>
 // Load filters and rules from a file via AJAX
 $(document).ready(function () {
+	var old_t = l("Loading document.ready");
 	$.ajax({
 		url: 'index.php?filters_and_rules=1',
 		dataType: 'json',
 		success: function(data) {
+			var old_t = l("receiving filters and rules");
 			var filters = data.filters;
 			var rules = data.rules;
 
 
-			if (filters.length) {
-				$('#builder-basic').queryBuilder({
-					plugins: ["bt-tooltip-errors"],
-					filters: filters,
-					rules: rules
-				});
-				$("#search_stuff").show();
-			} else {
+			if(!filters.length) {
 				$("#search_stuff").hide();
-				console.log("No DB entries found");
+				le("No DB entries found");
+				return;
 			}
 
+			if(!rules.length) {
+				$("#search_stuff").hide();
+				le("No DB entries found");
+				return;
+			}
 
-			var urlParams = new URLSearchParams(window.location.search);
-			if (urlParams.has('search')) {
-				var searchParam = urlParams.get('search');
-				try {
-					var query = JSON.parse(decodeURIComponent(searchParam));
+			l("building jqueryquerybuilder")
 
-					// Set the query rules in the query builder
-					$("#builder-basic").queryBuilder("setRules", query);
+			$('#builder-basic').queryBuilder({
+				plugins: ["bt-tooltip-errors"],
+				filters: filters,
+				rules: rules
+			});
 
-					// Trigger the search
-					searchEntries();
-				} catch (e) {
-					alert("ERROR: Could not parse search string from url");
-					console.error("ERROR: Could not parse search string from url");
-					console.error(e);
+			l("showing search")
+			$("#search_stuff").show();
+
+
+			try {
+				l("trying to find search param from url")
+				var urlParams = new URLSearchParams(window.location.search);
+				if (urlParams.has('search')) {
+					var searchParam = urlParams.get('search');
+					l("found search param from url:" + searchParam)
+					try {
+						l("trying to build query");
+						var query = JSON.parse(decodeURIComponent(searchParam));
+
+						// Set the query rules in the query builder
+						$("#builder-basic").queryBuilder("setRules", query);
+
+						// Trigger the search
+						searchEntries();
+					} catch (e) {
+						alert("ERROR: Could not parse search string from url");
+						console.error("ERROR: Could not parse search string from url");
+						console.error(e);
+					}
+				} else {
+					l("no search param found, resetting search");
+					resetSearch();
 				}
-			} else {
-				resetSearch();
+			} catch (e) {
+				console.error("ERROR in trying to receive filters and rules:", e);
 			}
 
+			l("receiving filters and rules", old_t);
+		},
+		error: function (e) {
+			console.error(e);
+			alert("ERROR loading site");
 		}
 	});
+
+	l("Loading document.ready", old_t);
 });
 
 $('#btn-reset').on('click', function() {

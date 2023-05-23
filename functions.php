@@ -258,7 +258,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 		// Handle form submission for deleting an entry
 		if (isset($_POST['delete_entry_id'])) {
 			$entryId = $_POST['delete_entry_id'];
-			$response = $mongodbhelper->deleteEntry($entryId);
+			$response = $GLOBALS["mdh"]->deleteEntry($entryId);
 			echo $response;
 			exit();
 		}
@@ -276,7 +276,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			$entryId = $_POST['entry_id'];
 			$newData = json_decode($_POST['json_data'], true);
 
-			$response = $mongodbhelper->updateEntry($entryId, $newData);
+			$response = $GLOBALS["mdh"]->updateEntry($entryId, $newData);
 			echo $response;
 			exit();
 		}
@@ -306,7 +306,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			}
 
 			foreach ($documents as $document) {
-				$mongodbhelper->insertDocument($document);
+				$GLOBALS["mdh"]->insertDocument($document);
 			}
 		}
 	}

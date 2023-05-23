@@ -52,7 +52,6 @@
 		<script>
 			"use strict";
 			<?php include("initialize_query_builder.php"); ?>
-			<?php include("sample_generalized_visualization.php"); ?>
 			<?php include("sample_map.php"); ?>
 			<?php include("sample_analyze.php"); ?>
 		</script>

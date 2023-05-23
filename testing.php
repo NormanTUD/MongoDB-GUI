@@ -346,9 +346,9 @@
 	$result = $mongodbHelper->find($searchQuery);
 	if(count($result)) {
 		$updatedEntry = $result[0];
-		is_equal("Search Entries after Update", $value, $updatedEntry['age']);
+		is_equal("Search Entries after inserting", $value, $updatedEntry['age']);
 	} else {
-		is_true("Searching failed", false);
+		is_true("Searching after inserting failed", false);
 	}
 
 	$newDocument = [
@@ -358,7 +358,6 @@
 	];
 
 	// Test replaceDocument() method
-	print ">>>>>$documentId<!!!!!\n";
 	$result = $mongodbHelper->replaceDocument($documentId, $newDocument);
 	$expected = '{"success":"Document replaced successfully.","documentId":{"$oid":"'.$documentId.'"}}';
 	$real = json_decode($result, true);
@@ -374,13 +373,13 @@
 	is_true("Replace Document - documentId matches expected", $realDocumentId === $documentId);
 
 	// Test find() method after update
-	$searchQuery = ['_id' => $mongodbHelper->createId($documentId)];
-	$result = $mongodbHelper->find($searchQuery);
+	$result = $mongodbHelper->findById($documentId);
+	dier($result);
 	if (count($result)) {
 		$updatedEntry = $result[0];
 		is_equal("Search Entries after Update", $newDocument['age'], $updatedEntry['age']);
 	} else {
-		is_true("Searching failed", false);
+		is_true("Searching failed, not found: $documentId", false);
 	}
 
 	$result = $mongodbHelper->deleteEntry($entryId);

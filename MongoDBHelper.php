@@ -41,39 +41,34 @@ class MongoDBHelper {
 	}
 
 	public function replaceDocument($documentId, $newDocument) {
-		$bulkWrite = $this->newBulkWrite();
-
-
-		// Convert the document ID to MongoDB\BSON\ObjectID if needed
-		$documentId = $this->createId($documentId);
-
-
-		// Retrieve the existing document
-		$existingDocument = $this->findById($documentId);
-		if (!$existingDocument) {
-			return json_encode(['error' => 'Document not found.']);
-		}
-
-
-		// Delete the existing document
-		$filter = ['_id' => $documentId];
-		$bulkWrite->delete($filter);
-
-
-		// Insert the new document with the same ID
-		#$existingDocument = $existingDocument->toArray();
-
-		$existingDocument = json_decode(json_encode($existingDocument), true);
-		$newDocument['_id'] = $existingDocument[0]['_id']['$oid'];
-		$bulkWrite->insert($this->convertNumericStrings($newDocument));
-
 		try {
+			$bulkWrite = $this->newBulkWrite();
+
+			// Convert the document ID to MongoDB\BSON\ObjectID if needed
+			$documentId = $this->createId($documentId);
+
+			// Delete the existing document
+			$filter = ['_id' => $documentId];
+			$bulkWrite->delete($filter);
 			$this->executeBulkWrite($bulkWrite);
-			return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
+
+			$bulkWrite = $this->newBulkWrite();
+			// Insert the new document with the same ID
+			$newDocument['_id'] = $documentId;
+			$bulkWrite->insert($this->convertNumericStrings($newDocument));
+
+			try {
+				$this->executeBulkWrite($bulkWrite);
+				return json_encode(['success' => 'Document replaced successfully.', 'documentId' => $documentId]);
+			} catch (Exception $e) {
+				return json_encode(['error' => 'Error 1 replacing document: ' . $e->getMessage()]);
+			}
 		} catch (Exception $e) {
-			return json_encode(['error' => 'Error replacing document: ' . $e->getMessage()]);
+			return json_encode(['error' => 'Error 2 replacing document: ' . $e->getMessage()]);
 		}
 	}
+
+
 
 
 
@@ -95,11 +90,15 @@ class MongoDBHelper {
 		}
 	}
 
+	private function query ($filter=[], $projection=[]) {
+		return new MongoDB\Driver\Query($filter, $projection);
+	}
+
 	public function find($filter=[], $projection=[]) {
 		print "======\n";
 		print_r($filter);
 		print "======\n";
-		$query = new MongoDB\Driver\Query($filter, $projection);
+		$query = $this->query($filter, $projection);
 
 		try {
 			$cursor = $this->executeQuery($query);
@@ -127,7 +126,7 @@ class MongoDBHelper {
 	}
 
 	public function getAllEntries() {
-		$query = new MongoDB\Driver\Query([]);
+		$query = $this->query([]);
 		try {
 			$cursor = $this->executeQuery($query);
 		} catch (\Throwable $e) { // For PHP 7
@@ -153,7 +152,7 @@ class MongoDBHelper {
 	}
 
 	public function findById($id) {
-		$query = new MongoDB\Driver\Query(['_id' => $this->createId($id)]);
+		$query = $this->query(['_id' => $id]);
 		$cursor = $this->executeQuery($query);
 
 		return $cursor->toArray();
@@ -207,6 +206,33 @@ class MongoDBHelper {
 		}
 
 		return $data;
+	}
+
+
+	public function deleteKey($documentId, $key) {
+		$bulkWrite = new MongoDB\Driver\BulkWrite();
+
+		// Convert the document ID to MongoDB\BSON\ObjectID if needed
+		$documentId = $this->createId($documentId);
+
+		// Retrieve the existing document
+		$existingDocument = $this->findById($documentId);
+		if (!$existingDocument) {
+			return json_encode(['error' => 'Document not found.']);
+		}
+
+		// Delete the specified key
+		unset($existingDocument[$key]);
+
+		// Replace the document with the updated key
+		$bulkWrite->replace(['_id' => $documentId], $existingDocument);
+
+		try {
+			$this->executeBulkWrite($bulkWrite);
+			return json_encode(['success' => 'Key deleted successfully.', 'documentId' => $documentId]);
+		} catch (Exception $e) {
+			return json_encode(['error' => 'Error deleting key: ' . $e->getMessage()]);
+		}
 	}
 }
 

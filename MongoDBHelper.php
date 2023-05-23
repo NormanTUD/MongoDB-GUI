@@ -52,7 +52,7 @@ class MongoDBHelper {
 		}
 	}
 
-	public function searchEntries($filter=[], $rules=[]) {
+	public function find($filter=[], $rules=[]) {
 		$query = new MongoDB\Driver\Query($filter, $rules);
 
 		try {

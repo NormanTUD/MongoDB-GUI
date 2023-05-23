@@ -3,6 +3,8 @@ if (!defined('INCLUDED_FROM_INDEX')) {
     die('This file must be included from index.php');
 }
 
+require_once 'MongoDBHelper.php';
+
 function exception_error_handler($errno, $errstr, $errfile, $errline ) {
 	print "<pre>\n";
 	throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
@@ -24,6 +26,8 @@ $GLOBALS["namespace"] = $GLOBALS["databaseName"].".".$GLOBALS['collectionName'];
 
 // Connect to MongoDB
 $GLOBALS["mongoClient"] = new MongoDB\Driver\Manager("mongodb://".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]);
+
+$mongodbHelper = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);
 
 if (!isset($GLOBALS["mongoClient"]) || !isset($GLOBALS["databaseName"]) || !isset($GLOBALS["collectionName"]) || !isset($GLOBALS["namespace"])) {
 	echo "Incomplete or missing $GLOBALS variables.";
@@ -69,31 +73,6 @@ function getEnvOrDie($name, $fn = 0) {
 	return $value;
 }
 
-// Function to delete an entry by ID
-function deleteEntry($entryId) {
-	try {
-		$bulkWrite = new MongoDB\Driver\BulkWrite();
-		if(is_array($entryId) && isset($entryId['oid'])) {
-			$entryId = $entryId['oid'];
-		}
-
-		if(!$entryId && is_array($entryId) && isset($entryId['$oid'])) {
-			$entryId = $entryId['$oid'];
-		}
-
-		$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
-
-		$bulkWrite->delete($filter);
-
-		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
-
-		return json_encode(['success' => 'Entry deleted successfully.', 'entryId' => $entryId]);
-	} catch (Exception $e) {
-		return json_encode(['error' => 'Error deleting entry: ' . $e->getMessage()]);
-	}
-}
-
-
 function convertNumericStrings($data) {
 	if (is_array($data)) {
 		$result = [];
@@ -120,35 +99,9 @@ function convertNumericStrings($data) {
 	return $data;
 }
 
-
-
-
-// Function to update an entry by ID
-function updateEntry($entryId, $newData) {
-	try {
-		$bulkWrite = new MongoDB\Driver\BulkWrite();
-		if(is_array($entryId) && isset($entryId['oid'])) {
-			$entryId = $entryId['oid'];
-		}
-		$filter = ['_id' => new MongoDB\BSON\ObjectID($entryId)];
-
-		// Delete the existing document
-		$bulkWrite->delete($filter);
-
-		// Insert the updated document
-		$newData['_id'] = new MongoDB\BSON\ObjectID($entryId);
-		$bulkWrite->insert(convertNumericStrings($newData));
-
-		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
-		return json_encode(['success' => 'Entry updated successfully.', 'entryId' => $entryId]);
-	} catch (Exception $e) {
-		return json_encode(['error' => 'Error updating entry: ' . $e->getMessage()]);
-	}
-}
-
 function generateQueryBuilderFilter() {
 	$query = new MongoDB\Driver\Query([], ['projection' => ['_id' => 0]]);
-	$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
+	$cursor = $mongodbHelper->executeQuery($GLOBALS["namespace"], $query);
 
 	$filters = [];
 	$rules = [];
@@ -261,7 +214,9 @@ function getDataType($value, $is_recursion=0) {
 function getAllEntries() {
 	$query = new MongoDB\Driver\Query([]);
 	try {
-		$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
+		$cursor = $mongodbHelper->executeQuery($GLOBALS["namespace"], $query);
+		$entries = $cursor->toArray();
+		return $entries;
 	} catch (\Throwable $e) { // For PHP 7
 		$serverIP = $_SERVER['SERVER_ADDR'];
 		print "There was an error connecting to MongoDB. Are you sure you bound it to 0.0.0.0?<br>\n";
@@ -276,8 +231,7 @@ function getAllEntries() {
 		print "Error:<br>\n<br>\n";
 		print($e);
 	}
-	$entries = $cursor->toArray();
-	return $entries;
+	return null;
 }
 
 // Handle form submission for updating an entry
@@ -296,7 +250,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 
 	if (isset($_POST['search_query'])) {
 		$searchQuery = json_decode($_POST['search_query'], true);
-		$matchingEntries = searchEntries($searchQuery);
+		$matchingEntries = $mongodbHelper->searchEntries($searchQuery);
 		echo json_encode($matchingEntries);
 		exit;
 	}
@@ -305,7 +259,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 		// Handle form submission for deleting an entry
 		if (isset($_POST['delete_entry_id'])) {
 			$entryId = $_POST['delete_entry_id'];
-			$response = deleteEntry($entryId);
+			$response = $mongodbhelper->deleteEntry($entryId);
 			echo $response;
 			exit();
 		}
@@ -314,7 +268,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 		if (isset($_POST['new_entry_data'])) {
 			$newData = json_decode($_POST['new_entry_data'], true);
 			$entryId = (string) new MongoDB\BSON\ObjectID();
-			$response = updateEntry($entryId, $newData);
+			$response = $mongodbHelper->insertDocument($entryId, $newData);
 			echo $response;
 			exit();
 		}
@@ -323,7 +277,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			$entryId = $_POST['entry_id'];
 			$newData = json_decode($_POST['json_data'], true);
 
-			$response = updateEntry($entryId, $newData);
+			$response = $mongodbhelper->updateEntry($entryId, $newData);
 			echo $response;
 			exit();
 		}
@@ -353,132 +307,11 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			}
 
 			foreach ($documents as $document) {
-				insertDocument($document);
+				$mongodbhelper->insertDocument($document);
 			}
 		}
 	}
 }
-
-function insertDocument($document) {
-	if($document) {
-		$bulkWrite = new MongoDB\Driver\BulkWrite();
-		$bulkWrite->insert(convertNumericStrings($document));
-
-		try {
-			$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
-			return json_encode(['success' => 'Entry created successfully.']);
-		} catch (Exception $e) {
-			return json_encode(['error' => 'Error creating entry: ' . $e->getMessage()]);
-		}
-	} else {
-		dier("Document not defined in insertDocument");
-	}
-}
-
-
-
-function searchEntries($searchQuery) {
-	$filter = $searchQuery;
-	$rules = [];
-	$query = new MongoDB\Driver\Query($filter, $rules);
-
-	try {
-		$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
-		$entries = $cursor->toArray();
-		return $entries;
-	} catch (\Throwable $e) {
-		dier($e);
-		// Handle the error appropriately
-		// ...
-	}
-}
-
-
-// Function to insert a single value into a document
-function insertValue($documentId, $key, $value)
-{
-	$bulkWrite = new MongoDB\Driver\BulkWrite();
-	$filter = ['_id' => new MongoDB\BSON\ObjectID($documentId)];
-	$update = ['$set' => [$key => $value]];
-
-	$bulkWrite->update($filter, $update);
-
-	try {
-		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
-		return json_encode(['success' => 'Value inserted successfully.', 'documentId' => $documentId]);
-	} catch (Exception $e) {
-		return json_encode(['error' => 'Error inserting value: ' . $e->getMessage()]);
-	}
-}
-
-// Function to delete a single value from a document
-function deleteValue($documentId, $key)
-{
-	$bulkWrite = new MongoDB\Driver\BulkWrite();
-	$filter = ['_id' => new MongoDB\BSON\ObjectID($documentId)];
-	$update = ['$unset' => [$documentId => '']];
-
-	$bulkWrite->update($filter, $update);
-
-	try {
-		$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
-		return json_encode(['success' => 'Value deleted successfully.', 'documentId' => $documentId]);
-	} catch (Exception $e) {
-		return json_encode(['error' => 'Error deleting value: ' . $e->getMessage()]);
-	}
-}
-
-
-
-class MongoDBDocument {
-	private $documentId;
-	private $data;
-
-	public function __construct($documentId)
-	{
-		$this->documentId = $documentId;
-		$this->loadData();
-	}
-
-	private function loadData()
-	{
-		$filter = ['_id' => new MongoDB\BSON\ObjectID($this->documentId)];
-		$query = new MongoDB\Driver\Query($filter);
-		$cursor = $GLOBALS["mongoClient"]->executeQuery($GLOBALS["namespace"], $query);
-		$this->data = (array) current($cursor->toArray());
-	}
-
-	public function setValue($key, $value)
-	{
-		$this->data[$key] = $value;
-		$this->updateData();
-	}
-
-	public function deleteValue($key)
-	{
-		unset($this->data[$key]);
-		$this->updateData();
-	}
-
-	private function updateData()
-	{
-		$bulkWrite = new MongoDB\Driver\BulkWrite();
-		$filter = ['_id' => new MongoDB\BSON\ObjectID($this->documentId)];
-		$update = ['$set' => $this->data];
-
-		$bulkWrite->update($filter, $update);
-
-		try {
-			$GLOBALS["mongoClient"]->executeBulkWrite($GLOBALS["namespace"], $bulkWrite);
-		} catch (Exception $e) {
-			// Handle update error if needed
-		}
-	}
-}
-
-#$document = new MongoDBDocument('6469552aeb8474be4d0f00b2');
-#$document->setValue('key', 'value');
-#dier($document);
 
 function get_entries_with_geo_coordinates ($entries) {
 	$entries_with_geo_coords = [];
@@ -539,40 +372,26 @@ function find_lat_lon_variables_recursive($entry, $original_entry=null) {
 	return $lat_lon_variables;
 }
 
-
-
-
-function avg($numbers) {
-    $sum = array_sum($numbers);
-    $count = count($numbers);
-
-    if ($count === 0) {
-        return 0; // Return 0 to avoid division by zero error
-    }
-
-    return $sum / $count;
-}
-
 function removeDuplicates($r) {
-    $uniqueOptions = [];
+	$uniqueOptions = [];
 
-    for ($i = 0; $i < count($r); $i++) {
-        $option = $r[$i];
-        $isDuplicate = false;
+	for ($i = 0; $i < count($r); $i++) {
+		$option = $r[$i];
+		$isDuplicate = false;
 
-        for ($j = $i + 1; $j < count($r); $j++) {
-            if ($option['id'] === $r[$j]['id'] && $option['label'] === $r[$j]['label']) {
-                $isDuplicate = true;
-                break;
-            }
-        }
+		for ($j = $i + 1; $j < count($r); $j++) {
+			if ($option['id'] === $r[$j]['id'] && $option['label'] === $r[$j]['label']) {
+				$isDuplicate = true;
+				break;
+			}
+		}
 
-        if (!$isDuplicate) {
-            $uniqueOptions[] = $option;
-        }
-    }
+		if (!$isDuplicate) {
+			$uniqueOptions[] = $option;
+		}
+	}
 
-    return $uniqueOptions;
+	return $uniqueOptions;
 }
 
 function stderr ($msg) {

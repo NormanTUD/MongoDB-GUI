@@ -297,7 +297,6 @@
 	is_equal("get_filters(path5, value5)", get_filters($path5, $value5), $expected5);
 	 */
 
-	require_once 'MongoDBHelper.php';
 	// Create an instance of MongoDBHelper
 	$mongodbHelper = new MongoDBHelper();
 
@@ -311,9 +310,9 @@
 	$entries = $mongodbHelper->getAllEntries();
 	is_unequal("Get All Entries", 0, count($entries));
 
-	// Test searchEntries() method
+	// Test find() method
 	$searchQuery = ['name' => 'John'];
-	$result = json_decode(json_encode($mongodbHelper->searchEntries($searchQuery)), true);
+	$result = json_decode(json_encode($mongodbHelper->find($searchQuery)), true);
 	is_unequal("Search Entries", 0, count($result));
 
 	$entryId = $result[0]["_id"]["\$oid"];
@@ -350,9 +349,9 @@
 	// Check if the documentId matches the expected value
 	is_true("Insert Value - documentId matches expected", $realDocumentId === $documentId);
 
-	// Test searchEntries() method after update
+	// Test find() method after update
 	$searchQuery = ['_id' => $mongodbHelper->createId($documentId )];
-	$result = $mongodbHelper->searchEntries($searchQuery);
+	$result = $mongodbHelper->find($searchQuery);
 	if(count($result)) {
 		$updatedEntry = $result[0];
 		is_equal("Search Entries after Update", $value, $updatedEntry['age']);

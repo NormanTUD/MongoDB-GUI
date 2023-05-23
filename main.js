@@ -551,6 +551,26 @@ function updateQueryStringParameter(url, key, value) {
 	l("updateQueryStringParameter", old_ts);
 }
 
+function removeQueryStringParameter(url, key) {
+	var old_ts = l("removeQueryStringParameter");
+	var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+	var separator = url.indexOf('?') !== -1 ? "&" : "?";
+
+	if (url.match(re)) {
+		return url.replace(re, function (match, p1, p2) {
+			if (p1 === "?" || p1 === "&") {
+				return p2 === "&" ? p1 : "";
+			} else {
+				return p1;
+			}
+		});
+	} else {
+		return url;
+	}
+
+	l("removeQueryStringParameter", old_ts);
+}
+
 function resetSearch(e=false) {
 	var old_ts = l("resetSearch");
 	if(e) {
@@ -558,7 +578,7 @@ function resetSearch(e=false) {
 		e.stopPropagation();
 	}
 
-	var newUrl = updateQueryStringParameter(window.location.href, 'search');
+	var newUrl = removeQueryStringParameter(window.location.href, 'search');
 	history.pushState({ path: newUrl }, '', newUrl);
 
 	// Reset the query builder

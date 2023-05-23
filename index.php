@@ -40,8 +40,8 @@
 			"use strict";
 			<?php include("initialize_query_builder.php"); ?>
 		</script>
-		<div class="status-bar">
-			<p id='l'>Status: Online</p>
+		<div id="status-bar">
+			<p id='l'>Initializing...</p>
 		</div>
 	</body>
 </html>

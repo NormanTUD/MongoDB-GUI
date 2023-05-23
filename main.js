@@ -257,7 +257,7 @@ function groupJSONStructures(entries) {
 }
 
 
-function generateVisualization(entries) {
+async function generateVisualization(entries) {
 	var old_ts = l("generateVisualization");
 	var analyze_fields = {
 		'age (avg)': {

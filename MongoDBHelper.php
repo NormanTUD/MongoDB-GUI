@@ -2,16 +2,17 @@
 class MongoDBHelper {
 	private $mongoClient;
 	private $namespace;
+	private $enableDebug;
 
 	public function __construct($mongodbHost = "localhost", $mongodbPort = 27017, $databaseName = "test", $collectionName = "Tzwei") {
 		$mongoConnectionString = "mongodb://{$mongodbHost}:{$mongodbPort}";
 		$this->mongoClient = new MongoDB\Driver\Manager($mongoConnectionString);
 		$this->namespace = "{$databaseName}.{$collectionName}";
-		$this->enableDebug = false;
+		$this->enableDebug = 0;
 	}
 
 	public function setDebug ($val) {
-		$this->enableDebug = !!$val;
+		$this->enableDebug = $val ? 1 : 0;
 	}
 
 	private function debug ($msg) {

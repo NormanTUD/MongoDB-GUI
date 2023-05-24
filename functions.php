@@ -426,7 +426,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			exit();
 		}
 
-		if(isset($_POST["auto_submit_form"]) && $_POST["auto_submit_form"] == "1") {
+		if(isset($_POST["auto_submit_form"])) {
 			$full = process_autoform($questions);
 
 			$post = json_decode(json_encode($_POST), true);

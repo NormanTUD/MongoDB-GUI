@@ -132,20 +132,21 @@
 
 		if (Object.keys(sensorData).length > 0) {
 			// Prepare JSON data to be submitted
-			var jsonData = JSON.stringify(sensorData);
+			var jsonData = "new_entry_data=" + JSON.stringify(sensorData);
 			log("JSON data to be submitted: " + jsonData);
 
 			// Submit JSON data to the server
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', 'submit.php', true);
-			xhr.setRequestHeader('Content-type', 'application/json');
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState === 4 && xhr.status === 200) {
-					var response = JSON.parse(xhr.responseText);
+			$.ajax({
+			url: 'submit.php',
+				type: 'POST',
+				data: jsonData,
+				success: function(response) {
 					log("Server response: " + response);
+				},
+				error: function(xhr, status, error) {
+					console.error("AJAX error:", error);
 				}
-			};
-			xhr.send(jsonData);
+			});
 
 			// Reset sensor data object
 			sensorData = {};

@@ -277,6 +277,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			$entryId = $GLOBALS["mdh"]->createId($entryId);
 			$response = $GLOBALS["mdh"]->insertDocument($entryId, $post);
 			echo $response;		
+			exit();
 		}
 
 		// Handle form submission for adding a new entry

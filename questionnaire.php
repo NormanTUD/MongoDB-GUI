@@ -117,7 +117,7 @@ function getTranslation($key, $span = false) {
     if (isset($language[$lang])) {
         if (isset($language[$lang][$key])) {
             if ($span) {
-                return '<span class="'.$key.'"></span>';
+                return '<span class="TRANSLATEME_'.$key.'"></span>';
             } else {
                 return $language[$lang][$key];
             }

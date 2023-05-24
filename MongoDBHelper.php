@@ -16,12 +16,10 @@ class MongoDBHelper {
 	}
 
 	private function debug ($msg) {
-		if($this->enableDebug) {
 			print("=================");
 			print_r($msg);
 			debug_print_backtrace();
 			print("=================");
-		}
 	}
 
 	private function newBulkWrite () {

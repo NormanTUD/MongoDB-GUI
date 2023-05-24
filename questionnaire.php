@@ -290,52 +290,70 @@ function generateFormField($question) {
 
 // Function to validate and process the form submission
 function processFormSubmission($questions) {
-    $response = [];
-    $errors = [];
+	$response = [];
+	$errors = [];
 
-    foreach ($questions as $group) {
-        foreach ($group['questions'] as $question) {
-            $name = $question['name'];
-            $value = $_POST[$name] ?? '';
+	foreach ($questions as $group) {
+		foreach ($group['questions'] as $question) {
+			$name = $question['name'];
+			if(isset($question["fields"])) {
+				$base_name = $question["name"];
+				foreach ($question["fields"] as $tq_name) {
+					$key = $base_name.'_'.$tq_name["name"];
+					$tq_value = $_POST[$key] ?? '';
 
-            if (isset($question['required']) && $question['required'] && empty($value)) {
-                $errors[] = getTranslation('required_question', true) . $question['question'];
-            }
+					if (isset($question['required']) && $question['required'] && empty($tq_value)) {
+						$errors[] = getTranslation('required_question', true) . $question['question'];
+					}
 
-            if ($question['input_type'] === 'number' && !is_numeric($value)) {
-                $errors[] = getTranslation('invalid_response', true) . $question['question'];
-            }
+					if ($question['input_type'] === 'number' && !is_numeric($tq_value)) {
+						$errors[] = getTranslation('invalid_response', true) . $question['question'];
+					}
 
-            $response[$name] = $value;
-        }
-    }
+					$response[$key] = $tq_value;
+				}
+			} else {
+				$value = $_POST[$name] ?? '';
 
-    if (!empty($errors)) {
-        // Display error messages
-        echo '<h2>Error</h2>';
-        echo '<ul>';
-        foreach ($errors as $error) {
-            echo '<li>' . $error . '</li>';
-        }
-        echo '</ul>';
-    } else {
-        // Display form submission data
-        echo '<h2>' . getTranslation('form_submission', true) . '</h2>';
-        echo '<ul>';
-	foreach ($response as $name => $value) {
-		if(is_array($value)) {
-			echo '<li><strong>' . $name . '</strong>: ' . join(', ', $value) . '</li>';
-		} else {
-			echo '<li><strong>' . $name . '</strong>: ' . $value . '</li>';
+				if (isset($question['required']) && $question['required'] && empty($value)) {
+					$errors[] = getTranslation('required_question', true) . $question['question'];
+				}
+
+				if ($question['input_type'] === 'number' && !is_numeric($value)) {
+					$errors[] = getTranslation('invalid_response', true) . $question['question'];
+				}
+
+				$response[$name] = $value;
+			}
 		}
 	}
-        echo '</ul>';
-    }
+
+	if (!empty($errors)) {
+		// Display error messages
+		echo '<h2>Error</h2>';
+		echo '<ul>';
+		foreach ($errors as $error) {
+			echo '<li>' . $error . '</li>';
+		}
+		echo '</ul>';
+	} else {
+		// Display form submission data
+		echo '<h2>' . getTranslation('form_submission', true) . '</h2>';
+		echo '<ul>';
+		foreach ($response as $name => $value) {
+			if(is_array($value)) {
+				echo '<li><strong>' . $name . '</strong>: ' . join(', ', $value) . '</li>';
+			} else {
+				echo '<li><strong>' . $name . '</strong>: ' . $value . '</li>';
+			}
+		}
+		echo '</ul>';
+	}
 }
 
 // Check if the form is submitted
 if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    processFormSubmission($questions);
+	processFormSubmission($questions);
 }
 ?>
 

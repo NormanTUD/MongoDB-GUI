@@ -135,7 +135,7 @@ class MongoDBHelper {
 
 		try {
 			$this->executeBulkWrite($bulkWrite);
-			return json_encode(['success' => 'Entry created successfully.', 'entryId' => $entryId['$oid']]);
+			return json_encode(['success' => 'Entry created successfully: '.$entryId['$oid'], 'entryId' => $entryId['$oid']]);
 		} catch (Exception $e) {
 			return json_encode(['error' => 'Error creating entry: ' . $e->getMessage()]);
 		}

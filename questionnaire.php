@@ -2,69 +2,85 @@
 // Sample list of questions and input types
 $questions = [
     [
-        'question' => 'What is your favorite color?',
-        'input_type' => 'text',
-        'required' => true
-    ],
-    [
-        'question' => 'How old are you?',
-        'input_type' => 'number',
-        'required' => true
-    ],
-    [
-        'question' => 'Enter your email address:',
-        'input_type' => 'email',
-        'required' => true
-    ],
-    [
-        'question' => 'Select your hobbies:',
-        'input_type' => 'checkbox',
-        'options' => [
-            'Reading',
-            'Sports',
-            'Music',
-            'Traveling'
-        ]
-    ],
-    [
-        'question' => 'Enter your coordinates:',
-        'input_type' => 'geocoordinates',
-        'required' => true,
-        'fields' => [
+        'group' => 'Personal Information',
+        'questions' => [
             [
-                'label' => 'Latitude',
-                'name' => 'latitude'
+                'question' => 'What is your name?',
+                'input_type' => 'text',
+                'required' => true
             ],
             [
-                'label' => 'Longitude',
-                'name' => 'longitude'
+                'question' => 'How old are you?',
+                'input_type' => 'number',
+                'required' => true
+            ],
+            [
+                'question' => 'Select your gender:',
+                'input_type' => 'radio',
+                'options' => [
+                    'Male',
+                    'Female',
+                    'Other'
+                ]
             ]
         ]
     ],
     [
-        'question' => 'Enter your address:',
-        'input_type' => 'address',
-        'required' => true,
-        'fields' => [
+        'group' => 'Hobbies',
+        'questions' => [
             [
-                'label' => 'Street',
-                'name' => 'street'
-            ],
-            [
-                'label' => 'City',
-                'name' => 'city'
-            ],
-            [
-                'label' => 'State',
-                'name' => 'state'
-            ],
-            [
-                'label' => 'Country',
-                'name' => 'country'
+                'question' => 'Select your hobbies:',
+                'input_type' => 'checkbox',
+                'options' => [
+                    'Reading',
+                    'Sports',
+                    'Music',
+                    'Traveling'
+                ]
             ]
         ]
     ],
-    // Add more questions here...
+    [
+        'group' => 'Location',
+        'questions' => [
+            [
+                'question' => 'Enter your address:',
+                'input_type' => 'address',
+                'required' => true,
+                'fields' => [
+                    [
+                        'label' => 'Street',
+                        'name' => 'street'
+                    ],
+                    [
+                        'label' => 'City',
+                        'name' => 'city'
+                    ],
+                    [
+                        'label' => 'State',
+                        'name' => 'state'
+                    ],
+                    [
+                        'label' => 'Country',
+                        'name' => 'country'
+                    ]
+                ]
+            ],
+            [
+                'question' => 'Select your country of residence:',
+                'input_type' => 'select',
+		'name' => 'country',
+                'options' => [
+                    'USA',
+                    'Canada',
+                    'UK',
+                    'Australia',
+                    'Other'
+                ]
+            ]
+        ]
+    ],
+    // Add more question groups here...
 ];
 
 // Function to check if a longitude value is valid
@@ -88,59 +104,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userResponses = [];
     $isValid = true;
 
-    // Iterate through each question and retrieve the user's response
-    foreach ($questions as $index => $question) {
-        $inputName = 'response_' . $index;
+    // Iterate through each question group and retrieve the user's responses
+    foreach ($questions as $group) {
+        foreach ($group['questions'] as $index => $question) {
+            $inputName = 'response_group_' . $index;
 
-        // Handle different input types
-        switch ($question['input_type']) {
-            case 'geocoordinates':
-                $response = [];
-                foreach ($question['fields'] as $field) {
-                    $fieldName = $inputName . '_' . $field['name'];
-                    $response[$field['name']] = $_POST[$fieldName];
-                }
+            // Handle different input types
+            switch ($question['input_type']) {
+                case 'address':
+                    $response = [];
+                    foreach ($question['fields'] as $field) {
+                        $fieldName = $inputName . '_' . $field['name'];
+                        $response[$field['name']] = $_POST[$fieldName];
+                    }
+                    break;
 
-                // Validate the longitude value
-                if (!isValidLongitude($response['longitude'])) {
-                    $isValid = false;
-                    echo 'Invalid longitude value for question: ' . $question['question'] . '<br>';
-                }
+                case 'radio':
+                case 'checkbox':
+                    $response = isset($_POST[$inputName]) ? $_POST[$inputName] : [];
+                    break;
 
-                if (!isValidLongitude($response['latitude'])) {
-                    $isValid = false;
-                    echo 'Invalid latitude value for question: ' . $question['question'] . '<br>';
-                }
+                default:
+                    $response = isset($_POST[$inputName]) ? $_POST[$inputName] : '';
 
-                break;
+                    // Validate if the field is required and empty
+                    if (isset($question['required']) && $question['required'] && empty($response)) {
+                        $isValid = false;
+                        echo 'Required question not answered: ' . $question['question'] . '<br>';
+                    }
+            }
 
-            case 'address':
-                $response = [];
-                foreach ($question['fields'] as $field) {
-                    $fieldName = $inputName . '_' . $field['name'];
-                    $response[$field['name']] = $_POST[$fieldName];
-                }
-                break;
-
-            case 'file':
-                $response = $_FILES[$inputName]['name'];
-                $uploadDir = 'uploads/';
-                $uploadFile = $uploadDir . basename($_FILES[$inputName]['name']);
-                move_uploaded_file($_FILES[$inputName]['tmp_name'], $uploadFile);
-                break;
-
-            default:
-                $response = isset($_POST[$inputName]) ? $_POST[$inputName] : '';
-
-                // Validate if the field is required and empty
-                if (isset($required["required"]) && $question['required'] && empty($response)) {
-                    $isValid = false;
-                    echo 'Required question not answered: ' . $question['question'] . '<br>';
-                }
+            // Store the user's response in the array
+            $userResponses[$group['group']][$question['question']] = $response;
         }
-
-        // Store the user's response in the array
-        $userResponses[$question['question']] = $response;
     }
 
     if ($isValid) {
@@ -153,25 +149,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Display the form again with error messages
         echo '<h1>Questionnaire</h1>';
         echo '<form method="POST" enctype="multipart/form-data">';
-        foreach ($questions as $index => $question) {
-            echo '<h3>' . $question['question'] . '</h3>';
+        foreach ($questions as $group) {
+            echo '<h2>' . $group['group'] . '</h2>';
+            foreach ($group['questions'] as $index => $question) {
+                echo '<h3>' . $question['question'] . '</h3>';
 
-            if ($question['input_type'] === 'geocoordinates' || $question['input_type'] === 'address') {
-                foreach ($question['fields'] as $field) {
-                    $fieldName = $inputName . '_' . $field['name'];
-                    echo '<label>' . $field['label'] . ':</label>';
-                    echo '<input type="text" name="response_' . $index . '_' . $field['name'] . '"><br>';
+                $inputName = 'response_group_' . $index;
+
+                // Handle different input types
+                switch ($question['input_type']) {
+                    case 'address':
+                        foreach ($question['fields'] as $field) {
+                            $fieldName = $inputName . '_' . $field['name'];
+                            echo '<label>' . $field['label'] . ':</label>';
+                            echo '<input type="text" name="' . $fieldName . '"><br>';
+                        }
+                        break;
+
+                    case 'radio':
+                        foreach ($question['options'] as $option) {
+                            echo '<label>';
+                            echo '<input type="radio" name="' . $inputName . '" value="' . $option . '"> ' . $option;
+                            echo '</label><br>';
+                        }
+                        break;
+
+                    case 'checkbox':
+                        foreach ($question['options'] as $option) {
+                            echo '<label>';
+                            echo '<input type="checkbox" name="' . $inputName . '[]" value="' . $option . '"> ' . $option;
+                            echo '</label><br>';
+                        }
+                        break;
+
+                    default:
+                        echo '<input type="' . $question['input_type'] . '" name="' . $inputName . '"><br>';
                 }
-            } elseif ($question['input_type'] === 'checkbox') {
-                foreach ($question['options'] as $option) {
-                    echo '<label>';
-                    echo '<input type="checkbox" name="response_' . $index . '[]" value="' . $option . '"> ' . $option;
-                    echo '</label><br>';
-                }
-            } elseif ($question['input_type'] === 'file') {
-                echo '<input type="file" name="response_' . $index . '"><br>';
-            } else {
-                echo '<input type="' . $question['input_type'] . '" name="response_' . $index . '"><br>';
             }
         }
 
@@ -193,26 +206,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($_SERVER['REQUEST_METHOD'] === 'GET'): ?>
         <h1>Questionnaire</h1>
         <form method="POST" enctype="multipart/form-data">
-            <?php foreach ($questions as $index => $question): ?>
-                <h3><?php echo $question['question']; ?></h3>
+            <?php foreach ($questions as $group): ?>
+                <h2><?php echo $group['group']; ?></h2>
+                <?php foreach ($group['questions'] as $index => $question): ?>
+                    <h3><?php echo $question['question']; ?></h3>
 
-                <?php if ($question['input_type'] === 'geocoordinates' || $question['input_type'] === 'address'): ?>
-                    <?php foreach ($question['fields'] as $field): ?>
-                        <label><?php echo $field['label']; ?>:
-                            <input type="text" name="response_<?php echo $index; ?>_<?php echo $field['name']; ?>">
-                        </label><br>
-                    <?php endforeach; ?>
-                <?php elseif ($question['input_type'] === 'checkbox'): ?>
-                    <?php foreach ($question['options'] as $option): ?>
-                        <label>
-                            <input type="checkbox" name="response_<?php echo $index; ?>[]" value="<?php echo $option; ?>"> <?php echo $option; ?>
-                        </label><br>
-                    <?php endforeach; ?>
-                <?php elseif ($question['input_type'] === 'file'): ?>
-                    <input type="file" name="response_<?php echo $index; ?>"><br>
-                <?php else: ?>
-                    <input type="<?php echo $question['input_type']; ?>" name="response_<?php echo $index; ?>"><br>
-                <?php endif; ?>
+                    <?php $inputName = 'response_group_' . $index; ?>
+
+                    <?php if ($question['input_type'] === 'address'): ?>
+                        <?php foreach ($question['fields'] as $field): ?>
+                            <?php $fieldName = $inputName . '_' . $field['name']; ?>
+                            <label><?php echo $field['label']; ?>:
+                                <input type="text" name="<?php echo $fieldName; ?>">
+                            </label><br>
+                        <?php endforeach; ?>
+                    <?php elseif ($question['input_type'] === 'select'): ?>
+			    <select name='<?php print $question["name"]; ?>'>
+                        <?php foreach ($question['options'] as $option): ?>
+				<option value="<?php echo $option; ?>"> <?php echo $option; ?></option>
+                        <?php endforeach; ?>
+</select>
+                    <?php elseif ($question['input_type'] === 'radio'): ?>
+                        <?php foreach ($question['options'] as $option): ?>
+                            <label>
+                                <input type="radio" name="<?php echo $inputName; ?>" value="<?php echo $option; ?>"> <?php echo $option; ?>
+                            </label><br>
+                        <?php endforeach; ?>
+                    <?php elseif ($question['input_type'] === 'checkbox'): ?>
+                        <?php foreach ($question['options'] as $option): ?>
+                            <label>
+                                <input type="checkbox" name="<?php echo $inputName; ?>[]" value="<?php echo $option; ?>"> <?php echo $option; ?>
+                            </label><br>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <input type="<?php echo $question['input_type']; ?>" name="<?php echo $inputName; ?>"><br>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             <?php endforeach; ?>
 
             <br>
@@ -221,4 +250,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 </body>
 </html>
-

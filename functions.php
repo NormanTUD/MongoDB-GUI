@@ -273,11 +273,9 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 		if(isset($_POST["auto_submit_form"]) && $_POST["auto_submit_form"] == "1") {
 			$post = json_decode(json_encode($_POST), true);
 			unset($post['auto_submit_form']);
-			#$entryId = (string) new MongoDB\BSON\ObjectID();
-			$entryId = $GLOBALS["mdh"]->createId();
-			dier($entryId);
+			$entryId = (string) new MongoDB\BSON\ObjectID();
+			$entryId = $GLOBALS["mdh"]->createId($entryId);
 			$response = $GLOBALS["mdh"]->insertDocument($entryId, $post);
-			dier($post);
 			echo $response;		
 		}
 
@@ -383,7 +381,7 @@ function find_lat_lon_variables_recursive($entry, $original_entry=null) {
 			}
 		}
 	} else {
-		dier("Entry is not an array/object");
+		return [];
 	}
 
 	return $lat_lon_variables;

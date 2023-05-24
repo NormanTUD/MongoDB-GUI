@@ -19,12 +19,12 @@ class MongoDBHelper {
 			try {
 				$entryId = $this->createId($entryId);
 			} catch (\Throwable $e) {
-				print "Entry-ID:\n";
-				print($entryId);
-				print "\n";
-				print "Error:\n";
-				print($e);
-				return json_encode(['error' => 'Error deleting entry: ' . $e->getMessage()]);
+				$str = "Entry-ID:\n";
+				$str .= ($entryId);
+				$str .= "\n";
+				$str .= "Error:\n";
+				$str .= $e;
+				return json_encode(['error' => 'Error deleting entry: ' . $e->getMessage()] . "\n$str");
 			}
 
 			$id = $this->createId($entryId);
@@ -115,7 +115,7 @@ class MongoDBHelper {
 				return json_encode(['error' => 'Error creating entry: ' . $e->getMessage()]);
 			}
 		} else {
-			die("Document not defined in insertDocument");
+			return json_encode(['error' => 'No document given']);
 		}
 	}
 

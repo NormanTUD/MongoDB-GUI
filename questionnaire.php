@@ -411,15 +411,15 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 						try {
 							var json = JSON.parse(d.json);
 						} catch (e) {
-							console.error(e);
+							toastr.error("Error:", e)
 						}
 					} catch (e) {
-						console.error(e);
+						toastr.error("Error:", e)
 					}
 					updateTranslations();
 				},
-				error: function (error) {
-					console.error('Error:', error);
+				error: function (e) {
+					toastr.error("Error:", e)
 					updateTranslations();
 				}
 			});

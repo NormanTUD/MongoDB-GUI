@@ -33,9 +33,9 @@ function l (msg, old_ts=null, printer="log") {
 	if(printer == "log") {
 		log(msg);
 	} else if (printer == "error") {
-		console.error(msg);
+		toastr.error(msg);
 	} else {
-		console.error("Unknown printer");
+		toastr.error("Unknown printer");
 		log(msg);
 	}
 
@@ -692,7 +692,7 @@ function convertRulesToMongoQuery(rules) {
 						value = false;
 					}
 				} else {
-					console.error("Unknown rule type", rule.type, rule);
+					toastr.error("Unknown rule type", rule.type, rule);
 				}
 
 				var fieldQuery = {};
@@ -749,12 +749,12 @@ function deleteEntry(entryId, event=null) {
 							delete window['editor_' + data.entryId['$oid']];
 						}
 					} catch (e) {
-						console.error(e);
+						toastr.error(e);
 					}
 				} else if (data.error) {
 					toastr.error(data.error);
 				} else {
-					console.error("??? case ???", data);
+					toastr.error("??? case ???", data);
 				}
 			} catch (e) {
 				toastr.error(e);
@@ -875,7 +875,7 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 			}
 		}
 	} else {
-		console.error("Entry is not an array/object");
+		toastr.error("Entry is not an array/object");
 	}
 	
 	//log("latLonVariables", latLonVariables);

@@ -819,11 +819,19 @@ function updateEntry(entryId, jsonData) {
 				json_data: jsonData
 			},
 		success: function (response) {
-			var data = JSON.parse(response);
-			if (data.success) {
-				toastr.success(data.success);
-			} else if (data.error) {
-				toastr.error(data.error);
+			if(response) {
+				try {
+					var data = JSON.parse(response);
+					if (data.success) {
+						toastr.success("OK:", data.success);
+					} else if (data.error) {
+						toastr.error("Error 5:", data.error);
+					}
+				} catch (e) {
+					toastr.error("Error 4:", "Trying to parse response failed");
+				}
+			} else {
+				toastr.error("Error 6:", "Response not found in updateEntry");
 			}
 		},
 		error: function () {

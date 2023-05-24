@@ -431,6 +431,8 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 
 			$post = json_decode(json_encode($_POST), true);
 			unset($post['auto_submit_form']);
+			dier($post);
+
 			$entryId = (string) new MongoDB\BSON\ObjectID();
 			$entryId = $GLOBALS["mdh"]->createId($entryId);
 			$response = $GLOBALS["mdh"]->insertDocument($entryId, $post);

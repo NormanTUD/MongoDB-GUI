@@ -24,6 +24,7 @@ class MongoDBHelper {
 	}
 
 	private function newBulkWrite () {
+		die("A");
 		$this->debug("newBulkWrite");
 		return new MongoDB\Driver\BulkWrite();
 	}

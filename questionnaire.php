@@ -73,7 +73,7 @@ include_once("functions.php");
 
 		}
 	</script>
-    <title><?php echo getTranslation('title'); ?></title>
+    <title>Questionnaire Test</title>
 </head>
 
 <body>

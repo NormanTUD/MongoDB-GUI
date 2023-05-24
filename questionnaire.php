@@ -145,7 +145,7 @@ $questions = [
 		]
 	],
 	[
-		'group' => getTranslation('hobbies_section',
+		'group' => getTranslation('hobbies_section'),
 		'questions' => [
 			[
 				'question' => getTranslation('hobbies_question'),

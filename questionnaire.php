@@ -406,32 +406,32 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 			 */
 
 			// Send form data to server
-$.ajax({
-    url: 'questionnaire.php',
-    type: 'POST',
-    contentType: 'application/json',
-    data: JSON.stringify({ new_entry_data: $("#myForm").serializeArray() }),
-    success: function (data) {
-        // Handle the server response
-        var resultContainer = document.getElementById('resultContainer');
-        try {
-            var d = JSON.parse(data);
-            resultContainer.innerHTML = d.html;
-            try {
-                var json = JSON.parse(d.json);
-            } catch (e) {
-                console.error(e);
-            }
-        } catch (e) {
-            console.error(e);
-        }
-        updateTranslations();
-    },
-    error: function (error) {
-        console.error('Error:', error);
-        updateTranslations();
-    }
-});
+			$.ajax({
+				url: 'questionnaire.php',
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify({ new_entry_data: $("#myForm").serializeArray() }),
+				success: function (data) {
+					// Handle the server response
+					var resultContainer = document.getElementById('resultContainer');
+					try {
+						var d = JSON.parse(data);
+						resultContainer.innerHTML = d.html;
+						try {
+							var json = JSON.parse(d.json);
+						} catch (e) {
+							console.error(e);
+						}
+					} catch (e) {
+						console.error(e);
+					}
+					updateTranslations();
+				},
+				error: function (error) {
+					console.error('Error:', error);
+					updateTranslations();
+				}
+			});
 
 		}
 	</script>

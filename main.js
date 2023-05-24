@@ -8,10 +8,6 @@ var heatLayer = null;
 
 function log (...args) { console.log(args); }
 
-function le (msg) {
-	return l (msg, null, "error");
-}
-
 function warning (...args) {
 	console.warn(...args);
 	toastr.warn(...args)
@@ -400,7 +396,7 @@ async function generalizedVisualization(entries) {
 				result: result
 			});
 		} else {
-			le("No result could be obtained");
+			error("No result could be obtained");
 			log("=====")
 			log("values:", values);
 			log("config:", config);

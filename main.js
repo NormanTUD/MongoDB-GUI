@@ -437,7 +437,7 @@ function appendEntry (entry_id) {
 		var full_entry = '<div id="' + id + '">' +
 				'<div id="jsoneditor_' + entry_id + '"></div>' +
 				'<button onclick="deleteEntry(\'' + entry_id + '\')"><span class="TRANSLATEME_delete" /></button>' +
-			'</div>'
+			'</div><hr>'
 
 		$('#entry_list').append(full_entry);
 	}

@@ -369,6 +369,45 @@ const language = {
   // Add more language translations here
 };
 
+var lang = 'de';
+
+// Get the language from the query string parameter 'lang'
+const urlParams = new URLSearchParams(window.location.search);
+const lang = urlParams.get('lang') || 'en'; // Default language is English
+
+// Function to update the translation of elements
+function updateTranslations() {
+  const elements = document.getElementsByClassName('TRANSLATEME');
+  for (const element of elements) {
+    const translationKey = element.classList[0];
+    const translation = language[lang][translationKey];
+    element.textContent = translation;
+  }
+}
+
+// Update translations on initial page load
+updateTranslations();
+
+// Update translations when language selector links are clicked
+const languageSelectors = document.getElementsByClassName('language-selector');
+for (const selector of languageSelectors) {
+  selector.addEventListener('click', function (event) {
+    event.preventDefault();
+    const selectedLang = this.getAttribute('href').substr(6);
+    urlParams.set('lang', selectedLang);
+    window.location.search = urlParams.toString();
+  });
+}
+
+// Update translations when language is changed via URL parameter
+window.addEventListener('popstate', function () {
+  const newLang = urlParams.get('lang') || 'en';
+  if (newLang !== lang) {
+    lang = newLang;
+    updateTranslations();
+  }
+});
+
 </script>
     <title><?php echo getTranslation('title'); ?></title>
 </head>

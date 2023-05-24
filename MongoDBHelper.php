@@ -7,13 +7,29 @@ class MongoDBHelper {
 		$mongoConnectionString = "mongodb://{$mongodbHost}:{$mongodbPort}";
 		$this->mongoClient = new MongoDB\Driver\Manager($mongoConnectionString);
 		$this->namespace = "{$databaseName}.{$collectionName}";
+		$this->debug = false;
+	}
+
+	public function setDebug ($val) {
+		$this->debug = !!$val;
+	}
+
+	private function debug ($msg) {
+		if($this->debug) {
+			print("=================");
+			print_r($msg);
+			debug_print_backtrace();
+			print("=================");
+		}
 	}
 
 	private function newBulkWrite () {
+		$this->debug("newBulkWrite");
 		return new MongoDB\Driver\BulkWrite();
 	}
 
 	public function deleteEntry($entryId) {
+		$this->debug(["deleteEntry" => $entryId]);
 		try {
 			$bulkWrite = $this->newBulkWrite();
 			try {
@@ -41,6 +57,7 @@ class MongoDBHelper {
 	}
 
 	public function replaceDocument($documentId, $newDocument) {
+		$this->debug(["replaceDocument" => ["documentId" => $documentId, "newDocument" => $newDocument]]);
 		try {
 			// Convert the document ID to MongoDB\BSON\ObjectID if needed
 
@@ -55,6 +72,7 @@ class MongoDBHelper {
 	}
 
 	private function updateIterateDocument($documentId, $document, $path = '') {
+		$this->debug(["updateIterateDocument" => ["documentId" => $documentId, "document" => $document, "path" => $path]]);
 		foreach ($document as $key => $value) {
 			$currentPath = $path . $key;
 
@@ -68,6 +86,7 @@ class MongoDBHelper {
 
 
 	public function insertValue($documentId, $key, $value) {
+		$this->debug(["insertValue" => ["documentId" => $documentId, "key" => $key, "value" => $value]]);
 		$bulkWrite = $this->newBulkWrite();
 		if($key == '_id' || $key == '$oid') {
 			return json_encode(['warning' => 'Not replacing _id', 'documentId' => $documentId]);
@@ -88,10 +107,12 @@ class MongoDBHelper {
 	}
 
 	private function query ($filter=[], $projection=[]) {
+		$this->debug(["query" => ["filter" => $filter, "projection" => $projection]]);
 		return new MongoDB\Driver\Query($filter, $projection);
 	}
 
 	public function find($filter=[], $projection=[]) {
+		$this->debug(["find" => ["filter" => $filter, "projection" => $projection]]);
 		$query = $this->query($filter, $projection);
 
 		try {
@@ -99,11 +120,12 @@ class MongoDBHelper {
 			$entries = $cursor->toArray();
 			return json_decode(json_encode($entries), true);
 		} catch (\Throwable $e) {
-			die($e);
+			return json_encode(["error" => $e]);
 		}
 	}
 
 	public function insertDocument($document) {
+		$this->debug(["insertDocument" => ["document" => $document]]);
 		if ($document) {
 			$bulkWrite = $this->newBulkWrite();
 			$entryId = json_decode(json_encode($bulkWrite->insert($this->convertNumericStrings($document))), true);
@@ -120,6 +142,7 @@ class MongoDBHelper {
 	}
 
 	public function getAllEntries() {
+		$this->debug("getAllEntries");
 		$query = $this->query([]);
 		try {
 			$cursor = $this->executeQuery($query);
@@ -142,10 +165,12 @@ class MongoDBHelper {
 	}
 
 	private function executeBulkWrite($bulkWrite) {
+		$this->debug(["executeBulkWrite" => ["bulkWrite" => $bulkWrite]]);
 		$this->mongoClient->executeBulkWrite($this->namespace, $bulkWrite);
 	}
 
 	public function findById($id) {
+		$this->debug(["findById" => ["id" => $id]]);
 		$id = $this->createId($id);
 		$filter = ['_id' => $id];
 		$query = $this->query($filter);
@@ -156,10 +181,12 @@ class MongoDBHelper {
 	}
 
 	public function executeQuery($query) {
+		$this->debug(["executeQuery" => ["query" => $query]]);
 		return $this->mongoClient->executeQuery($this->namespace, $query);
 	}
 
 	public function createId ($id) {
+		$this->debug(["createId" => ["id" => $id]]);
 		if (is_array($id) && isset($id['oid'])) {
 			$id = $id['oid'];
 		}
@@ -169,7 +196,7 @@ class MongoDBHelper {
 		}
 
 		if(!$id) {
-			die("Could not get id");
+			return json_encode(["error" => "Could not get id"]);
 		}
 
 		if (is_string($id)) {
@@ -180,6 +207,7 @@ class MongoDBHelper {
 	}
 
 	private function convertNumericStrings($data) {
+		$this->debug(["convertNumericStrings" => ["data" => $id]]);
 		if (is_array($data)) {
 			$result = [];
 			foreach ($data as $key => $value) {
@@ -205,8 +233,8 @@ class MongoDBHelper {
 		return $data;
 	}
 
-
 	public function deleteKey($documentId, $key) {
+		$this->debug(["deleteKey" => ["documentId" => $documentId, "key" => $key]]);
 		$bulkWrite = new MongoDB\Driver\BulkWrite();
 
 		// Convert the document ID to MongoDB\BSON\ObjectID if needed
@@ -234,4 +262,5 @@ class MongoDBHelper {
 }
 
 $GLOBALS["mdh"] = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);
+$GLOBALS["mdh"]->setDebug(1);
 ?>

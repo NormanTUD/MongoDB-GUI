@@ -29,7 +29,7 @@ $language = [
 		'state_label' => 'State',
 		'country_label' => 'Country',
 		'hobbies_question' => 'What are your hobbies?',
-		'hobbies_question' => 'Hobbies?',
+		'hobbies_section' => 'Hobbies?',
 		'personal_information' => 'Personal information',
 		'location_question' => 'Location'
 	],

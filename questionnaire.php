@@ -34,9 +34,11 @@ $language = [
 		'USA' => 'USA',
 		'UK' => 'UK',
 		'Australia' => 'Australia',
+		"form_submission" => "Sent data",
 		"Canada" => "Canada"
 	],
 	'de' => [
+		"form_submission" => "Gesendete Daten",
 		'name_question' => 'Wie ist dein Name?',
 		'age_question' => 'Wie alt bist du?',
 		'gender_question' => 'Was ist dein Geschlecht?',
@@ -71,6 +73,7 @@ $language = [
 	],
 	'ja' => [
 		'name_question' => 'お名前は何ですか？',
+		"form_submission" => "FORM_SUBMISSION",
 		'age_question' => '年齢はいくつですか？',
 		'gender_question' => '性別は何ですか？',
 		'male_option' => '男性',
@@ -185,23 +188,26 @@ $questions = [
 			[
 				'question' => 'address_question',
 				'input_type' => 'address',
-				'required' => true,
 				'name' => 'location',
 				'fields' => [
 					[
 						'label' => 'street_label',
+						'required' => true,
 						'name' => 'street'
 					],
 					[
 						'label' => 'city_label',
+						'required' => true,
 						'name' => 'city'
 					],
 					[
 						'label' => 'state_label',
+						'required' => true,
 						'name' => 'state'
 					],
 					[
 						'label' => 'country_label',
+						'required' => true,
 						'name' => 'country'
 					]
 				]
@@ -234,11 +240,11 @@ function processFormSubmission($questions)
             $value = $_POST[$name] ?? '';
 
             if (isset($question['required']) && $question['required'] && empty($value)) {
-                $errors[] = getTranslation('required_question') . $question['question'];
+                $errors[] = getTranslation('required_question', true) . $question['question'];
             }
 
             if ($question['input_type'] === 'number' && !is_numeric($value)) {
-                $errors[] = getTranslation('invalid_response') . $question['question'];
+                $errors[] = getTranslation('invalid_response', true) . $question['question'];
             }
 
             $response[$name] = $value;
@@ -255,11 +261,15 @@ function processFormSubmission($questions)
         echo '</ul>';
     } else {
         // Display form submission data
-        echo '<h2>' . getTranslation('form_submission') . '</h2>';
+        echo '<h2>' . getTranslation('form_submission', true) . '</h2>';
         echo '<ul>';
-        foreach ($response as $name => $value) {
-            echo '<li><strong>' . $name . '</strong>: ' . $value . '</li>';
-        }
+	foreach ($response as $name => $value) {
+		if(is_array($value)) {
+			echo '<li><strong>' . $name . '</strong>: ' . join(', ', $value) . '</li>';
+		} else {
+			echo '<li><strong>' . $name . '</strong>: ' . $value . '</li>';
+		}
+	}
         echo '</ul>';
     }
 }
@@ -332,7 +342,7 @@ const language = <?php print json_encode($language); ?>;
                 <h3><?php echo getTranslation($question['question'], true); ?></h3>
                 <?php foreach ($question['fields'] as $field): ?>
                     <label for="<?php echo $question['name'] . '_' . $field['name']; ?>"><?php echo getTranslation($field['label'], true); ?></label>
-                    <input type="text" name="<?php echo $question['name'] . '_' . $field['name']; ?>"<?php if ($question['required']) echo ' required'; ?>>
+                    <input type="text" name="<?php echo $question['name'] . '_' . $field['name']; ?>"<?php if (isset($question["required"]) && $question['required']) echo ' required'; ?>>
                 <?php endforeach; ?>
             <?php elseif ($question['input_type'] === 'select'): ?>
                 <h3><?php echo getTranslation($question['question'], true); ?></h3>

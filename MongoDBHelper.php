@@ -127,18 +127,17 @@ class MongoDBHelper {
 
 	public function insertDocument($document) {
 		$this->debug(["insertDocument" => ["document" => $document]]);
-		if ($document) {
-			$bulkWrite = $this->newBulkWrite();
-			$entryId = json_decode(json_encode($bulkWrite->insert($this->convertNumericStrings($document))), true);
+		if (!$document) {
+			$document = [];
+		}
+		$bulkWrite = $this->newBulkWrite();
+		$entryId = json_decode(json_encode($bulkWrite->insert($this->convertNumericStrings($document))), true);
 
-			try {
-				$this->executeBulkWrite($bulkWrite);
-				return json_encode(['success' => 'Entry created successfully.', 'entryId' => $entryId['$oid']]);
-			} catch (Exception $e) {
-				return json_encode(['error' => 'Error creating entry: ' . $e->getMessage()]);
-			}
-		} else {
-			return json_encode(['error' => 'No document given']);
+		try {
+			$this->executeBulkWrite($bulkWrite);
+			return json_encode(['success' => 'Entry created successfully.', 'entryId' => $entryId['$oid']]);
+		} catch (Exception $e) {
+			return json_encode(['error' => 'Error creating entry: ' . $e->getMessage()]);
 		}
 	}
 

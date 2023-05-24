@@ -29,6 +29,7 @@ $language = [
 		'state_label' => 'State',
 		'country_label' => 'Country',
 		'hobbies_question' => 'What are your hobbies?',
+		'hobbies_question' => 'Hobbies?',
 		'personal_information' => 'Personal information',
 		'location_question' => 'Location'
 	],
@@ -58,6 +59,7 @@ $language = [
 		'state_label' => 'Bundesland',
 		'country_label' => 'Land',
 		'hobbies_question' => 'Was sind deine Hobbys?',
+		'hobbies_section ' => 'Hobbys',
 		'personal_information' => 'Persönliche Informationen',
 		'location_question' => 'Ort'
 	],
@@ -87,6 +89,7 @@ $language = [
 		'state_label' => '都道府県',
 		'country_label' => '国',
 		'hobbies_question' => '趣味は何ですか？',
+		'hobbies_section' => '趣味は何ですか',
 		'personal_information' => '個人情報',
 		'location_question' => '位置'
 	],
@@ -142,7 +145,7 @@ $questions = [
 		]
 	],
 	[
-		'group' => 'Hobbies',
+		'group' => getTranslation('hobbies_section',
 		'questions' => [
 			[
 				'question' => getTranslation('hobbies_question'),

@@ -779,26 +779,30 @@ function addNewEntry(event) {
 			'new_entry_data': JSON.stringify(jsonData)
 		},
 		success: function (response) {
-			var data = JSON.parse(response);
-			if (data.success) {
-				toastr.success(data.success);
+			try {
+				var data = JSON.parse(response);
+				if (data.success) {
+					toastr.success(data.success);
 
-				appendEntry(data.entryId);
+					appendEntry(data.entryId);
 
-				const newEditor = new JSONEditor(
-					document.getElementById('jsoneditor_' + data.entryId),
-					{
-						mode: 'tree',
-							onBlur: function () {
-								const updatedJson = newEditor.get();
-								const newJsonData = JSON.stringify(updatedJson, null, 2);
-								updateEntry(data.entryId, newJsonData);
-							}
-					}
-				);
-				newEditor.set(jsonData);
-			} else if (data.error) {
-				toastr.error(data.error);
+					const newEditor = new JSONEditor(
+						document.getElementById('jsoneditor_' + data.entryId),
+						{
+							mode: 'tree',
+								onBlur: function () {
+									const updatedJson = newEditor.get();
+									const newJsonData = JSON.stringify(updatedJson, null, 2);
+									updateEntry(data.entryId, newJsonData);
+								}
+						}
+					);
+					newEditor.set(jsonData);
+				} else if (data.error) {
+					toastr.error(data.error);
+				}
+			} catch (e) {
+				toastr.error("Error:", e);
 			}
 		},
 		error: function () {

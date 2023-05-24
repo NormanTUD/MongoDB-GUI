@@ -432,12 +432,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			$post = json_decode(json_encode($_POST), true);
 			unset($post['auto_submit_form']);
 
-			$entryId = (string) new MongoDB\BSON\ObjectID();
-			$entryId = $GLOBALS["mdh"]->createId($entryId);
-
-			$post["_id"] = $entryId;
-
-			$response = $GLOBALS["mdh"]->insertDocument($entryId, $post);
+			$response = $GLOBALS["mdh"]->insertDocument($post);
 
 			$full['inserter'] = $response;
 
@@ -449,7 +444,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 		if (isset($_POST['new_entry_data'])) {
 			$newData = json_decode($_POST['new_entry_data'], true);
 			$entryId = (string) new MongoDB\BSON\ObjectID();
-			$response = $GLOBALS["mdh"]->insertDocument($entryId, $newData);
+			$response = $GLOBALS["mdh"]->insertDocument($newData);
 			echo $response;
 			exit();
 		}

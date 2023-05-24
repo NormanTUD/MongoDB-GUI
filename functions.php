@@ -33,12 +33,19 @@ if (!isset($GLOBALS["mongoClient"]) || !isset($GLOBALS["databaseName"]) || !isse
 
 require_once 'MongoDBHelper.php';
 
-$connection = fsockopen($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $errno, $errstr, 5);
-if (!$connection) {
+try {
+	$connection = fsockopen($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $errno, $errstr, 5);
+	if (!$connection) {
+		echo "Unable to connect to ".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]." and port specified";
+		return;
+	}
+	fclose($connection);
+} catch (\Throwable $e) {
 	echo "Unable to connect to ".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]." and port specified";
-	return;
+	echo "Is a mongodb instance running?";
+	echo $a;
+	exit(1);
 }
-fclose($connection);
 
 function dier ($msg) {
 	print_r($msg);

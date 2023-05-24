@@ -107,8 +107,7 @@ $language = [
 		'Canada' => 'Canada',
 		'Australia' => 'Australia',
 		"errors" => "Fehler"
-	],
-	// Add more language translations here
+	]
 ];
 
 // Function to retrieve language translations
@@ -399,21 +398,10 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 				e.stopPropagation();
 			}
 
-			// Collect form data
-			/*
-			var formData = new FormData(document.getElementById('myForm'));
-			log(formData);
-			 */
-
-			// Send form data to server
 			$.ajax({
-				url: 'questionnaire.php',
-				contentType: 'application/json',
-				type: 'POST',
-				data: {
-					new_entry_data: $("#myForm").serializeArray()
-				},
-
+				type : 'POST',
+				url : 'questionnaire.php',
+				data : $('#myForm').serialize(),
 				success: function (data) {
 					// Handle the server response
 					var resultContainer = document.getElementById('resultContainer');

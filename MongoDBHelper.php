@@ -207,7 +207,7 @@ class MongoDBHelper {
 	}
 
 	private function convertNumericStrings($data) {
-		$this->debug(["convertNumericStrings" => ["data" => $id]]);
+		$this->debug(["convertNumericStrings" => ["data" => $data]]);
 		if (is_array($data)) {
 			$result = [];
 			foreach ($data as $key => $value) {

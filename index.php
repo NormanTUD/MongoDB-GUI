@@ -13,6 +13,7 @@
 		<?php include("headers.php"); ?>
 	</head>
 	<body>
+		<?php include("language_choser.php"); ?>
 		<div id="map" style="height: 400px;"></div>
 
 		<div id="search_stuff">
@@ -25,7 +26,7 @@
 		</div>
 
 
-		<b><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> on <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></b><br>
+		<b><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> <span class="TRANSLATEME_on"></span> <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></b><br>
 
 		<div id="entry_list">
 		</div>

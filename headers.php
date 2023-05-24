@@ -22,4 +22,8 @@
 <script src="translations.js"></script>
 <script>
 	const language = <?php print json_encode($language); ?>;
+
+	$(document).ready(function () {
+		updateTranslations();
+	});
 </script>

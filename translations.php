@@ -1,6 +1,7 @@
 <?php
 $language = [
 	'en' => [
+		'on' => 'on',
 		'name_question' => 'What is your name?',
 		'age_question' => 'How old are you?',
 		'gender_question' => 'Whats your gender?',
@@ -31,11 +32,18 @@ $language = [
 		'USA' => 'USA',
 		'UK' => 'UK',
 		'Australia' => 'Australia',
-		"form_submission" => "Sent data",
 		"Canada" => "Canada",
-		"errors" => "Errors"
+		"form_submission" => "Sent data",
+
+
+		"errors" => "Errors",
+
+		'import_from_csv_json' => 'Import from CSV/JSON',
+		"explain_import_csv" => "For CSV: Each line is one new document, the keys being the column names. Please use comma as a seperator. Write strings in double quotes.",
+		"explain_import_json" => "For JSON: The whole file is one document."
 	],
 	'de' => [
+		"on" => 'auf',
 		"form_submission" => "Gesendete Daten",
 		'name_question' => 'Wie ist dein Name?',
 		'age_question' => 'Wie alt bist du?',
@@ -68,9 +76,14 @@ $language = [
 		'UK' => 'UK',
 		"Canada" => "Canada",
 		'Australia' => 'Australien',
-		"errors" => "Fehler"
-	],
+
+		"errors" => "Fehler",
+		'import_from_csv_json' => 'Aus CSV/JSON importieren',
+		"explain_import_csv" => "Für CSV: Jede Zeile ist ein neues Dokument. Bitte Komma als Seperator benutzen, Strings mit Komma in Anführungszeichen.",
+		"explain_import_json" => "Für JSON: Das gesamte Dokument ist ein neues Dokument"],
 	'ja' => [
+		'import_from_csv_json' => 'Import from CSV/JSON (japanese)',
+		'on' => 'ON (japanese)',
 		'name_question' => 'お名前は何ですか？',
 		"form_submission" => "FORM_SUBMISSION",
 		'age_question' => '年齢はいくつですか？',
@@ -103,7 +116,10 @@ $language = [
 		'UK' => 'UK',
 		'Canada' => 'Canada',
 		'Australia' => 'Australia',
-		"errors" => "Fehler"
+
+		"errors" => "Fehler",
+		"explain_import_csv" => "For CSV: Each line is one new document, the keys being the column names. Please use comma as a seperator. Write strings in double quotes. (japanese)",
+		"explain_import_json" => "For JSON: The whole file is one document. (japanese)"
 	]
 ];
 ?>

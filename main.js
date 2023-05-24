@@ -521,15 +521,6 @@ function updateMap(entries) {
 		}).addTo(map);
 	}
 
-
-
-
-
-
-
-
-
-
 	markerCluster.clearLayers();
 	map.removeLayer(heatLayer);
 
@@ -865,6 +856,15 @@ function updateEntry(entryId, jsonData) {
 }
 
 function findLatLonVariablesRecursive(entry, originalEntry = null) {
+	var keywords = [
+		["lat", "lon"],
+		["latitude", "longitude"]
+	];
+
+	return findVariablesRecursive(entry, keywords, originalEntry);
+}
+
+function findVariablesRecursive(entry, keywords, originalEntry = null) {
 	var old_ts;
 	if (originalEntry === null) {
 		originalEntry = JSON.parse(JSON.stringify(entry));
@@ -873,11 +873,6 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 
 	const latLonVariables = [];
 	const geoCoordRegex = /^[-+]?\d{1,3}(?:\.\d+)?$/;
-
-	const keywords = [
-		["lat", "lon"],
-		["latitude", "longitude"]
-	];
 
 	if (Array.isArray(entry) || typeof entry === "object") {
 		for (const key in entry) {
@@ -908,9 +903,7 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 		error("Entry is not an array/object");
 	}
 	
-	//log("latLonVariables", latLonVariables);
 	var no_duplicates = removeDuplicatesFromJSON(latLonVariables, !!old_ts);
-	//log("no_duplicates", no_duplicates);
 
 	if(old_ts) {
 		l("findLatLonVariablesRecursive", old_ts);

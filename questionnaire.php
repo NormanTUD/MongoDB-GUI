@@ -289,6 +289,8 @@ function generateFormField($question) {
 
 // Function to validate and process the form submission
 function processFormSubmission($questions) {
+	$html = '';
+
 	$response = [];
 	$errors = [];
 
@@ -329,30 +331,32 @@ function processFormSubmission($questions) {
 
 	if (!empty($errors)) {
 		// Display error messages
-		echo '<h2>Error</h2>';
-		echo '<ul>';
+		$html .= '<h2>Error</h2>';
+		$html .= '<ul>';
 		foreach ($errors as $error) {
-			echo '<li>' . $error . '</li>';
+			$html .= '<li>' . $error . '</li>';
 		}
-		echo '</ul>';
+		$html .= '</ul>';
 	} else {
 		// Display form submission data
-		echo '<h2>' . getTranslation('form_submission', true) . '</h2>';
-		echo '<ul>';
+		$html .= '<h2>' . getTranslation('form_submission', true) . '</h2>';
+		$html .= '<ul>';
 		foreach ($response as $name => $value) {
 			if(is_array($value)) {
-				echo '<li><strong>' . $name . '</strong>: ' . join(', ', $value) . '</li>';
+				$html .= '<li><strong>' . $name . '</strong>: ' . join(', ', $value) . '</li>';
 			} else {
-				echo '<li><strong>' . $name . '</strong>: ' . $value . '</li>';
+				$html .= '<li><strong>' . $name . '</strong>: ' . $value . '</li>';
 			}
 		}
-		echo '</ul>';
+		$html .= '</ul>';
 	}
+
+	return ["html" => $html, "json" => json_encode($response)];
 }
 
 // Check if the form is submitted
 if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-	processFormSubmission($questions);
+	print json_encode(processFormSubmission($questions));
 	exit();
 }
 ?>
@@ -391,7 +395,13 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 			.then(data => {
 			    // Handle the server response
 			    var resultContainer = document.getElementById('resultContainer');
-			    resultContainer.innerHTML = data;
+			    try {
+				    var d = JSON.parse(data);
+				    log(d);
+				    resultContainer.innerHTML = d.html;
+			    } catch (e) {
+				console.error(e);
+			    }
 			})
 			.catch(error => {
 			    console.error('Error:', error);
@@ -402,6 +412,7 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 </head>
 
 <body>
+<div id="resultContainer"></div>
     <div>
         <?php
         $languageIcons = [
@@ -427,7 +438,6 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
     <br>
     <button onclick='submitForm(event);' type="submit"><?php echo getTranslation('submit', true); ?></button>
 </form>
-<div id="resultContainer"></div>
 	<script>
 // Get the language from the query string parameter 'lang'
 const urlParams = new URLSearchParams(window.location.search);

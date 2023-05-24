@@ -818,6 +818,7 @@ function addNewEntry(event) {
 				} else if (data.error) {
 					error(data.error);
 				}
+				updateTranslations();
 			} catch (e) {
 				error(e, "Error:");
 			}
@@ -828,8 +829,6 @@ function addNewEntry(event) {
 	});
 
 	l("addNewEntry", old_ts);
-
-	updateTranslations();
 }
 
 function updateEntry(entryId, jsonData) {

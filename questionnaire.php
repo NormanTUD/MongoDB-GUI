@@ -297,6 +297,8 @@
 			<?php endforeach; ?>
 		<button type="submit">Send</button>
 		</form>
+	<?php else: ?>
+		Not in a Browserlike environment. Are you calling this from the CLI?
 	<?php endif; ?>
 </body>
 </html>

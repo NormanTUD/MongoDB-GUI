@@ -43,7 +43,7 @@ try {
 } catch (\Throwable $e) {
 	echo "Unable to connect to ".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]." and port specified";
 	echo "Is a mongodb instance running?";
-	echo $a;
+	echo $e;
 	exit(1);
 }
 

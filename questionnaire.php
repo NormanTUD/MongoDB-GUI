@@ -35,7 +35,8 @@ $language = [
 		'UK' => 'UK',
 		'Australia' => 'Australia',
 		"form_submission" => "Sent data",
-		"Canada" => "Canada"
+		"Canada" => "Canada",
+		"errors" => "Errors"
 	],
 	'de' => [
 		"form_submission" => "Gesendete Daten",
@@ -69,7 +70,8 @@ $language = [
 		'USA' => 'USA',
 		'UK' => 'UK',
 		"Canada" => "Canada",
-		'Australia' => 'Australien'
+		'Australia' => 'Australien',
+		"errors" => "Fehler"
 	],
 	'ja' => [
 		'name_question' => 'お名前は何ですか？',
@@ -103,7 +105,8 @@ $language = [
 		'USA' => 'USA',
 		'UK' => 'UK',
 		'Canada' => 'Canada',
-		'Australia' => 'Australia'
+		'Australia' => 'Australia',
+		"errors" => "Fehler"
 	],
 	// Add more language translations here
 ];
@@ -304,11 +307,11 @@ function processFormSubmission($questions) {
 					$tq_value = $_POST[$key] ?? '';
 
 					if (isset($question['required']) && $question['required'] && empty($tq_value)) {
-						$errors[] = getTranslation('required_question', true) . $question['question'];
+						$errors[] = getTranslation('required_question', true) . getTranslation($question['question'], true);
 					}
 
 					if ($question['input_type'] === 'number' && !is_numeric($tq_value)) {
-						$errors[] = getTranslation('invalid_response', true) . $question['question'];
+						$errors[] = getTranslation('invalid_response', true) . getTranslation($question['question'], true);
 					}
 
 					$response[$key] = $tq_value;
@@ -317,11 +320,11 @@ function processFormSubmission($questions) {
 				$value = $_POST[$name] ?? '';
 
 				if (isset($question['required']) && $question['required'] && empty($value)) {
-					$errors[] = getTranslation('required_question', true) . $question['question'];
+					$errors[] = getTranslation('required_question', true) . getTranslation($question['question'], true);
 				}
 
 				if ($question['input_type'] === 'number' && !is_numeric($value)) {
-					$errors[] = getTranslation('invalid_response', true) . $question['question'];
+					$errors[] = getTranslation('invalid_response', true) . getTranslation($question['question'], true);
 				}
 
 				$response[$name] = $value;
@@ -331,7 +334,7 @@ function processFormSubmission($questions) {
 
 	if (!empty($errors)) {
 		// Display error messages
-		$html .= '<h2>Error</h2>';
+		$html .= '<h2>'.getTranslation("errors", true).'</h2>';
 		$html .= '<ul>';
 		foreach ($errors as $error) {
 			$html .= '<li>' . $error . '</li>';
@@ -390,7 +393,7 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 			// Send form data to server
 			fetch('questionnaire.php', {
 				method: 'POST',
-					body: formData
+				body: formData
 			})
 			.then(response => response.text())
 			.then(data => {
@@ -403,10 +406,11 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 						var json = JSON.parse(d.json);
 					} catch (e) {
 						console.error(e);
+						updateTranslations();
 					}
 
 					$.ajax({
-						url: "index.php",
+						url: "questionnaire.php?lang=" + lang,
 						type: 'POST',
 						new_entry_data: data.json,
 						success: function (r) {
@@ -419,6 +423,7 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 							} else if (data.error) {
 								toastr.error(data.error);
 							}
+							updateTranslations();
 						},
 						error: function () {
 							toastr.error('Error updating entry.');
@@ -426,10 +431,12 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 					});
 				} catch (e) {
 					console.error(e);
+					updateTranslations();
 				}
 			})
 			.catch(error => {
 				console.error('Error:', error);
+				updateTranslations();
 			});
 		}
 	</script>

@@ -156,8 +156,7 @@ $questions = [
 				'input_type' => 'number',
 				'required' => true,
 				'name' => 'age'
-			]
-			/*,
+			],
 			[
 				'question' => 'gender_question',
 				'input_type' => 'radio',
@@ -168,9 +167,8 @@ $questions = [
 					'other_option'
 				]
 			]
-			 */
 		]
-	]/*,
+	],
 	[
 		'group' => 'hobbies_question',
 		'questions' => [
@@ -231,7 +229,6 @@ $questions = [
 			]
 		]
 	]
-	 */
 ];
 
 
@@ -296,6 +293,8 @@ function generateFormField($question) {
 // Function to validate and process the form submission
 function processFormSubmission($questions) {
 	$html = '';
+
+dier($_POST);
 
 	$response = [];
 	$errors = [];
@@ -415,9 +414,7 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({
-					new_entry_data: getFormData($("#myForm"))
-				})
+				body: JSON.stringify({new_entry_data: getFormData($("#myForm"))})
 			})
 			.then(response => response.text())
 			.then(data => {
@@ -447,7 +444,6 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 </head>
 
 <body>
-<div id="resultContainer"></div>
     <div>
         <?php
         $languageIcons = [
@@ -466,6 +462,7 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
         }
         ?>
     </div>
+	<div id="resultContainer"></div>
     <h1><?php echo getTranslation('h1', 1); ?></h1>
 <form method="POST" enctype="multipart/form-data" id='myForm'>
     <?php echo generateFormFields($questions); ?>

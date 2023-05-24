@@ -12,15 +12,15 @@ class MongoDBHelper {
 	}
 
 	public function setDebug ($val) {
-		$this->enableDebug = ($val == 1 ? 1 : 0);
+		$enableDebug = ($val == 1 ? 1 : 0);
 	}
 
 	private function debug ($msg) {
-		if($this->enableDebug) {
-			print("=================");
+		if($enableDebug) {
+			print("=================\n");
 			print_r($msg);
 			debug_print_backtrace();
-			print("=================");
+			print("\n=================\n");
 		}
 	}
 

@@ -37,7 +37,8 @@ $language = [
 
 
 		"errors" => "Errors",
-
+		"search" => "Search",
+		"reset_search" => "Reset search",
 		'import_from_csv_json' => 'Import from CSV/JSON',
 		"explain_import_csv" => "For CSV: Each line is one new document, the keys being the column names. Please use comma as a seperator. Write strings in double quotes.",
 		"explain_import_json" => "For JSON: The whole file is one document.",
@@ -84,13 +85,15 @@ $language = [
 		"explain_import_csv" => "Für CSV: Jede Zeile ist ein neues Dokument. Bitte Komma als Seperator benutzen, Strings mit Komma in Anführungszeichen.",
 		"explain_import_json" => "Für JSON: Das gesamte Dokument ist ein neues Dokument",
 		"add_new_entry" => "Neuen Eintrag hinzufügen",
-		"delete" => "Löschen"
+		"delete" => "Löschen",
+		"search" => "Suchen",
+		"reset_search" => "Suche resetten"
 	],
 	'ja' => [
-		'import_from_csv_json' => 'Import from CSV/JSON (japanese)',
-		'on' => 'ON (japanese)',
+		'import_from_csv_json' => 'CSV/JSON からインポートする',
+		'on' => 'オン',
 		'name_question' => 'お名前は何ですか？',
-		"form_submission" => "FORM_SUBMISSION",
+		'form_submission' => 'フォームの提出',
 		'age_question' => '年齢はいくつですか？',
 		'gender_question' => '性別は何ですか？',
 		'male_option' => '男性',
@@ -104,8 +107,8 @@ $language = [
 		'country_residence_question' => '居住国はどこですか？',
 		'title' => 'アンケート',
 		'submit' => '送信',
-		'required_question' => '必須の質問が回答されていません: ',
-		'invalid_response' => '無効な回答です: ',
+		'required_question' => '必須の質問が回答されていません：',
+		'invalid_response' => '無効な回答です：',
 		'h1' => 'アンケート',
 		'not_in_browser' => 'ブラウザのような環境ではありません。CLI から呼び出していますか？',
 		'select_option' => 'オプションを選択',
@@ -117,16 +120,18 @@ $language = [
 		'hobbies_question' => '趣味は何ですか？',
 		'personal_information' => '個人情報',
 		'location_question' => '位置',
-		'USA' => 'USA',
-		'UK' => 'UK',
-		'Canada' => 'Canada',
-		'Australia' => 'Australia',
-
-		"errors" => "Fehler",
-		"explain_import_csv" => "For CSV: Each line is one new document, the keys being the column names. Please use comma as a seperator. Write strings in double quotes. (japanese)",
-		"explain_import_json" => "For JSON: The whole file is one document. (japanese)",
-		"add_new_entry" => "Add new entry",
-		"delete" => "Delete"
+		'USA' => 'アメリカ',
+		'UK' => 'イギリス',
+		'Canada' => 'カナダ',
+		'Australia' => 'オーストラリア',
+		'errors' => 'エラー',
+		'explain_import_csv' => 'CSV の場合：各行は新しいドキュメントであり、キーは列名です。カンマを区切り文字として使用してください。文字列はダブルクォートで囲んでください。',
+		'explain_import_json' => 'JSON の場合：ファイル全体が1つのドキュメントです。',
+		'add_new_entry' => '新しいエントリを追加',
+		'delete' => '削除',
+		"search" => "検索",
+		"reset_search" => "検索をリセットする"
 	]
+
 ];
 ?>

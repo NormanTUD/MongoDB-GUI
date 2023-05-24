@@ -19,8 +19,8 @@
 		<div id="search_stuff">
 			<form>
 				<div id="builder-basic"></div>
-				<button onclick="update_current_query(event);searchEntries()">Search</button>
-				<button onclick="resetSearch(event)">Reset Search</button>
+				<button onclick="update_current_query(event);searchEntries()"><span class="TRANSLATEME_search" /></button>
+				<button onclick="resetSearch(event)"><span class='TRANSLATEME_reset_search' /></button>
 				<div id="current_query"></div>
 			</form>
 		</div>

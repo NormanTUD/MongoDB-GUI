@@ -390,28 +390,41 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 			fetch('questionnaire.php', {
 				method: 'POST',
 					body: formData
-				})
-				.then(response => response.text())
-				.then(data => {
-					// Handle the server response
-					var resultContainer = document.getElementById('resultContainer');
+			})
+			.then(response => response.text())
+			.then(data => {
+				// Handle the server response
+				var resultContainer = document.getElementById('resultContainer');
+				try {
+					var d = JSON.parse(data);
+					resultContainer.innerHTML = d.html;
 					try {
-						var d = JSON.parse(data);
-						log(d);
-						resultContainer.innerHTML = d.html;
-						try {
-							var json = JSON.parse(d.json);
-							log(json);
-						} catch (e) {
-							console.error(e);
-						}
+						var json = JSON.parse(d.json);
 					} catch (e) {
 						console.error(e);
 					}
-				})
-				.catch(error => {
-					console.error('Error:', error);
-				});
+
+
+					fetch('index.php', {
+						method: 'POST',
+						new_entry_data: data.json
+					})
+					.then(response => response.text())
+					.then(data => {
+						// Handle the server response
+						var resultContainer = document.getElementById('resultContainer');
+						resultContainer.innerHTML = data;
+					})
+					.catch(error => {
+						console.error('Error:', error);
+					});
+				} catch (e) {
+					console.error(e);
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
 		}
 	</script>
     <title><?php echo getTranslation('title'); ?></title>

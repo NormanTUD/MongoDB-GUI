@@ -407,19 +407,25 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 					var resultContainer = document.getElementById('resultContainer');
 					try {
 						var d = JSON.parse(data);
+						log(d);
 						resultContainer.innerHTML = d.html;
 						try {
-							var json = JSON.parse(d.json);
+							var json = d.json;
+							if(json) {
+								console.log(json);
+							} else {
+								toastr.warning("json was empty from questionnaire");
+							}
 						} catch (e) {
-							toastr.error("Error:", e)
+							toastr.error(e, "Error 1:");
 						}
 					} catch (e) {
-						toastr.error("Error:", e)
+						toastr.error(e, "Error 2:");
 					}
 					updateTranslations();
 				},
 				error: function (e) {
-					toastr.error("Error:", e)
+					toastr.error(e, "Error 3:");
 					updateTranslations();
 				}
 			});

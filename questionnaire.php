@@ -378,35 +378,41 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 ?>
 	<script>
 		const language = <?php print json_encode($language); ?>;
-		    function submitForm(e) {
-			    if(e) {
+		function submitForm(e) {
+			if(e) {
 				e.preventDefault();
 				e.stopPropagation();
-			    }
+			}
 			// Collect form data
 			var formData = new FormData(document.getElementById('myForm'));
 
 			// Send form data to server
 			fetch('questionnaire.php', {
-			    method: 'POST',
-			    body: formData
-			})
-			.then(response => response.text())
-			.then(data => {
-			    // Handle the server response
-			    var resultContainer = document.getElementById('resultContainer');
-			    try {
-				    var d = JSON.parse(data);
-				    log(d);
-				    resultContainer.innerHTML = d.html;
-			    } catch (e) {
-				console.error(e);
-			    }
-			})
-			.catch(error => {
-			    console.error('Error:', error);
-			});
-		    }
+				method: 'POST',
+					body: formData
+				})
+				.then(response => response.text())
+				.then(data => {
+					// Handle the server response
+					var resultContainer = document.getElementById('resultContainer');
+					try {
+						var d = JSON.parse(data);
+						log(d);
+						resultContainer.innerHTML = d.html;
+						try {
+							var json = JSON.parse(d.json);
+							log(json);
+						} catch (e) {
+							console.error(e);
+						}
+					} catch (e) {
+						console.error(e);
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+		}
 	</script>
     <title><?php echo getTranslation('title'); ?></title>
 </head>

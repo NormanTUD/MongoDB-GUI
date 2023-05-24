@@ -156,7 +156,8 @@ $questions = [
 				'input_type' => 'number',
 				'required' => true,
 				'name' => 'age'
-			],
+			]
+			/*,
 			[
 				'question' => 'gender_question',
 				'input_type' => 'radio',
@@ -167,8 +168,9 @@ $questions = [
 					'other_option'
 				]
 			]
+			 */
 		]
-	],
+	]/*,
 	[
 		'group' => 'hobbies_question',
 		'questions' => [
@@ -229,6 +231,7 @@ $questions = [
 			]
 		]
 	]
+	 */
 ];
 
 
@@ -354,7 +357,7 @@ function processFormSubmission($questions) {
 		$html .= '</ul>';
 	}
 
-	return ["html" => $html, "json" => json_encode($response)];
+	return ["html" => $html, "json" => json_encode($response), "errors" => $errors];
 }
 
 // Check if the form is submitted
@@ -381,6 +384,18 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 ?>
 	<script>
 		const language = <?php print json_encode($language); ?>;
+
+		function getFormData($form){
+			var unindexed_array = $form.serializeArray();
+			var indexed_array = {};
+
+			$.map(unindexed_array, function(n, i){
+				indexed_array[n['name']] = n['value'];
+			});
+
+			return indexed_array;
+		}
+
 		function submitForm(e) {
 			if(e) {
 				e.preventDefault();
@@ -388,12 +403,21 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 			}
 
 			// Collect form data
+			/*
 			var formData = new FormData(document.getElementById('myForm'));
+			log(formData);
+			 */
 
 			// Send form data to server
+
 			fetch('questionnaire.php', {
 				method: 'POST',
-				body: formData
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					new_entry_data: getFormData($("#myForm"))
+				})
 			})
 			.then(response => response.text())
 			.then(data => {
@@ -402,37 +426,16 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 				try {
 					var d = JSON.parse(data);
 					resultContainer.innerHTML = d.html;
+
 					try {
 						var json = JSON.parse(d.json);
 					} catch (e) {
 						console.error(e);
-						updateTranslations();
 					}
-
-					$.ajax({
-						url: "questionnaire.php?lang=" + lang,
-						type: 'POST',
-						new_entry_data: data.json,
-						success: function (r) {
-							var data = JSON.parse(r);
-
-							var resultContainer = document.getElementById('resultContainer');
-							resultContainer.innerHTML = data.html;
-							if (data.success) {
-								toastr.success(data.success);
-							} else if (data.error) {
-								toastr.error(data.error);
-							}
-							updateTranslations();
-						},
-						error: function () {
-							toastr.error('Error updating entry.');
-						}
-					});
 				} catch (e) {
 					console.error(e);
-					updateTranslations();
 				}
+				updateTranslations();
 			})
 			.catch(error => {
 				console.error('Error:', error);

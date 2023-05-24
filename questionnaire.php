@@ -440,7 +440,6 @@ function updateTranslations() {
 	const elements = document.querySelectorAll('[class^="TRANSLATEME_"]');
 	elements.forEach((element) => {
 		const translationKey = element.classList[0].substring(12);
-		log(translationKey);
 		const translation = language[lang][translationKey];
 		element.textContent = translation;
 	});

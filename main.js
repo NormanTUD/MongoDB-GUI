@@ -12,6 +12,26 @@ function le (msg) {
 	return l (msg, null, "error");
 }
 
+function warning (...args) {
+	console.warn(...args);
+	toastr.warn(...args)
+}
+
+function info (...args) {
+	console.log(...args);
+	toastr.info(...args);
+}
+
+function success (...args) {
+	console.log(...args);
+	toastr.success(...args);
+}
+
+function error (...args) {
+	console.error(...args);
+	toastr.error(...args);
+}
+
 function l (msg, old_ts=null, printer="log") {
 	var ct = t();
 
@@ -33,9 +53,9 @@ function l (msg, old_ts=null, printer="log") {
 	if(printer == "log") {
 		log(msg);
 	} else if (printer == "error") {
-		toastr.error(msg);
+		error(msg);
 	} else {
-		toastr.error("Unknown printer");
+		error("Unknown printer");
 		log(msg);
 	}
 
@@ -86,7 +106,7 @@ function load_all_entries () {
 			var data = JSON.parse(response);
 
 			if (data !== null && data.success) {
-				toastr.success(data.success);
+				success(data.success);
 
 				// Update the entry list with all entries
 				$('#entry_list').html(data.entries);
@@ -100,11 +120,11 @@ function load_all_entries () {
 				var entries = data.entries;
 				visualizations(entries)
 			} else if (data.error) {
-				toastr.error(data.error);
+				error(data.error);
 			}
 		},
 		error: function () {
-			toastr.error('Error resetting search.');
+			error('Error resetting search.');
 		}
 	});
 
@@ -164,15 +184,15 @@ function searchEntries() {
 					// Generate the visualization
 					visualizations(matchingEntries);
 				} else {
-					toastr.info('No matching entries found.');
+					info('No matching entries found.');
 				}
 			},
 			error: function() {
-				toastr.error('Error searching entries.');
+				error('Error searching entries.');
 			}
 		});
 	} else {
-		toastr.info('Could not get search rules.');
+		info('Could not get search rules.');
 	}
 
 	l("searchEntries", old_ts);
@@ -693,7 +713,7 @@ function convertRulesToMongoQuery(rules) {
 						value = false;
 					}
 				} else {
-					toastr.error("Unknown rule type", rule.type, rule);
+					error(rule.type, rule, "Unknown rule type");
 				}
 
 				var fieldQuery = {};
@@ -737,7 +757,7 @@ function deleteEntry(entryId, event=null) {
 				var data = JSON.parse(response);
 				if (data.success) {
 					try {
-						toastr.success(data.success);
+						success(data.success);
 						// Remove the deleted entry from the page
 						var entry_id = 'entry_id' + data.entryId
 						var editor_id = 'json_editor_' + data.entryId
@@ -750,19 +770,19 @@ function deleteEntry(entryId, event=null) {
 							delete window['editor_' + data.entryId['$oid']];
 						}
 					} catch (e) {
-						toastr.error(e);
+						error(e);
 					}
 				} else if (data.error) {
-					toastr.error(data.error);
+					error(data.error);
 				} else {
-					toastr.error("??? case ???", data);
+					error(data, "??? case ???");
 				}
 			} catch (e) {
-				toastr.error(e);
+				error(e);
 			}
 		},
 		error: function () {
-			toastr.error('Error deleting entry.');
+			error('Error deleting entry.');
 		}
 	});
 	
@@ -783,7 +803,7 @@ function addNewEntry(event) {
 			try {
 				var data = JSON.parse(response);
 				if (data.success) {
-					toastr.success(data.success);
+					success(data.success);
 
 					appendEntry(data.entryId);
 
@@ -800,14 +820,14 @@ function addNewEntry(event) {
 					);
 					newEditor.set(jsonData);
 				} else if (data.error) {
-					toastr.error(data.error);
+					error(data.error);
 				}
 			} catch (e) {
-				toastr.error("Error:", e);
+				error(e, "Error:");
 			}
 		},
 		error: function () {
-			toastr.error('Error adding new entry.');
+			error('Error adding new entry.');
 		}
 	});
 
@@ -828,19 +848,19 @@ function updateEntry(entryId, jsonData) {
 				try {
 					var data = JSON.parse(response);
 					if (data.success) {
-						toastr.success("OK:", data.success);
+						success(data.success, "OK");
 					} else if (data.error) {
-						toastr.error("Error 5:", data.error);
+						error(data.error, "Error 5:");
 					}
 				} catch (e) {
-					toastr.error("Error 4:", "Trying to parse response failed");
+					error("Trying to parse response failed", "Error 4:");
 				}
 			} else {
-				toastr.error("Error 6:", "Response not found in updateEntry");
+				error("Response not found in updateEntry", "Error 6:");
 			}
 		},
 		error: function () {
-			toastr.error('Error updating entry.');
+			error('Error updating entry.');
 		}
 	});
 
@@ -888,7 +908,7 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 			}
 		}
 	} else {
-		toastr.error("Entry is not an array/object");
+		error("Entry is not an array/object");
 	}
 	
 	//log("latLonVariables", latLonVariables);

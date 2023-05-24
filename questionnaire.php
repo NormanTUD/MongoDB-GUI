@@ -47,28 +47,28 @@ include_once("functions.php");
 							var json = d.json;
 							if(json) {
 								if(inserter.success) {
-									toastr.success("OK", inserter.success);
+									success("OK", inserter.success);
 									console.log(json);
 								} else if (inserter.error) {
-									toastr.error("Inserter failed", inserter.error);
+									error("Inserter failed", inserter.error);
 									console.error(json);
 								} else {
-									toastr.error("Inserter failed");
+									error("Inserter failed");
 									console.error(json);
 								}
 							} else {
-								toastr.warning("json was empty from questionnaire");
+								warning("json was empty from questionnaire");
 							}
 						} catch (e) {
-							toastr.error(e, "Error 1:");
+							error(e, "Error 1:");
 						}
 					} catch (e) {
-						toastr.error(e, "Error 2:");
+						error(e, "Error 2:");
 					}
 					updateTranslations();
 				},
 				error: function (e) {
-					toastr.error(e, "Error 3:");
+					error(e, "Error 3:");
 					updateTranslations();
 				}
 			});

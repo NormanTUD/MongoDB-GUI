@@ -143,9 +143,9 @@
 				success: function(response) {
 					try {
 						log("Server response: " + response);
-						toastr.success("Success", JSON.parse(response)["success"]);
+						success("Success", JSON.parse(response)["success"]);
 					} catch (e) {
-						toastr.error("Error", e);
+						error("Error", e);
 					}
 				},
 				error: function(xhr, status, error) {

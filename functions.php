@@ -194,7 +194,7 @@ function getDataType($value, $is_recursion=0) {
 			return 'integer';
 		} elseif (is_float($value)) {
 			return 'double';
-		} elseif (preg_match('/^[+-]?\d+(?:\.\d+)?$/', $value)) {
+		} elseif (preg_match('/^\s*[+-]?\d+(?:\.\d+)?\s*$/', $value)) {
 			return 'double';
 		} else {
 			dier("Unhandled numeric type, >$value<");

@@ -337,7 +337,7 @@ const language = <?php print json_encode($language); ?>;
             <?php elseif ($question['input_type'] === 'select'): ?>
                 <h3><?php echo getTranslation($question['question'], true); ?></h3>
                 <select name="<?php echo $question['name']; ?>">
-                    <option value=""><?php echo getTranslation('select_option', true); ?></option>
+                    <?php echo getTranslation('select_option', true, true); ?>
                     <?php foreach ($question['options'] as $option): ?>
 			<?php echo getTranslation($option, true, true); ?>
                     <?php endforeach; ?>

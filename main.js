@@ -828,6 +828,8 @@ function addNewEntry(event) {
 	});
 
 	l("addNewEntry", old_ts);
+
+	updateTranslations();
 }
 
 function updateEntry(entryId, jsonData) {

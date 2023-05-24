@@ -453,7 +453,8 @@ const languageSelectors = document.getElementsByClassName('language-selector');
 Array.from(languageSelectors).forEach((selector) => {
 selector.addEventListener('click', function (event) {
 	event.preventDefault();
-	const selectedLang = this.getAttribute('href').substr(6);
+	log(this);
+	const selectedLang = $(this).find("a")[0].getAttribute('href').substr(6);
 	urlParams.set('lang', selectedLang);
 	window.location.search = urlParams.toString();
 });

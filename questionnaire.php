@@ -377,8 +377,6 @@ function updateTranslations() {
 		const translation = language[lang][translationKey];
 		if(translation) {
 			element.textContent = translation;
-			log(element);
-			log(translation);
 		} else {
 			alert("Could not translate " + translationKey + " to " + lang);
 		}

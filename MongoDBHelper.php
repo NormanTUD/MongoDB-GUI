@@ -7,15 +7,15 @@ class MongoDBHelper {
 		$mongoConnectionString = "mongodb://{$mongodbHost}:{$mongodbPort}";
 		$this->mongoClient = new MongoDB\Driver\Manager($mongoConnectionString);
 		$this->namespace = "{$databaseName}.{$collectionName}";
-		$this->debug = false;
+		$this->enableDebug = false;
 	}
 
 	public function setDebug ($val) {
-		$this->debug = !!$val;
+		$this->enableDebug = !!$val;
 	}
 
 	private function debug ($msg) {
-		if($this->debug) {
+		if($this->enableDebug) {
 			print("=================");
 			print_r($msg);
 			debug_print_backtrace();

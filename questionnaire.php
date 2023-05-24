@@ -187,7 +187,7 @@ $questions = [
 		'questions' => [
 			[
 				'question' => 'address_question',
-				'input_type' => 'address',
+				'input_type' => 'text',
 				'name' => 'location',
 				'fields' => [
 					[
@@ -228,9 +228,68 @@ $questions = [
 	]
 ];
 
-// Function to validate and process the form submission
-function processFormSubmission($questions)
+
+function generateFormFields($questions)
 {
+    $html = '';
+    
+    foreach ($questions as $group) {
+        $html .= '<h2>' . getTranslation($group['group'], true) . '</h2>';
+        
+        foreach ($group['questions'] as $index => $question) {
+            $html .= generateFormField($question);
+        }
+    }
+    
+    return $html;
+}
+
+function generateFormField($question) {
+	$html = '';
+
+	if ($question['input_type'] === 'text' || $question['input_type'] === 'number') {
+		$html .= '<h3>' . getTranslation($question['question'], true) . '</h3>';
+		if(isset($question["fields"]) && is_array($question["fields"])) {
+			foreach ($question['fields'] as $field) {
+				$html .= '<label for="' . $question['name'] . '_' . $field['name'] . '">' . getTranslation($field['label'], true) . '</label>';
+				$html .= '<input type="text" name="' . $question['name'] . '_' . $field['name'] . '"';
+				if (isset($field["required"]) && $field['required']) {
+					$html .= ' required';
+				}
+				$html .= '>';
+			}
+		} else {
+			$html .= '<input type="' . $question['input_type'] . '" name="' . $question['name'] . '"';
+			if (isset($question["required"]) && $question['required']) {
+				$html .= ' required';
+			}
+			$html .= '>';
+		}
+	} elseif ($question['input_type'] === 'radio') {
+		$html .= '<h3>' . getTranslation($question['question'], true) . '</h3>';
+		foreach ($question['options'] as $option) {
+			$html .= '<input type="radio" id="' . $question['name'] . '" name="' . $question['name'] . '" value="' . $option . '">' . getTranslation($option, true);
+		}
+	} elseif ($question['input_type'] === 'checkbox') {
+		$html .= '<h3>' . getTranslation($question['question'], true) . '</h3>';
+		foreach ($question['options'] as $option) {
+			$html .= '<input type="checkbox" name="' . $question['name'] . '[]" value="' . $option . '">' . getTranslation($option, true);
+		}
+	} elseif ($question['input_type'] === 'select') {
+		$html .= '<h3>' . getTranslation($question['question'], true) . '</h3>';
+		$html .= '<select name="' . $question['name'] . '">';
+		$html .= getTranslation('select_option', true, true);
+		foreach ($question['options'] as $option) {
+			$html .= getTranslation($option, true, true);
+		}
+		$html .= '</select>';
+	}
+
+	return $html;
+}
+
+// Function to validate and process the form submission
+function processFormSubmission($questions) {
     $response = [];
     $errors = [];
 
@@ -322,41 +381,9 @@ const language = <?php print json_encode($language); ?>;
     </div>
     <h1><?php echo getTranslation('h1', 1); ?></h1>
 <form method="POST" enctype="multipart/form-data">
-    <?php foreach ($questions as $group): ?>
-        <h2><?php echo getTranslation($group['group'], true); ?></h2>
-        <?php foreach ($group['questions'] as $index => $question): ?>
-            <?php if ($question['input_type'] === 'text' || $question['input_type'] === 'number'): ?>
-                <h3><?php echo getTranslation($question['question'], true); ?></h3>
-                <input type="<?php echo $question['input_type']; ?>" name="<?php echo $question['name']; ?>"<?php if ($question['required']) echo ' required'; ?>>
-            <?php elseif ($question['input_type'] === 'radio'): ?>
-                <h3><?php echo getTranslation($question['question'], true); ?></h3>
-                <?php foreach ($question['options'] as $option): ?>
-                    <input type="radio" id="<?php echo $question['name']; ?>" name="<?php echo $question['name']; ?>" value="<?php echo $option; ?>"><?php echo getTranslation($option, true); ?>
-                <?php endforeach; ?>
-            <?php elseif ($question['input_type'] === 'checkbox'): ?>
-                <h3><?php echo getTranslation($question['question'], true); ?></h3>
-                <?php foreach ($question['options'] as $option): ?>
-                    <input type="checkbox" name="<?php echo $question['name']; ?>[]" value="<?php echo $option; ?>"><?php echo getTranslation($option, true); ?>
-                <?php endforeach; ?>
-            <?php elseif ($question['input_type'] === 'address'): ?>
-                <h3><?php echo getTranslation($question['question'], true); ?></h3>
-                <?php foreach ($question['fields'] as $field): ?>
-                    <label for="<?php echo $question['name'] . '_' . $field['name']; ?>"><?php echo getTranslation($field['label'], true); ?></label>
-                    <input type="text" name="<?php echo $question['name'] . '_' . $field['name']; ?>"<?php if (isset($question["required"]) && $question['required']) echo ' required'; ?>>
-                <?php endforeach; ?>
-            <?php elseif ($question['input_type'] === 'select'): ?>
-                <h3><?php echo getTranslation($question['question'], true); ?></h3>
-                <select name="<?php echo $question['name']; ?>">
-                    <?php echo getTranslation('select_option', true, true); ?>
-                    <?php foreach ($question['options'] as $option): ?>
-			<?php echo getTranslation($option, true, true); ?>
-                    <?php endforeach; ?>
-                </select>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    <?php endforeach; ?>
-	<br>
-	<br>
+    <?php echo generateFormFields($questions); ?>
+    <br>
+    <br>
     <button type="submit"><?php echo getTranslation('submit', true); ?></button>
 </form>
 	<script>

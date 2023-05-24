@@ -353,6 +353,7 @@ function processFormSubmission($questions) {
 // Check if the form is submitted
 if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
 	processFormSubmission($questions);
+	exit();
 }
 ?>
 
@@ -372,8 +373,31 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 	include("headers.php");
 ?>
 	<script>
-const language = <?php print json_encode($language); ?>;
-</script>
+		const language = <?php print json_encode($language); ?>;
+		    function submitForm(e) {
+			    if(e) {
+				e.preventDefault();
+				e.stopPropagation();
+			    }
+			// Collect form data
+			var formData = new FormData(document.getElementById('myForm'));
+
+			// Send form data to server
+			fetch('questionnaire.php', {
+			    method: 'POST',
+			    body: formData
+			})
+			.then(response => response.text())
+			.then(data => {
+			    // Handle the server response
+			    var resultContainer = document.getElementById('resultContainer');
+			    resultContainer.innerHTML = data;
+			})
+			.catch(error => {
+			    console.error('Error:', error);
+			});
+		    }
+	</script>
     <title><?php echo getTranslation('title'); ?></title>
 </head>
 
@@ -397,12 +421,13 @@ const language = <?php print json_encode($language); ?>;
         ?>
     </div>
     <h1><?php echo getTranslation('h1', 1); ?></h1>
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" id='myForm'>
     <?php echo generateFormFields($questions); ?>
     <br>
     <br>
-    <button type="submit"><?php echo getTranslation('submit', true); ?></button>
+    <button onclick='submitForm(event);' type="submit"><?php echo getTranslation('submit', true); ?></button>
 </form>
+<div id="resultContainer"></div>
 	<script>
 // Get the language from the query string parameter 'lang'
 const urlParams = new URLSearchParams(window.location.search);

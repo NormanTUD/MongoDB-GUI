@@ -16,7 +16,6 @@ class MongoDBHelper {
 	}
 
 	private function debug ($msg) {
-		dier($this->enableDebug);
 		if($this->enableDebug) {
 			print("=================");
 			print_r($msg);

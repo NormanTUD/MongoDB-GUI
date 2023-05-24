@@ -387,7 +387,7 @@ const language = {
         foreach ($language as $lang => $translations) {
             if (isset($languageIcons[$lang])) {
                 echo '<span class="language-selector">';
-                echo '<a href="?lang=' . $lang . '">' . $languageIcons[$lang] . '</a>';
+		echo '<span onclick="setLang(\''.htmlentities($lang).'\')">' . $languageIcons[$lang] . '</span>';
                 echo '</span>';
             }
         }
@@ -435,6 +435,11 @@ const language = {
 const urlParams = new URLSearchParams(window.location.search);
 let lang = urlParams.get('lang') || 'en'; // Default language is English
 
+function setLang (l) {
+	lang = l;
+	updateTranslations();
+}
+
 // Function to update the translation of elements
 function updateTranslations() {
 	const elements = document.querySelectorAll('[class^="TRANSLATEME_"]');
@@ -449,15 +454,11 @@ function updateTranslations() {
 updateTranslations();
 
 // Update translations when language selector links are clicked
-const languageSelectors = document.getElementsByClassName('language-selector');
+var languageSelectors = $(".language-selector").find("span")
 Array.from(languageSelectors).forEach((selector) => {
-selector.addEventListener('click', function (event) {
-	event.preventDefault();
-	log(this);
-	const selectedLang = $(this).find("a")[0].getAttribute('href').substr(6);
-	urlParams.set('lang', selectedLang);
-	window.location.search = urlParams.toString();
-});
+	selector.addEventListener('click', function (event) {
+		event.preventDefault();
+	});
 });
 
 // Update translations when language is changed via URL parameter

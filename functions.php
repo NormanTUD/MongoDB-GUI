@@ -319,6 +319,7 @@ function generateFormField($question) {
 	} elseif ($question['input_type'] === 'select') {
 		$html .= '<h3>' . getTranslation($question['question'], true) . '</h3>';
 		$html .= '<select name="' . $question['name'] . '">';
+		//$html .= getTranslation('select_option', true);
 		foreach ($question['options'] as $option) {
 			$html .= getTranslation($option, true);
 		}

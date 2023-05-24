@@ -229,8 +229,7 @@ $questions = [
 ];
 
 
-function generateFormFields($questions)
-{
+function generateFormFields($questions) {
     $html = '';
     
     foreach ($questions as $group) {

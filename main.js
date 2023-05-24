@@ -773,10 +773,10 @@ function addNewEntry(event) {
 	event.stopPropagation();
 	const jsonData = {}; // Set your initial data here
 	$.ajax({
-	url: PHP_SELF,
+		url: PHP_SELF,
 		type: 'POST',
 		data: {
-			new_entry_data: JSON.stringify(jsonData)
+			'new_entry_data': JSON.stringify(jsonData)
 		},
 		success: function (response) {
 			var data = JSON.parse(response);

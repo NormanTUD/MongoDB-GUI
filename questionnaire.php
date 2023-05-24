@@ -408,9 +408,12 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 			// Send form data to server
 			$.ajax({
 				url: 'questionnaire.php',
-				type: 'POST',
 				contentType: 'application/json',
-				data: JSON.stringify({ new_entry_data: $("#myForm").serializeArray() }),
+				type: 'POST',
+				data: {
+					new_entry_data: $("#myForm").serializeArray()
+				},
+
 				success: function (data) {
 					// Handle the server response
 					var resultContainer = document.getElementById('resultContainer');

@@ -1,5 +1,4 @@
 <?php
-exit(php_info());
 	define('INCLUDED_FROM_INDEX', true);
 	include("functions.php");
 	// Define a counter for the number of started tests

@@ -142,6 +142,7 @@ class MongoDBHelper {
 	}
 
 	public function getAllEntries() {
+		die("A");
 		$this->debug("getAllEntries");
 		$query = $this->query([]);
 		try {

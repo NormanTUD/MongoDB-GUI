@@ -420,7 +420,7 @@ function appendEntry (entry_id) {
 	if(!$("#" + id).length) {
 		var full_entry = '<div id="' + id + '">' +
 				'<div id="jsoneditor_' + entry_id + '"></div>' +
-				'<button onclick="deleteEntry(\'' + entry_id + '\')">Delete</button>' +
+				'<button onclick="deleteEntry(\'' + entry_id + '\')"><span class="TRANSLATEME_delete" /></button>' +
 			'</div>'
 
 		$('#entry_list').append(full_entry);

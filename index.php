@@ -30,7 +30,7 @@
 
 		<div id="entry_list">
 		</div>
-		<button onclick="addNewEntry(event)">Add New Entry</button>
+		<button onclick="addNewEntry(event)"><span class='TRANSLATEME_add_new_entry' /></button>
 
 		<div id="countKeysChart"></div>
 		<div id="generalizedVisualizationChart"></div>

@@ -40,7 +40,9 @@ $language = [
 
 		'import_from_csv_json' => 'Import from CSV/JSON',
 		"explain_import_csv" => "For CSV: Each line is one new document, the keys being the column names. Please use comma as a seperator. Write strings in double quotes.",
-		"explain_import_json" => "For JSON: The whole file is one document."
+		"explain_import_json" => "For JSON: The whole file is one document.",
+		"delete" => "Delete",
+		"add_new_entry" => "Add new entry"
 	],
 	'de' => [
 		"on" => 'auf',
@@ -80,7 +82,10 @@ $language = [
 		"errors" => "Fehler",
 		'import_from_csv_json' => 'Aus CSV/JSON importieren',
 		"explain_import_csv" => "Für CSV: Jede Zeile ist ein neues Dokument. Bitte Komma als Seperator benutzen, Strings mit Komma in Anführungszeichen.",
-		"explain_import_json" => "Für JSON: Das gesamte Dokument ist ein neues Dokument"],
+		"explain_import_json" => "Für JSON: Das gesamte Dokument ist ein neues Dokument",
+		"add_new_entry" => "Neuen Eintrag hinzufügen",
+		"delete" => "Löschen"
+	],
 	'ja' => [
 		'import_from_csv_json' => 'Import from CSV/JSON (japanese)',
 		'on' => 'ON (japanese)',
@@ -119,7 +124,9 @@ $language = [
 
 		"errors" => "Fehler",
 		"explain_import_csv" => "For CSV: Each line is one new document, the keys being the column names. Please use comma as a seperator. Write strings in double quotes. (japanese)",
-		"explain_import_json" => "For JSON: The whole file is one document. (japanese)"
+		"explain_import_json" => "For JSON: The whole file is one document. (japanese)",
+		"add_new_entry" => "Add new entry",
+		"delete" => "Delete"
 	]
 ];
 ?>

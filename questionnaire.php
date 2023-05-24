@@ -7,16 +7,19 @@ $questions = [
             [
                 'question' => 'What is your name?',
                 'input_type' => 'text',
-                'required' => true
+                'required' => true,
+		'name' => 'your_name'
             ],
             [
                 'question' => 'How old are you?',
                 'input_type' => 'number',
-                'required' => true
+		'required' => true,
+		'name' => 'age'
             ],
             [
                 'question' => 'Select your gender:',
                 'input_type' => 'radio',
+                'name' => 'gender',
                 'options' => [
                     'Male',
                     'Female',
@@ -31,6 +34,7 @@ $questions = [
             [
                 'question' => 'Select your hobbies:',
                 'input_type' => 'checkbox',
+		'name' => 'hobbies',
                 'options' => [
                     'Reading',
                     'Sports',
@@ -83,6 +87,55 @@ $questions = [
     // Add more question groups here...
 ];
 
+// Function to check the completeness and plausibility of the questions array
+function checkQuestionsArray($questions) {
+	foreach ($questions as $group) {
+		if (!isset($group['group'])) {
+			return false;
+		}
+
+		if (!isset($group['questions']) || !is_array($group['questions']) || empty($group['questions'])) {
+			return false;
+		}
+
+		foreach ($group['questions'] as $question) {
+			if (!isset($question['question']) || !isset($question['input_type'])) {
+				return false;
+			}
+
+			if (!isset($question["name"]) && !isset($question["fields"])) {
+				return false;
+			}
+
+			if ($question['input_type'] === 'radio' || $question['input_type'] === 'checkbox') {
+				if (!isset($question['options']) || !is_array($question['options']) || empty($question['options'])) {
+					return false;
+				}
+			}
+
+			if ($question['input_type'] === 'address') {
+				if (!isset($question['fields']) || !is_array($question['fields']) || empty($question['fields'])) {
+					return false;
+				}
+
+				foreach ($question['fields'] as $field) {
+					if (!isset($field['label']) || !isset($field['name'])) {
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+// Check the completeness and plausibility of the questions array
+if (!checkQuestionsArray($questions)) {
+	echo 'Invalid or incomplete questions array.';
+	exit;
+}
+
 // Function to check if a longitude value is valid
 function isValidLongitude($longitude) {
     // Check if the longitude is a numeric value
@@ -99,7 +152,7 @@ function isValidLongitude($longitude) {
 }
 
 // Check if the form is submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Prepare an array to store the user's responses
     $userResponses = [];
     $isValid = true;
@@ -203,7 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Questionnaire</title>
 </head>
 <body>
-    <?php if ($_SERVER['REQUEST_METHOD'] === 'GET'): ?>
+    <?php if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'GET'): ?>
         <h1>Questionnaire</h1>
         <form method="POST" enctype="multipart/form-data">
             <?php foreach ($questions as $group): ?>

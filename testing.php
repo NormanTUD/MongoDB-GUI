@@ -1,12 +1,4 @@
 <?php
-// or
-$class_methods = get_class_methods(new MongoDB\Driver\BulkWrite());
-
-foreach ($class_methods as $method_name) {
-    echo "$method_name\n";
-}
-
-#exit;
 	define('INCLUDED_FROM_INDEX', true);
 	include("functions.php");
 	// Define a counter for the number of started tests

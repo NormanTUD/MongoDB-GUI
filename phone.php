@@ -141,7 +141,12 @@
 				type: 'POST',
 				data: jsonData,
 				success: function(response) {
-					log("Server response: " + response);
+					try {
+						log("Server response: " + response);
+						toastr.success("Success", JSON.parse(response)["success"]);
+					} catch (e) {
+						toastr.error("Error", e);
+					}
 				},
 				error: function(xhr, status, error) {
 					console.error("AJAX error:", error);

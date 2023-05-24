@@ -383,6 +383,7 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 				e.preventDefault();
 				e.stopPropagation();
 			}
+
 			// Collect form data
 			var formData = new FormData(document.getElementById('myForm'));
 
@@ -404,19 +405,24 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 						console.error(e);
 					}
 
+					$.ajax({
+						url: "index.php",
+						type: 'POST',
+						new_entry_data: data.json,
+						success: function (r) {
+							var data = JSON.parse(r);
 
-					fetch('index.php', {
-						method: 'POST',
-						new_entry_data: data.json
-					})
-					.then(response => response.text())
-					.then(data => {
-						// Handle the server response
-						var resultContainer = document.getElementById('resultContainer');
-						resultContainer.innerHTML = data;
-					})
-					.catch(error => {
-						console.error('Error:', error);
+							var resultContainer = document.getElementById('resultContainer');
+							resultContainer.innerHTML = data.html;
+							if (data.success) {
+								toastr.success(data.success);
+							} else if (data.error) {
+								toastr.error(data.error);
+							}
+						},
+						error: function () {
+							toastr.error('Error updating entry.');
+						}
 					});
 				} catch (e) {
 					console.error(e);

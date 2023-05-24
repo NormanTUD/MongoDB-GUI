@@ -222,7 +222,7 @@
 			    case 'radio':
 				foreach ($question['options'] as $option) {
 				    echo '<label>';
-				    echo '<input type="radio" name="' . $inputName . '" value="' . $option . '"> ' . $option;
+				    echo '	<input type="radio" name="' . $inputName . '" value="' . $option . '"> ' . $option;
 				    echo '</label><br>';
 				}
 				break;
@@ -230,7 +230,7 @@
 			    case 'checkbox':
 				foreach ($question['options'] as $option) {
 				    echo '<label>';
-				    echo '<input type="checkbox" name="' . $inputName . '[]" value="' . $option . '"> ' . $option;
+				    echo '	<input type="checkbox" name="' . $inputName . '[]" value="' . $option . '"> ' . $option;
 				    echo '</label><br>';
 				}
 				break;

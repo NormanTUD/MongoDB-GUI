@@ -254,11 +254,36 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .language-selector {
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
     <title><?php echo getTranslation('title'); ?></title>
 </head>
 
 <body>
+    <div>
+        <?php
+        $languageIcons = [
+            'en' => '🇺🇸', // English
+            'de' => '🇩🇪', // German
+            'ja' => '🇯🇵', // Japanese
+            // Add more language icons here
+        ];
+
+        foreach ($language as $lang => $translations) {
+            if (isset($languageIcons[$lang])) {
+                echo '<span class="language-selector">';
+                echo '<a href="?lang=' . $lang . '">' . $languageIcons[$lang] . '</a>';
+                echo '</span>';
+            }
+        }
+        ?>
+    </div>
     <h1><?php echo getTranslation('h1'); ?></h1>
+
     <form method="POST" enctype="multipart/form-data">
         <?php foreach ($questions as $group): ?>
             <h2><?php echo $group['group']; ?></h2>

@@ -55,10 +55,13 @@ include_once("functions.php");
 							if(json) {
 								if(inserter.success) {
 									toastr.success("OK", inserter.success);
+									console.error(json);
 								} else if (inserter.error) {
 									toastr.error("Inserter failed", inserter.error);
+									console.error(json);
 								} else {
 									toastr.error("Inserter failed");
+									console.error(json);
 								}
 							} else {
 								toastr.warning("json was empty from questionnaire");

@@ -41,19 +41,25 @@ include_once("functions.php");
 
 			$.ajax({
 				type : 'POST',
-				url : 'questionnaire.php?q=' + JSON.stringify(questions),
+				url : 'questionnaire.php',
 				data : serialized_form,
 				success: function (data) {
 					// Handle the server response
 					var resultContainer = document.getElementById('resultContainer');
 					try {
 						var d = JSON.parse(data);
-						log(d);
+						var inserter = JSON.parse(d.inserter);
 						resultContainer.innerHTML = d.html;
 						try {
 							var json = d.json;
 							if(json) {
-								console.log(json);
+								if(inserter.success) {
+									toastr.success("OK", inserter.success);
+								} else if (inserter.error) {
+									toastr.error("Inserter failed", inserter.error);
+								} else {
+									toastr.error("Inserter failed");
+								}
 							} else {
 								toastr.warning("json was empty from questionnaire");
 							}

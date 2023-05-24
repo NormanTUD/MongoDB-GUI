@@ -427,8 +427,7 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 		}
 
 		if(isset($_POST["auto_submit_form"]) && $_POST["auto_submit_form"] == "1") {
-			$q = json_decode($_GET["q"], true);
-			$r = process_autoform($q);
+			$full = process_autoform($questions);
 
 			$post = json_decode(json_encode($_POST), true);
 			unset($post['auto_submit_form']);
@@ -436,7 +435,6 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			$entryId = $GLOBALS["mdh"]->createId($entryId);
 			$response = $GLOBALS["mdh"]->insertDocument($entryId, $post);
 
-			$full = $r;
 			$full['inserter'] = $response;
 
 			echo json_encode($full);		

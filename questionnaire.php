@@ -395,7 +395,7 @@ const language = {
     <h1><?php echo getTranslation('h1', 1); ?></h1>
 <form method="POST" enctype="multipart/form-data">
     <?php foreach ($questions as $group): ?>
-        <h2><?php echo $group['group']; ?></h2>
+        <h2><?php echo getTranslation($group['group'], true); ?></h2>
         <?php foreach ($group['questions'] as $index => $question): ?>
             <?php if ($question['input_type'] === 'text' || $question['input_type'] === 'number'): ?>
                 <h3><?php echo getTranslation($question['question'], true); ?></h3>

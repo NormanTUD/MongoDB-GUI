@@ -462,6 +462,7 @@ function initJsonEditor(entry) {
 
 	editor.set(entry);
 	l("initJsonEditor", old_ts);
+	updateTranslations();
 }
 
 function updateMap(entries) {

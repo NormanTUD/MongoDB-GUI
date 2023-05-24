@@ -48,7 +48,7 @@ include_once("functions.php");
 							if(json) {
 								if(inserter.success) {
 									toastr.success("OK", inserter.success);
-									console.error(json);
+									console.log(json);
 								} else if (inserter.error) {
 									toastr.error("Inserter failed", inserter.error);
 									console.error(json);

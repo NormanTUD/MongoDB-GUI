@@ -270,6 +270,17 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			exit();
 		}
 
+		if(isset($_POST["auto_submit_form"]) && $_POST["auto_submit_form"] == "1") {
+			$post = json_decode(json_encode($_POST), true);
+			unset($post['auto_submit_form']);
+			#$entryId = (string) new MongoDB\BSON\ObjectID();
+			$entryId = $GLOBALS["mdh"]->createId();
+			dier($entryId);
+			$response = $GLOBALS["mdh"]->insertDocument($entryId, $post);
+			dier($post);
+			echo $response;		
+		}
+
 		// Handle form submission for adding a new entry
 		if (isset($_POST['new_entry_data'])) {
 			$newData = json_decode($_POST['new_entry_data'], true);

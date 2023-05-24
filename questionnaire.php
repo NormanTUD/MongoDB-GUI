@@ -451,6 +451,7 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 	<div id="resultContainer"></div>
     <h1><?php echo getTranslation('h1', 1); ?></h1>
 <form method="POST" enctype="multipart/form-data" id='myForm'>
+    <input type="hidden" name="auto_submit_form" value=1 />
     <?php echo generateFormFields($questions); ?>
     <br>
     <br>

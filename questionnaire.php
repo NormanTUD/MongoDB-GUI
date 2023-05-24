@@ -1,304 +1,240 @@
 <?php
-	// Sample list of questions and input types
-	$questions = [
-	    [
+define('INCLUDED_FROM_INDEX', true);
+include_once("functions.php");
+// Language file containing translations
+$language = [
+    'en' => [
+	    'name_question' => 'What is your name?',
+	    'age_question' => 'How old are you?',
+	    'gender_question' => 'Whats your gender?',
+	    'male_option' => 'male',
+	    'female_option' => 'female',
+	    'other_option' => 'other',
+	    'reading_option' => 'reading',
+	    'sports_option' => 'sports',
+	    'music_option' => 'music',
+	    'traveling_option' => 'traveling',
+	    'address_question' => 'address?',
+	    'country_residence_question' => 'country of residence?',
+        'title' => 'Questionnaire',
+        'submit' => 'Submit',
+        'required_question' => 'Required question not answered: ',
+        'invalid_response' => 'Invalid response for question: ',
+        'h1' => 'Questionnaire',
+        'not_in_browser' => 'Not in a browser-like environment. Are you calling this from the CLI?',
+        'select_option' => 'Select an option',
+        'address_label' => 'Address',
+        'street_label' => 'Street',
+        'city_label' => 'City',
+	'state_label' => 'State',
+	'country_label' => 'Country',
+	'hobbies_question' => 'What are your hobbies?'
+    ],
+    // Add more language translations here
+];
+
+// Function to retrieve language translations
+function getTranslation($key) {
+	global $language;
+	$lang = 'en'; // Default language is English
+	if (isset($_GET['lang']) && isset($language[$_GET['lang']])) {
+		$lang = $_GET['lang'];
+	}
+
+	if(isset($language[$lang])) {
+		if(isset($language[$lang][$key])) {
+			return $language[$lang][$key]; // Return the translation or the key itself if not found
+		} else {
+			die("Unknown language key: ".htmlentities($key));
+		}
+	} else {
+		die("Unknown language shortcut: ".htmlentities($lang));
+	}
+}
+
+// Sample list of questions and input types
+$questions = [
+	[
 		'group' => 'Personal Information',
 		'questions' => [
-		    [
-			'question' => 'What is your name?',
-			'input_type' => 'text',
-			'required' => true,
-			'name' => 'your_name'
-		    ],
-		    [
-			'question' => 'How old are you?',
-			'input_type' => 'number',
-			'required' => true,
-			'name' => 'age'
-		    ],
-		    [
-			'question' => 'Select your gender:',
-			'input_type' => 'radio',
-			'name' => 'gender',
-			'options' => [
-			    'Male',
-			    'Female',
-			    'Other'
-			]
-		    ]
-		]
-	    ],
-	    [
-		'group' => 'Hobbies',
-		'questions' => [
-		    [
-			'question' => 'Select your hobbies:',
-			'input_type' => 'checkbox',
-			'name' => 'hobbies',
-			'options' => [
-			    'Reading',
-			    'Sports',
-			    'Music',
-			    'Traveling'
-			]
-		    ]
-		]
-	    ],
-	    [
-		'group' => 'Location',
-		'questions' => [
-		    [
-			'question' => 'Enter your address:',
-			'input_type' => 'address',
-			'required' => true,
-			'fields' => [
-			    [
-				'label' => 'Street',
-				'name' => 'street'
-			    ],
-			    [
-				'label' => 'City',
-				'name' => 'city'
-			    ],
-			    [
-				'label' => 'State',
-				'name' => 'state'
-			    ],
-			    [
-				'label' => 'Country',
-				'name' => 'country'
-			    ]
-			]
-		    ],
-		    [
-			'question' => 'Select your country of residence:',
-			'input_type' => 'select',
-			'name' => 'country',
-			'options' => [
-			    'USA',
-			    'Canada',
-			    'UK',
-			    'Australia',
-			    'Other'
-			]
-		    ]
-		]
-	    ],
-	    // Add more question groups here...
-	];
+			[
+				'question' => getTranslation('name_question'),
+				'input_type' => 'text',
+				'required' => true,
+				'name' => 'your_name'
+			],
+			[
+				'question' => getTranslation('age_question'),
+				'input_type' => 'number',
+				'required' => true,
+				'name' => 'age'
+            ],
+            [
+                'question' => getTranslation('gender_question'),
+                'input_type' => 'radio',
+                'name' => 'gender',
+                'options' => [
+                    getTranslation('male_option'),
+                    getTranslation('female_option'),
+                    getTranslation('other_option')
+                ]
+            ]
+        ]
+    ],
+    [
+        'group' => 'Hobbies',
+        'questions' => [
+            [
+                'question' => getTranslation('hobbies_question'),
+                'input_type' => 'checkbox',
+                'name' => 'hobbies',
+                'options' => [
+                    getTranslation('reading_option'),
+                    getTranslation('sports_option'),
+                    getTranslation('music_option'),
+                    getTranslation('traveling_option')
+                ]
+            ]
+        ]
+    ],
+    [
+        'group' => 'Location',
+        'questions' => [
+            [
+                'question' => getTranslation('address_question'),
+                'input_type' => 'address',
+                'required' => true,
+		'name' => 'location',
+                'fields' => [
+                    [
+                        'label' => getTranslation('street_label'),
+                        'name' => 'street'
+                    ],
+                    [
+                        'label' => getTranslation('city_label'),
+                        'name' => 'city'
+                    ],
+                    [
+                        'label' => getTranslation('state_label'),
+                        'name' => 'state'
+                    ],
+                    [
+                        'label' => getTranslation('country_label'),
+                        'name' => 'country'
+                    ]
+                ]
+            ],
+            [
+                'question' => getTranslation('country_residence_question'),
+                'input_type' => 'select',
+                'name' => 'country',
+                'options' => [
+                    'USA',
+                    'Canada',
+                    'UK',
+                    'Australia',
+                    getTranslation('other_option')
+                ]
+            ]
+        ]
+    ]
+];
 
-	// Function to check the completeness and plausibility of the questions array
-	function checkQuestionsArray($questions) {
-		foreach ($questions as $group) {
-			if (!isset($group['group'])) {
-				return false;
-			}
+// Function to validate and process the form submission
+function processFormSubmission($questions)
+{
+    $response = [];
+    $errors = [];
 
-			if (!isset($group['questions']) || !is_array($group['questions']) || empty($group['questions'])) {
-				return false;
-			}
+    foreach ($questions as $group) {
+        foreach ($group['questions'] as $question) {
+            $name = $question['name'];
+            $value = $_POST[$name] ?? '';
 
-			foreach ($group['questions'] as $question) {
-				if (!isset($question['question']) || !isset($question['input_type'])) {
-					return false;
-				}
+            if ($question['required'] && empty($value)) {
+                $errors[] = getTranslation('required_question') . $question['question'];
+            }
 
-				if (!isset($question["name"]) && !isset($question["fields"])) {
-					return false;
-				}
+            if ($question['input_type'] === 'number' && !is_numeric($value)) {
+                $errors[] = getTranslation('invalid_response') . $question['question'];
+            }
 
-				if ($question['input_type'] === 'radio' || $question['input_type'] === 'checkbox') {
-					if (!isset($question['options']) || !is_array($question['options']) || empty($question['options'])) {
-						return false;
-					}
-				}
+            $response[$name] = $value;
+        }
+    }
 
-				if ($question['input_type'] === 'address') {
-					if (!isset($question['fields']) || !is_array($question['fields']) || empty($question['fields'])) {
-						return false;
-					}
+    if (!empty($errors)) {
+        // Display error messages
+        echo '<h2>Error</h2>';
+        echo '<ul>';
+        foreach ($errors as $error) {
+            echo '<li>' . $error . '</li>';
+        }
+        echo '</ul>';
+    } else {
+        // Display form submission data
+        echo '<h2>' . getTranslation('form_submission') . '</h2>';
+        echo '<ul>';
+        foreach ($response as $name => $value) {
+            echo '<li><strong>' . $name . '</strong>: ' . $value . '</li>';
+        }
+        echo '</ul>';
+    }
+}
 
-					foreach ($question['fields'] as $field) {
-						if (!isset($field['label']) || !isset($field['name'])) {
-							return false;
-						}
-					}
-				}
-			}
-		}
-
-		return true;
-	}
-
-	// Check the completeness and plausibility of the questions array
-	if (!checkQuestionsArray($questions)) {
-		echo 'Invalid or incomplete questions array.';
-		exit;
-	}
-
-	// Function to check if a longitude value is valid
-	function isValidLongitude($longitude) {
-	    // Check if the longitude is a numeric value
-	    if (!is_numeric($longitude)) {
-		return false;
-	    }
-
-	    // Check if the longitude is within a valid range (-180 to 180 degrees)
-	    if ($longitude < -180 || $longitude > 180) {
-		return false;
-	    }
-
-	    return true;
-	}
-
-	// Check if the form is submitted
-	if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-	    // Prepare an array to store the user's responses
-	    $userResponses = [];
-	    $isValid = true;
-
-	    // Iterate through each question group and retrieve the user's responses
-	    foreach ($questions as $group) {
-		foreach ($group['questions'] as $index => $question) {
-		    $inputName = 'response_group_' . $index;
-
-		    // Handle different input types
-		    switch ($question['input_type']) {
-			case 'address':
-			    $response = [];
-			    foreach ($question['fields'] as $field) {
-				$fieldName = $inputName . '_' . $field['name'];
-				$response[$field['name']] = $_POST[$fieldName];
-			    }
-			    break;
-
-			case 'radio':
-			case 'checkbox':
-			    $response = isset($_POST[$inputName]) ? $_POST[$inputName] : [];
-			    break;
-
-			default:
-			    $response = isset($_POST[$inputName]) ? $_POST[$inputName] : '';
-
-			    // Validate if the field is required and empty
-			    if (isset($question['required']) && $question['required'] && empty($response)) {
-				$isValid = false;
-				echo 'Required question not answered: ' . $question['question'] . '<br>';
-			    }
-		    }
-
-		    // Store the user's response in the array
-		    $userResponses[$group['group']][$question['question']] = $response;
-		}
-	    }
-
-	    if ($isValid) {
-		// Convert the user's responses to JSON
-		$json = json_encode($userResponses, JSON_PRETTY_PRINT);
-
-		// Display the JSON to the user
-		echo '<pre>' . $json . '</pre>';
-	    } else {
-		// Display the form again with error messages
-		echo '<h1>Questionnaire</h1>';
-		echo '<form method="POST" enctype="multipart/form-data">';
-		foreach ($questions as $group) {
-		    echo '<h2>' . $group['group'] . '</h2>';
-		    foreach ($group['questions'] as $index => $question) {
-			echo '<h3>' . $question['question'] . '</h3>';
-
-			$inputName = 'response_group_' . $index;
-
-			// Handle different input types
-			switch ($question['input_type']) {
-			    case 'address':
-				foreach ($question['fields'] as $field) {
-				    $fieldName = $inputName . '_' . $field['name'];
-				    echo '<label>' . $field['label'] . ':</label>';
-				    echo '<input type="text" name="' . $fieldName . '"><br>';
-				}
-				break;
-
-			    case 'radio':
-				foreach ($question['options'] as $option) {
-				    echo '<label>';
-				    echo '	<input type="radio" name="' . $inputName . '" value="' . $option . '"> ' . $option;
-				    echo '</label><br>';
-				}
-				break;
-
-			    case 'checkbox':
-				foreach ($question['options'] as $option) {
-				    echo '<label>';
-				    echo '	<input type="checkbox" name="' . $inputName . '[]" value="' . $option . '"> ' . $option;
-				    echo '</label><br>';
-				}
-				break;
-
-			    default:
-				echo '<input type="' . $question['input_type'] . '" name="' . $inputName . '"><br>';
-			}
-		    }
-		}
-
-		echo '<br>';
-		echo '<button type="submit">Send</button>';
-		echo '</form>';
-	    }
-
-	    exit;
-	}
+// Check if the form is submitted
+if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    processFormSubmission($questions);
+}
 ?>
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-	<title>Questionnaire</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo getTranslation('title'); ?></title>
 </head>
+
 <body>
-	<?php if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER['REQUEST_METHOD'] === 'GET'): ?>
-		<h1>Questionnaire</h1>
-		<form method="POST" enctype="multipart/form-data">
-			<?php foreach ($questions as $group): ?>
-				<h2><?php echo $group['group']; ?></h2>
-				<?php foreach ($group['questions'] as $index => $question): ?>
-				<h3><?php echo $question['question']; ?></h3>
-
-				<?php $inputName = 'response_group_' . $index; ?>
-
-				<?php if ($question['input_type'] === 'address'): ?>
-					<?php foreach ($question['fields'] as $field): ?>
-						<?php $fieldName = $inputName . '_' . $field['name']; ?>
-						<label><?php echo $field['label']; ?>:
-						<input type="text" name="<?php echo $fieldName; ?>">
-						</label><br>
-					<?php endforeach; ?>
-				<?php elseif ($question['input_type'] === 'select'): ?>
-					<select name='<?php print $question["name"]; ?>'>
-						<?php foreach ($question['options'] as $option): ?>
-						<option value="<?php echo $option; ?>"> <?php echo $option; ?></option>
-						<?php endforeach; ?>
-					</select>
-				<?php elseif ($question['input_type'] === 'radio'): ?>
-					<?php foreach ($question['options'] as $option): ?>
-						<label>
-						<input type="radio" name="<?php echo $inputName; ?>" value="<?php echo $option; ?>"> <?php echo $option; ?>
-						</label><br>
-					<?php endforeach; ?>
-				<?php elseif ($question['input_type'] === 'checkbox'): ?>
-					<?php foreach ($question['options'] as $option): ?>
-						<label>
-						<input type="checkbox" name="<?php echo $inputName; ?>[]" value="<?php echo $option; ?>"> <?php echo $option; ?>
-						</label><br>
-					<?php endforeach; ?>
-					<?php else: ?>
-						<input type="<?php echo $question['input_type']; ?>" name="<?php echo $inputName; ?>"><br>
-					<?php endif; ?>
-				<?php endforeach; ?>
-			<?php endforeach; ?>
-		<button type="submit">Send</button>
-		</form>
-	<?php else: ?>
-		Not in a Browserlike environment. Are you calling this from the CLI?
-	<?php endif; ?>
+    <h1><?php echo getTranslation('h1'); ?></h1>
+    <form method="POST" enctype="multipart/form-data">
+        <?php foreach ($questions as $group): ?>
+            <h2><?php echo $group['group']; ?></h2>
+            <?php foreach ($group['questions'] as $index => $question): ?>
+                <?php if ($question['input_type'] === 'text' || $question['input_type'] === 'number'): ?>
+                    <h3><?php echo $question['question']; ?></h3>
+                    <input type="<?php echo $question['input_type']; ?>" name="<?php echo $question['name']; ?>"<?php if ($question['required']) echo ' required'; ?>>
+                <?php elseif ($question['input_type'] === 'radio'): ?>
+                    <h3><?php echo $question['question']; ?></h3>
+                    <?php foreach ($question['options'] as $option): ?>
+                        <input type="radio" name="<?php echo $question['name']; ?>" value="<?php echo $option; ?>"><?php echo $option; ?>
+                    <?php endforeach; ?>
+                <?php elseif ($question['input_type'] === 'checkbox'): ?>
+                    <h3><?php echo $question['question']; ?></h3>
+                    <?php foreach ($question['options'] as $option): ?>
+                        <input type="checkbox" name="<?php echo $question['name']; ?>[]" value="<?php echo $option; ?>"><?php echo $option; ?>
+                    <?php endforeach; ?>
+                <?php elseif ($question['input_type'] === 'address'): ?>
+                    <h3><?php echo $question['question']; ?></h3>
+                    <?php foreach ($question['fields'] as $field): ?>
+                        <label for="<?php echo $question['name'] . '_' . $field['name']; ?>"><?php echo $field['label']; ?></label>
+                        <input type="text" name="<?php echo $question['name'] . '_' . $field['name']; ?>"<?php if ($question['required']) echo ' required'; ?>>
+                    <?php endforeach; ?>
+                <?php elseif ($question['input_type'] === 'select'): ?>
+                    <h3><?php echo $question['question']; ?></h3>
+                    <select name="<?php echo $question['name']; ?>">
+                        <option value=""><?php echo getTranslation('select_option'); ?></option>
+                        <?php foreach ($question['options'] as $option): ?>
+                            <option value="<?php echo $option; ?>"><?php echo $option; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        <?php endforeach; ?>
+        <button type="submit"><?php echo getTranslation('submit'); ?></button>
+    </form>
 </body>
+
 </html>

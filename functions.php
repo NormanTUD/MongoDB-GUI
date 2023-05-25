@@ -3,6 +3,8 @@ if (!defined('INCLUDED_FROM_INDEX')) {
     die('This file must be included from index.php');
 }
 
+require 'translations.php';
+require 'questions.php';
 
 function exception_error_handler($errno, $errstr, $errfile, $errline ) {
 	print "<pre>\n";
@@ -240,6 +242,160 @@ function getAllEntries() {
 	return null;
 }
 
+// Function to retrieve language translations
+function getTranslation($key, $option = false) {
+	$span = true;
+	global $language;
+	$lang = 'en'; // Default language is English
+
+	if (isset($_GET['lang']) && isset($language[$_GET['lang']])) {
+		$lang = htmlentities($_GET['lang']);
+	}
+
+	if (isset($language[$lang])) {
+		if (isset($language[$lang][$key])) {
+			if ($span) {
+				if($option) {
+					return '<option class="TRANSLATEME_'.$key.'">'.$key.'</option>';
+				} else {
+					return '<span value="'.$key.'" class="TRANSLATEME_'.$key.'">'.$key.'</span>';
+				}
+			} else {
+				return $language[$lang][$key];
+			}
+		} else {
+			throw new Exception("Unknown language key: \$language[$lang][" . htmlentities($key) . "]");
+		}
+	} else {
+		throw new Exception("Unknown language shortcut: " . htmlentities($lang));
+	}
+}
+
+function generateFormFields($questions) {
+    $html = '';
+    
+    foreach ($questions as $group) {
+        $html .= '<h2>' . getTranslation($group['group'], true) . '</h2>';
+        
+        foreach ($group['questions'] as $index => $question) {
+            $html .= generateFormField($question);
+        }
+    }
+    
+    return $html;
+}
+
+function generateFormField($question) {
+	$html = '';
+
+	if ($question['input_type'] === 'text' || $question['input_type'] === 'number') {
+		$html .= '<h3>' . getTranslation($question['question'], true) . '</h3>';
+		if(isset($question["fields"]) && is_array($question["fields"])) {
+			foreach ($question['fields'] as $field) {
+				$html .= '<label for="' . $question['name'] . '_' . $field['name'] . '">' . getTranslation($field['label'], true) . '</label>';
+				$html .= '<input type="text" name="' . $question['name'] . '_' . $field['name'] . '"';
+				if (isset($field["required"]) && $field['required']) {
+					$html .= ' required';
+				}
+				$html .= '>';
+			}
+		} else {
+			$html .= '<input type="' . $question['input_type'] . '" name="' . $question['name'] . '"';
+			if (isset($question["required"]) && $question['required']) {
+				$html .= ' required';
+			}
+			$html .= '>';
+		}
+	} elseif ($question['input_type'] === 'radio') {
+		$html .= '<h3>' . getTranslation($question['question'], true) . '</h3>';
+		foreach ($question['options'] as $option) {
+			$html .= '<input type="radio" id="' . $question['name'] . '" name="' . $question['name'] . '" value="' . $option . '">' . getTranslation($option, true);
+		}
+	} elseif ($question['input_type'] === 'checkbox') {
+		$html .= '<h3>' . getTranslation($question['question'], true) . '</h3>';
+		foreach ($question['options'] as $option) {
+			$html .= '<input type="checkbox" name="' . $question['name'] . '[]" value="' . $option . '">' . getTranslation($option, true);
+		}
+	} elseif ($question['input_type'] === 'select') {
+		$html .= '<h3>' . getTranslation($question['question'], true) . '</h3>';
+		$html .= '<select name="' . $question['name'] . '">';
+		//$html .= getTranslation('select_option', true);
+		foreach ($question['options'] as $option) {
+			$html .= getTranslation($option, true);
+		}
+		$html .= '</select>';
+	}
+
+	return $html;
+}
+
+// Function to validate and process the form submission
+function process_autoform($questions) {
+	$html = '';
+
+	$response = [];
+	$errors = [];
+
+	foreach ($questions as $group) {
+		foreach ($group['questions'] as $question) {
+			$name = $question['name'];
+			if(isset($question["fields"])) {
+				$base_name = $question["name"];
+				foreach ($question["fields"] as $tq_name) {
+					$key = $base_name.'_'.$tq_name["name"];
+					$tq_value = $_POST[$key] ?? '';
+
+					if (isset($question['required']) && $question['required'] && empty($tq_value)) {
+						$errors[] = getTranslation('required_question') . getTranslation($question['question']);
+					}
+
+					if ($question['input_type'] === 'number' && !is_numeric($tq_value)) {
+						$errors[] = getTranslation('invalid_response') . getTranslation($question['question']);
+					}
+
+					$response[$key] = $tq_value;
+				}
+			} else {
+				$value = $_POST[$name] ?? '';
+
+				if (isset($question['required']) && $question['required'] && empty($value)) {
+					$errors[] = getTranslation('required_question') . getTranslation($question['question']);
+				}
+
+				if ($question['input_type'] === 'number' && !is_numeric($value)) {
+					$errors[] = getTranslation('invalid_response') . getTranslation($question['question']);
+				}
+
+				$response[$name] = $value;
+			}
+		}
+	}
+
+	if (!empty($errors)) {
+		// Display error messages
+		$html .= '<h2>'.getTranslation("errors").'</h2>';
+		$html .= '<ul>';
+		foreach ($errors as $error) {
+			$html .= '<li>' . $error . '</li>';
+		}
+		$html .= '</ul>';
+	} else {
+		// Display form submission data
+		$html .= '<h2>' . getTranslation('form_submission') . '</h2>';
+		$html .= '<ul>';
+		foreach ($response as $name => $value) {
+			if(is_array($value)) {
+				$html .= '<li><strong>' . $name . '</strong>: ' . join(', ', $value) . '</li>';
+			} else {
+				$html .= '<li><strong>' . $name . '</strong>: ' . $value . '</li>';
+			}
+		}
+		$html .= '</ul>';
+	}
+
+	return ["html" => $html, "json" => json_encode($response), "errors" => $errors];
+}
+
 // Handle form submission for updating an entry
 if(isset($_SERVER['REQUEST_METHOD'])) {
 	if (isset($_GET['filters_and_rules'])) {
@@ -270,11 +426,25 @@ if(isset($_SERVER['REQUEST_METHOD'])) {
 			exit();
 		}
 
+		if(isset($_POST["auto_submit_form"])) {
+			$full = process_autoform($questions);
+
+			$post = json_decode(json_encode($_POST), true);
+			unset($post['auto_submit_form']);
+
+			$response = $GLOBALS["mdh"]->insertDocument($post);
+
+			$full['inserter'] = $response;
+
+			echo json_encode($full);		
+			exit();
+		}
+
 		// Handle form submission for adding a new entry
 		if (isset($_POST['new_entry_data'])) {
 			$newData = json_decode($_POST['new_entry_data'], true);
 			$entryId = (string) new MongoDB\BSON\ObjectID();
-			$response = $GLOBALS["mdh"]->insertDocument($entryId, $newData);
+			$response = $GLOBALS["mdh"]->insertDocument($newData);
 			echo $response;
 			exit();
 		}
@@ -372,7 +542,7 @@ function find_lat_lon_variables_recursive($entry, $original_entry=null) {
 			}
 		}
 	} else {
-		dier("Entry is not an array/object");
+		return [];
 	}
 
 	return $lat_lon_variables;

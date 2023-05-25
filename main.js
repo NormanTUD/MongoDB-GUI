@@ -8,8 +8,24 @@ var heatLayer = null;
 
 function log (...args) { console.log(args); }
 
-function le (msg) {
-	return l (msg, null, "error");
+function warning (...args) {
+	console.warn(...args);
+	toastr.warn(...args)
+}
+
+function info (...args) {
+	console.log(...args);
+	toastr.info(...args);
+}
+
+function success (...args) {
+	console.log(...args);
+	toastr.success(...args);
+}
+
+function error (...args) {
+	console.error(...args);
+	toastr.error(...args);
 }
 
 function l (msg, old_ts=null, printer="log") {
@@ -33,9 +49,9 @@ function l (msg, old_ts=null, printer="log") {
 	if(printer == "log") {
 		log(msg);
 	} else if (printer == "error") {
-		console.error(msg);
+		error(msg);
 	} else {
-		console.error("Unknown printer");
+		error("Unknown printer");
 		log(msg);
 	}
 
@@ -86,7 +102,7 @@ function load_all_entries () {
 			var data = JSON.parse(response);
 
 			if (data !== null && data.success) {
-				toastr.success(data.success);
+				success(data.success);
 
 				// Update the entry list with all entries
 				$('#entry_list').html(data.entries);
@@ -100,11 +116,11 @@ function load_all_entries () {
 				var entries = data.entries;
 				visualizations(entries)
 			} else if (data.error) {
-				toastr.error(data.error);
+				error(data.error);
 			}
 		},
 		error: function () {
-			toastr.error('Error resetting search.');
+			error('Error resetting search.');
 		}
 	});
 
@@ -164,15 +180,15 @@ function searchEntries() {
 					// Generate the visualization
 					visualizations(matchingEntries);
 				} else {
-					toastr.info('No matching entries found.');
+					info('No matching entries found.');
 				}
 			},
 			error: function() {
-				toastr.error('Error searching entries.');
+				error('Error searching entries.');
 			}
 		});
 	} else {
-		toastr.info('Could not get search rules.');
+		info('Could not get search rules.');
 	}
 
 	l("searchEntries", old_ts);
@@ -380,7 +396,7 @@ async function generalizedVisualization(entries) {
 				result: result
 			});
 		} else {
-			le("No result could be obtained");
+			error("No result could be obtained");
 			log("=====")
 			log("values:", values);
 			log("config:", config);
@@ -420,8 +436,8 @@ function appendEntry (entry_id) {
 	if(!$("#" + id).length) {
 		var full_entry = '<div id="' + id + '">' +
 				'<div id="jsoneditor_' + entry_id + '"></div>' +
-				'<button onclick="deleteEntry(\'' + entry_id + '\')">Delete</button>' +
-			'</div>'
+				'<button onclick="deleteEntry(\'' + entry_id + '\')"><span class="TRANSLATEME_delete" /></button>' +
+			'</div><hr>'
 
 		$('#entry_list').append(full_entry);
 	}
@@ -462,6 +478,7 @@ function initJsonEditor(entry) {
 
 	editor.set(entry);
 	l("initJsonEditor", old_ts);
+	updateTranslations();
 }
 
 function updateMap(entries) {
@@ -503,15 +520,6 @@ function updateMap(entries) {
 			maxZoom: 18
 		}).addTo(map);
 	}
-
-
-
-
-
-
-
-
-
 
 	markerCluster.clearLayers();
 	map.removeLayer(heatLayer);
@@ -692,7 +700,7 @@ function convertRulesToMongoQuery(rules) {
 						value = false;
 					}
 				} else {
-					console.error("Unknown rule type", rule.type, rule);
+					error(rule.type, rule, "Unknown rule type");
 				}
 
 				var fieldQuery = {};
@@ -736,7 +744,7 @@ function deleteEntry(entryId, event=null) {
 				var data = JSON.parse(response);
 				if (data.success) {
 					try {
-						toastr.success(data.success);
+						success(data.success);
 						// Remove the deleted entry from the page
 						var entry_id = 'entry_id' + data.entryId
 						var editor_id = 'json_editor_' + data.entryId
@@ -749,19 +757,19 @@ function deleteEntry(entryId, event=null) {
 							delete window['editor_' + data.entryId['$oid']];
 						}
 					} catch (e) {
-						console.error(e);
+						error(e);
 					}
 				} else if (data.error) {
-					toastr.error(data.error);
+					error(data.error);
 				} else {
-					console.error("??? case ???", data);
+					error(data, "??? case ???");
 				}
 			} catch (e) {
-				toastr.error(e);
+				error(e);
 			}
 		},
 		error: function () {
-			toastr.error('Error deleting entry.');
+			error('Error deleting entry.');
 		}
 	});
 	
@@ -779,30 +787,35 @@ function addNewEntry(event) {
 			'new_entry_data': JSON.stringify(jsonData)
 		},
 		success: function (response) {
-			var data = JSON.parse(response);
-			if (data.success) {
-				toastr.success(data.success);
+			try {
+				var data = JSON.parse(response);
+				if (data.success) {
+					success(data.success);
 
-				appendEntry(data.entryId);
+					appendEntry(data.entryId);
 
-				const newEditor = new JSONEditor(
-					document.getElementById('jsoneditor_' + data.entryId),
-					{
-						mode: 'tree',
-							onBlur: function () {
-								const updatedJson = newEditor.get();
-								const newJsonData = JSON.stringify(updatedJson, null, 2);
-								updateEntry(data.entryId, newJsonData);
-							}
-					}
-				);
-				newEditor.set(jsonData);
-			} else if (data.error) {
-				toastr.error(data.error);
+					const newEditor = new JSONEditor(
+						document.getElementById('jsoneditor_' + data.entryId),
+						{
+							mode: 'tree',
+								onBlur: function () {
+									const updatedJson = newEditor.get();
+									const newJsonData = JSON.stringify(updatedJson, null, 2);
+									updateEntry(data.entryId, newJsonData);
+								}
+						}
+					);
+					newEditor.set(jsonData);
+				} else if (data.error) {
+					error(data.error);
+				}
+				updateTranslations();
+			} catch (e) {
+				error(e, "Error:");
 			}
 		},
 		error: function () {
-			toastr.error('Error adding new entry.');
+			error('Error adding new entry.');
 		}
 	});
 
@@ -819,15 +832,23 @@ function updateEntry(entryId, jsonData) {
 				json_data: jsonData
 			},
 		success: function (response) {
-			var data = JSON.parse(response);
-			if (data.success) {
-				toastr.success(data.success);
-			} else if (data.error) {
-				toastr.error(data.error);
+			if(response) {
+				try {
+					var data = JSON.parse(response);
+					if (data.success) {
+						success(data.success, "OK");
+					} else if (data.error) {
+						error(data.error, "Error 5:");
+					}
+				} catch (e) {
+					error("Trying to parse response failed", "Error 4:");
+				}
+			} else {
+				error("Response not found in updateEntry", "Error 6:");
 			}
 		},
 		error: function () {
-			toastr.error('Error updating entry.');
+			error('Error updating entry.');
 		}
 	});
 
@@ -835,6 +856,15 @@ function updateEntry(entryId, jsonData) {
 }
 
 function findLatLonVariablesRecursive(entry, originalEntry = null) {
+	var keywords = [
+		["lat", "lon"],
+		["latitude", "longitude"]
+	];
+
+	return findVariablesRecursive(entry, keywords, originalEntry);
+}
+
+function findVariablesRecursive(entry, keywords, originalEntry = null) {
 	var old_ts;
 	if (originalEntry === null) {
 		originalEntry = JSON.parse(JSON.stringify(entry));
@@ -843,11 +873,6 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 
 	const latLonVariables = [];
 	const geoCoordRegex = /^[-+]?\d{1,3}(?:\.\d+)?$/;
-
-	const keywords = [
-		["lat", "lon"],
-		["latitude", "longitude"]
-	];
 
 	if (Array.isArray(entry) || typeof entry === "object") {
 		for (const key in entry) {
@@ -875,12 +900,10 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 			}
 		}
 	} else {
-		console.error("Entry is not an array/object");
+		error("Entry is not an array/object");
 	}
 	
-	//log("latLonVariables", latLonVariables);
 	var no_duplicates = removeDuplicatesFromJSON(latLonVariables, !!old_ts);
-	//log("no_duplicates", no_duplicates);
 
 	if(old_ts) {
 		l("findLatLonVariablesRecursive", old_ts);

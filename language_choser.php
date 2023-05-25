@@ -1,11 +1,13 @@
 <div id="language_choser">
 <?php
-        $languageIcons = [
-            'en' => '🇺🇸', // English
-            'de' => '🇩🇪', // German
-            'ja' => '🇯🇵', // Japanese
-            // Add more language icons here
-        ];
+	$languageIcons = [
+		'en' => '🇺🇸', // English
+		'de' => '🇩🇪', // German
+		'ja' => '🇯🇵', // Japanese
+		'zh' => '🇨🇳', // Chinese
+		// Add more language icons here
+	];
+
 
         foreach ($language as $lang => $translations) {
             if (isset($languageIcons[$lang])) {

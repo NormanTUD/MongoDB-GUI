@@ -6,6 +6,7 @@ if (!defined('INCLUDED_FROM_INDEX')) {
 // Load filters and rules from a file via AJAX
 $(document).ready(function () {
 	var old_t = l("Loading document.ready");
+	Swal.showLoading()
 	$.ajax({
 		url: 'index.php?filters_and_rules=1',
 		dataType: 'json',

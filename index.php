@@ -49,6 +49,5 @@
 		<div id="status-bar">
 			<p id='l'>Initializing...</p>
 		</div>
-
 	</body>
 </html>

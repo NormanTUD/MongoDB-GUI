@@ -1,4 +1,5 @@
 "use strict";
+var s = null;
 var focus_log = {};
 var performance_log = {};
 
@@ -48,21 +49,37 @@ function parse_server_response (response) {
 function warning (...args) {
 	console.warn(...args);
 	toastr.warn(...args)
+	try {
+		swal.close();
+	} catch (e) {
+	}
 }
 
 function info (...args) {
 	console.log(...args);
 	toastr.info(...args);
+	try {
+		swal.close();
+	} catch (e) {
+	}
 }
 
 function success (...args) {
 	console.log(...args);
 	toastr.success(...args);
+	try {
+		swal.close();
+	} catch (e) {
+	}
 }
 
 function error (...args) {
 	console.error(...args);
 	toastr.error(...args);
+	try {
+		swal.close();
+	} catch (e) {
+	}
 }
 
 function l (msg, old_ts=null, printer="log") {

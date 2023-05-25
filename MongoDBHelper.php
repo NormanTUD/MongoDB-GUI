@@ -262,5 +262,5 @@ class MongoDBHelper {
 }
 
 $GLOBALS["mdh"] = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);
-$GLOBALS["mdh"]->setDebug(1);
+#$GLOBALS["mdh"]->setDebug(1);
 ?>

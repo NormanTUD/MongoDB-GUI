@@ -27,3 +27,5 @@
 		updateTranslations();
 	});
 </script>
+<link href='sweetalert2.min.css' rel='stylesheet' />
+<script src='sweetalert2.all.js'></script>

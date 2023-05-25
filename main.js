@@ -191,6 +191,7 @@ async function visualizations (entries) {
 	var groups = await groupJSONStructures(entries);
 	if(groups) {
 		var old_ts = l("groups: " + groups);
+		Swal.close();
 	}
 }
 

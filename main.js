@@ -9,24 +9,24 @@ var heatLayer = null;
 
 function log (...args) { console.log(args); }
 
-function parse_server_response (response) {
+function parse_server_response (response, config={success: 1, error: 1, warnings: 1}) {
 	if(response) {
 		try {
 			var data = JSON.parse(response);
 
 			var shown_messages = 0;
-			if (Object.keys(data).includes("success") && data.success) {
+			if (Object.keys(data).includes("success") && data.success && Object.keys(config).includes("success") && config["success"]) {
 				success(data.success, "OK:");
 				shown_messages++;
 			}
 
-			if (Object.keys(data).includes("warning") && data.warning) {
+			if (Object.keys(data).includes("warning") && data.warning && Object.keys(config).includes("warning") && config["warning"]) {
 				error(data.warning, "Warning:");
 				console.warn(data);
 				shown_messages++;
 			}
 
-			if (Object.keys(data).includes("error") && data.error) {
+			if (Object.keys(data).includes("error") && data.error && Object.keys(config).includes("error") && config["error"]) {
 				error(data.error, "Error:");
 				console.error(data);
 				shown_messages++;
@@ -794,7 +794,7 @@ function deleteEntry(entryId, event=null) {
 		},
 		success: function (response) {
 			try {
-				var data = parse_server_response(response);
+				var data = parse_server_response(response, {error: 1, warning: 1, success: 0});
 				if (Object.keys(data).includes("success") && data.success) {
 					try {
 						// Remove the deleted entry from the page

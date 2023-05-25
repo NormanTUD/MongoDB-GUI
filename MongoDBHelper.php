@@ -285,6 +285,21 @@
 			}
 		}
 
+		public function count($query = []) {
+			$cursor = $this->executeQuery($this->query($query));
+			return $cursor->count();
+		}
+
+		public function deleteMany($query) {
+			$this->debug(["deleteMany" => ["query" => $query]]);
+			$deleteResult = $this->collection->deleteMany($query);
+			return $deleteResult->isAcknowledged();
+		}
+
+		public function distinct($field, $query = []) {
+			$distinctValues = $this->collection->distinct($field, $query);
+			return $distinctValues;
+		}
 	}
 
 	$GLOBALS["mdh"] = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);

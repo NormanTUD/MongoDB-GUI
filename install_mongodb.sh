@@ -10,7 +10,7 @@ echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/debian buster/mongod
 sudo apt-get update
 
 # Install MongoDB
-sudo apt-get install -y mongodb-org php
+sudo apt-get install -y mongodb-org php docker-compose
 
 # Start MongoDB service
 echo "Starting MongoDB service..."

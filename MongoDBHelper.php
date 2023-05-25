@@ -133,21 +133,6 @@ class MongoDBHelper {
 		return $res;
 	}
 
-	/*
-	public function find($filter=[], $projection=[]) {
-		$this->debug(["find" => ["filter" => $filter, "projection" => $projection]]);
-		$query = $this->query($filter, $projection);
-
-		try {
-			$cursor = $this->executeQuery($query);
-			$entries = $cursor->toArray();
-			return json_decode(json_encode($entries), true);
-		} catch (\Throwable $e) {
-			return json_encode(["error" => $e]);
-		}
-	}
-	 */
-
 	public function insertDocument($document) {
 		$this->debug(["insertDocument" => ["document" => $document]]);
 		if (!$document) {

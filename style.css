@@ -1,3 +1,49 @@
+#bottom_filler {
+	height: 50px;
+}
 #new_entry_container {
-    margin-bottom: 10px;
+	margin-bottom: 10px;
+}
+
+#builder-basic .query-builder {
+	font-size: 14px;
+	color: #333;
+	/* Add more custom styles */
+}
+
+#builder-basic .query-builder .rules-group-header {
+	background-color: #f0f0f0;
+	padding: 10px;
+	/* Add more custom styles */
+}
+
+.event-link {
+	cursor: pointer;
+	color: blue;
+	text-decoration: underline;
+}
+
+/* Set the position and dimensions of the status bar */
+#status-bar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background-color: #e5e5e5;
+	z-index: 99999;
+	border: 1px groove #626262;
+	padding: 2px;
+	box-sizing: border-box;
+}
+
+/* Style the status text */
+#l {
+	margin: 0;
+	color: #000;
+	font-weight: bold;
+}
+
+.language-selector {
+	display: inline-block;
+	margin-right: 5px;
 }

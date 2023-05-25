@@ -9,7 +9,7 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html
 
 # Install necessary dependencies
 RUN apt-get update && apt-get install -y \
-    libssl-dev \
+    libssl-dev iproute2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install the MongoDB extension using pecl
@@ -36,5 +36,4 @@ RUN cat /usr/local/etc/php/php.ini
 EXPOSE $APACHE_PORT
 
 # Start Apache server
-CMD ["/var/www/html/run.sh"]
 CMD ["apache2-foreground"]

@@ -8,6 +8,43 @@ var heatLayer = null;
 
 function log (...args) { console.log(args); }
 
+function parse_server_response (response) {
+	if(response) {
+		try {
+			var data = JSON.parse(response);
+
+			var shown_messages = 0;
+			if (Object.keys(data).includes("success") && data.success) {
+				success(data.success, "OK:");
+				shown_messages++;
+			}
+
+			if (Object.keys(data).includes("warning") && data.warning) {
+				error(data.warning, "Warning:");
+				console.warn(data);
+				shown_messages++;
+			}
+
+			if (Object.keys(data).includes("error") && data.error) {
+				error(data.error, "Error:");
+				console.error(data);
+				shown_messages++;
+			}
+
+			if(shown_messages) {
+				return data;
+			}
+		} catch (e) {
+			error("Trying to parse response failed", "Error:");
+		}
+	} else {
+		error("No response found", "Error");
+		console.error(response);
+	}
+
+	return {"success": null, "warning": null, "error": null};
+}
+
 function warning (...args) {
 	console.warn(...args);
 	toastr.warn(...args)
@@ -99,7 +136,7 @@ function load_all_entries () {
 			'reset_search': true
 		},
 		success: function (response) {
-			var data = JSON.parse(response);
+			var data = parse_server_response(response);
 
 			if (data !== null && data.success) {
 				success(data.success);
@@ -741,8 +778,8 @@ function deleteEntry(entryId, event=null) {
 		},
 		success: function (response) {
 			try {
-				var data = JSON.parse(response);
-				if (data.success) {
+				var data = parse_server_response(response);
+				if (Object.keys(data).includes("success") && data.success) {
 					try {
 						success(data.success);
 						// Remove the deleted entry from the page
@@ -759,10 +796,6 @@ function deleteEntry(entryId, event=null) {
 					} catch (e) {
 						error(e);
 					}
-				} else if (data.error) {
-					error(data.error);
-				} else {
-					error(data, "??? case ???");
 				}
 			} catch (e) {
 				error(e);
@@ -787,32 +820,24 @@ function addNewEntry(event) {
 			'new_entry_data': JSON.stringify(jsonData)
 		},
 		success: function (response) {
-			try {
-				var data = JSON.parse(response);
-				if (data.success) {
-					success(data.success);
+			var data = parse_server_response(response);
+			if (data.success) {
+				appendEntry(data.entryId);
 
-					appendEntry(data.entryId);
-
-					const newEditor = new JSONEditor(
-						document.getElementById('jsoneditor_' + data.entryId),
-						{
-							mode: 'tree',
-								onBlur: function () {
-									const updatedJson = newEditor.get();
-									const newJsonData = JSON.stringify(updatedJson, null, 2);
-									updateEntry(data.entryId, newJsonData);
-								}
-						}
-					);
-					newEditor.set(jsonData);
-				} else if (data.error) {
-					error(data.error);
-				}
-				updateTranslations();
-			} catch (e) {
-				error(e, "Error:");
+				const newEditor = new JSONEditor(
+					document.getElementById('jsoneditor_' + data.entryId),
+					{
+						mode: 'tree',
+							onBlur: function () {
+								const updatedJson = newEditor.get();
+								const newJsonData = JSON.stringify(updatedJson, null, 2);
+								updateEntry(data.entryId, newJsonData);
+							}
+					}
+				);
+				newEditor.set(jsonData);
 			}
+			updateTranslations();
 		},
 		error: function () {
 			error('Error adding new entry.');
@@ -832,20 +857,7 @@ function updateEntry(entryId, jsonData) {
 				json_data: jsonData
 			},
 		success: function (response) {
-			if(response) {
-				try {
-					var data = JSON.parse(response);
-					if (data.success) {
-						success(data.success, "OK");
-					} else if (data.error) {
-						error(data.error, "Error 5:");
-					}
-				} catch (e) {
-					error("Trying to parse response failed", "Error 4:");
-				}
-			} else {
-				error("Response not found in updateEntry", "Error 6:");
-			}
+			parse_server_response(response);
 		},
 		error: function () {
 			error('Error updating entry.');

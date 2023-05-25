@@ -487,10 +487,10 @@ async function generalizedVisualization(entries) {
 function appendEntry (entry_id) {
 	var id = "entry_" + entry_id;
 	if(!$("#" + id).length) {
-		var full_entry = '<div id="' + id + '">' +
+		var full_entry = '<div id="' + id + '"><hr>' +
 				'<div id="jsoneditor_' + entry_id + '"></div>' +
 				'<button onclick="deleteEntry(\'' + entry_id + '\')"><span class="TRANSLATEME_delete" /></button>' +
-			'<hr></div>'
+			'</div>'
 
 		$('#entry_list').append(full_entry);
 	}

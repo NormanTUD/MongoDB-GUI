@@ -12,7 +12,7 @@ class MongoDBHelper {
 	}
 
 	public function setDebug ($val) {
-		$this->enableDebug = ($val == 1 ? 1 : 0);
+		$this->enableDebug = ($val === 1 ? 1 : 0);
 	}
 
 	private function debug ($msg) {
@@ -262,5 +262,5 @@ class MongoDBHelper {
 }
 
 $GLOBALS["mdh"] = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);
-#$GLOBALS["mdh"]->setDebug(1);
+$GLOBALS["mdh"]->setDebug(1);
 ?>

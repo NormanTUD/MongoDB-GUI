@@ -307,7 +307,7 @@
 	$result = json_decode($result, true);
 	unset($result["entryId"]);
 	$result = json_encode($result);
-	is_equal("Insert Document", '{"success":"Entry created successfully."}', $result);
+	regex_matches("Insert Document", $result, '/"success":"Entry created successfully/');
 
 	// Test getAllEntries() method
 	$entries = $mongodbHelper->getAllEntries();

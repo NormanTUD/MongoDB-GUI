@@ -406,4 +406,74 @@
 	$realEntryId = $real['entryId'];
 	is_true("Delete Entry - entryId matches expected", isset($realEntryId['$oid']) && $realEntryId['$oid'] === $documentId);
 
+	// Insert sample documents for aggregation
+	$documents = [
+		[
+			'name' => 'John',
+			'age' => 30,
+			'gender' => 'Male'
+		],
+		[
+			'name' => 'Jane',
+			'age' => 25,
+			'gender' => 'Female'
+		],
+		[
+			'name' => 'Michael',
+			'age' => 35,
+			'gender' => 'Male'
+		],
+	];
+
+	$ids = [];
+
+	foreach ($documents as $document) {
+		$insertedDocumentId = $mongodbHelper->insertDocument($document);
+		$ids[] = $insertedDocumentId;
+		// Optionally, you can store the inserted document IDs for later reference or cleanup
+	}
+
+	// Perform aggregation on the inserted data
+	$pipeline = [
+		[
+			'$match' => [
+				'age' => ['$gte' => 30] // Match documents where age is greater than or equal to 30
+			]
+		],
+		[
+			'$group' => [
+				'_id' => '$gender',
+				'averageAge' => ['$avg' => '$age'],
+				'count' => ['$sum' => 1]
+			]
+		],
+	];
+
+	$result = $mongodbHelper->aggregate($pipeline);
+
+	try {
+		// Process the aggregation result
+		if ($result) {
+			foreach ($result as $entry) {
+				$gender = $entry['_id'];
+				$averageAge = $entry['averageAge'];
+				$count = $entry['count'];
+
+				// Process or display the aggregated data as needed
+
+				is_unequal("aggregation test", $gender, 0);
+				is_unequal("aggregation test", $averageAge, 0);
+				is_unequal("aggregation test", $count, 0);
+			}
+		} else {
+			test_failed();
+			echo "No results found.\n";
+		}
+
+		foreach ($ids as $id) {
+			$mongodbHelper->deleteEntry($id);
+		}
+	} catch (\Throwable $e) {
+		print "ERROR: $e";
+	}
 ?>

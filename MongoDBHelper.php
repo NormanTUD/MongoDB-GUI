@@ -3,10 +3,14 @@ class MongoDBHelper {
 	private $mongoClient;
 	private $namespace;
 	private $enableDebug;
+	private $collectionName;
+	private $databaseName;
 
 	public function __construct($mongodbHost = "localhost", $mongodbPort = 27017, $databaseName = "test", $collectionName = "Tzwei") {
 		$mongoConnectionString = "mongodb://{$mongodbHost}:{$mongodbPort}";
 		$this->mongoClient = new MongoDB\Driver\Manager($mongoConnectionString);
+		$this->collectionName = $collectionName;
+		$this->databaseName = $databaseName;
 		$this->namespace = "{$databaseName}.{$collectionName}";
 		$this->enableDebug = 0;
 	}
@@ -257,6 +261,23 @@ class MongoDBHelper {
 			return json_encode(['success' => 'Key deleted successfully.', 'documentId' => $documentId]);
 		} catch (Exception $e) {
 			return json_encode(['error' => 'Error deleting key: ' . $e->getMessage()]);
+		}
+	}
+
+	public function aggregate($pipeline) {
+		$this->debug(["aggregate" => ["pipeline" => $pipeline]]);
+
+		$command = new MongoDB\Driver\Command([
+			'aggregate' => $this->collectionName,
+			'pipeline' => $pipeline,
+			'cursor' => new stdClass(),
+		]);
+
+		try {
+			$cursor = $this->mongoClient->executeCommand($this->databaseName, $command);
+			return json_decode(json_encode($cursor->toArray()), true);
+		} catch (\Throwable $e) {
+			return json_encode(["error" => $e]);
 		}
 	}
 }

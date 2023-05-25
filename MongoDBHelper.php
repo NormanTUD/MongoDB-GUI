@@ -116,6 +116,24 @@ class MongoDBHelper {
 		return new MongoDB\Driver\Query($filter, $projection);
 	}
 
+
+	public function find($query = [], $projection = [], $offset = null, $limit = null) {
+		$this->debug(["find" => ["query" => $query]]);
+		$options = [];
+		if (!empty($projection)) {
+			$options['projection'] = $projection;
+		}
+		if ($offset !== null && $limit !== null) {
+			$options['skip'] = $offset;
+			$options['limit'] = $limit;
+		}
+
+		$cursor = $this->executeQuery($this->query($query), $options);
+		$res = json_decode(json_encode($cursor->toArray()), true);
+		return $res;
+	}
+
+	/*
 	public function find($filter=[], $projection=[]) {
 		$this->debug(["find" => ["filter" => $filter, "projection" => $projection]]);
 		$query = $this->query($filter, $projection);
@@ -128,6 +146,7 @@ class MongoDBHelper {
 			return json_encode(["error" => $e]);
 		}
 	}
+	 */
 
 	public function insertDocument($document) {
 		$this->debug(["insertDocument" => ["document" => $document]]);
@@ -280,6 +299,7 @@ class MongoDBHelper {
 			return json_encode(["error" => $e]);
 		}
 	}
+
 }
 
 $GLOBALS["mdh"] = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);

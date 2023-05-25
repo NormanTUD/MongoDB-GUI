@@ -9,7 +9,7 @@ var heatLayer = null;
 
 function log (...args) { console.log(args); }
 
-function parse_server_response (response, config={success: 1, error: 1, warnings: 1}) {
+function parse_server_response (response, config={success: 1, error: 1, warning: 1, closeSwal: 0}) {
 	if(response) {
 		try {
 			var data = JSON.parse(response);
@@ -30,6 +30,10 @@ function parse_server_response (response, config={success: 1, error: 1, warnings
 				error(data.error, "Error:");
 				console.error(data);
 				shown_messages++;
+			}
+
+			if(Object.keys(config).includes("closeSwal") && config["closeSwal"]) {
+				Swal.close();
 			}
 
 			if(shown_messages) {
@@ -153,7 +157,7 @@ function load_all_entries () {
 			'reset_search': true
 		},
 		success: function (response) {
-			var data = parse_server_response(response);
+			var data = parse_server_response(response); // , {success: 0, error: 1, warning: 1, closeSwal: 1});
 
 			if (data !== null && data.success) {
 				// Update the entry list with all entries
@@ -794,7 +798,7 @@ function deleteEntry(entryId, event=null) {
 		},
 		success: function (response) {
 			try {
-				var data = parse_server_response(response, {error: 1, warning: 1, success: 0});
+				var data = parse_server_response(response);
 				if (Object.keys(data).includes("success") && data.success) {
 					try {
 						// Remove the deleted entry from the page

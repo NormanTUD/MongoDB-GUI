@@ -6,7 +6,13 @@ if (!defined('INCLUDED_FROM_INDEX')) {
 // Load filters and rules from a file via AJAX
 $(document).ready(function () {
 	var old_t = l("Loading document.ready");
-	Swal.showLoading()
+	Swal.fire({
+		allowOutsideClick: false,
+		showConfirmButton: false,
+		showCancelButton: false,
+		title: "The site is loading. This may take a minute.",
+		html: 'Please wait'
+	});
 	$.ajax({
 		url: 'index.php?filters_and_rules=1',
 		dataType: 'json',

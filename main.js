@@ -156,8 +156,6 @@ function load_all_entries () {
 			var data = parse_server_response(response);
 
 			if (data !== null && data.success) {
-				success(data.success);
-
 				// Update the entry list with all entries
 				$('#entry_list').html(data.entries);
 
@@ -492,7 +490,7 @@ function appendEntry (entry_id) {
 		var full_entry = '<div id="' + id + '">' +
 				'<div id="jsoneditor_' + entry_id + '"></div>' +
 				'<button onclick="deleteEntry(\'' + entry_id + '\')"><span class="TRANSLATEME_delete" /></button>' +
-			'</div><hr>'
+			'<hr></div>'
 
 		$('#entry_list').append(full_entry);
 	}
@@ -799,7 +797,6 @@ function deleteEntry(entryId, event=null) {
 				var data = parse_server_response(response);
 				if (Object.keys(data).includes("success") && data.success) {
 					try {
-						success(data.success);
 						// Remove the deleted entry from the page
 						var entry_id = 'entry_id' + data.entryId
 						var editor_id = 'json_editor_' + data.entryId

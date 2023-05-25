@@ -190,7 +190,7 @@ function traverseDocument($data, $prefix, &$filters, &$rules) {
 
 function getDataType($value, $is_recursion=0) {
 	if (is_numeric($value)) {
-		if (preg_match('/^[+-]?\d+$/', $value)) {
+		if (preg_match('/^\s*[+-]?\d+\s*$/', $value)) {
 			return 'integer';
 		} elseif (is_float($value)) {
 			return 'double';

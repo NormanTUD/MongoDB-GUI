@@ -516,12 +516,14 @@ function find_lat_lon_variables_recursive($entry, $keywords=[]) {
 		["latitude", "longitude"]
 	];
 
+	$names = ["lat", "lon"];
+
 	$geo_coord_regex = '/^-?\d{1,3}(?:\.\d+)?$/';
 
-	return find_variables_recursive($entry, $keywords, $geo_coord_regex);
+	return find_variables_recursive($entry, $keywords, $names, $geo_coord_regex);
 }
 
-function find_variables_recursive($entry, $keywords, $regex=null, $original_entry=null) {
+function find_variables_recursive($entry, $keywords, $names, $regex=null, $original_entry=null) {
 	if(!count($keywords)) {
 		throw new Exception("Missing parameter \$keywords");
 	}
@@ -529,8 +531,9 @@ function find_variables_recursive($entry, $keywords, $regex=null, $original_entr
 	if(is_null($original_entry)) {
 		$original_entry = json_decode(json_encode($entry), true);
 	}
+
 	$entry = json_decode(json_encode($entry), true);
-	$lat_lon_variables = [];
+	$variables = [];
 
 	if (is_array($entry) || is_object($entry)) {
 		foreach ($entry as $key => $value) {
@@ -541,13 +544,13 @@ function find_variables_recursive($entry, $keywords, $regex=null, $original_entr
 				$lon_name = $kw[1];
 
 				if (is_array($value) || is_object($value)) {
-					$nested_variables = find_variables_recursive($value, $keywords, $regex, $original_entry);
-					$lat_lon_variables = array_merge($lat_lon_variables, $nested_variables);
+					$nested_variables = find_variables_recursive($value, $keywords, $names, $regex, $original_entry);
+					$variables = array_merge($variables, $nested_variables);
 				} elseif ($key === $lat_name && (!$regex || preg_match($regex, $value)) && isset($entry[$lon_name]) && (!$regex || preg_match($regex, $value))) {
-					$ll = ['lat' => $value, 'lon' => $entry[$lon_name], 'original_entry' => $original_entry];
+					$ll = [$names[0] => $value, $names[1] => $entry[$lon_name], 'original_entry' => $original_entry];
 				}
 				if (count($ll)) {
-					$lat_lon_variables[] = $ll;
+					$variables[] = $ll;
 				}
 			}
 		}
@@ -555,7 +558,7 @@ function find_variables_recursive($entry, $keywords, $regex=null, $original_entr
 		return [];
 	}
 
-	return $lat_lon_variables;
+	return $variables;
 }
 
 function removeDuplicates($r) {

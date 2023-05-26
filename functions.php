@@ -38,8 +38,10 @@ try {
 	}
 	fclose($connection);
 } catch (\Throwable $e) {
-	echo "Unable to connect to ".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]." and port specified";
-	echo "Is a mongodb instance running?";
+	echo "Unable to connect to ".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]." and port specified<br>\n";
+	echo "Is a mongodb instance running?<br>\n";
+	echo "try <code>sudo service mongod start</code> on your host and make sure you broadcast to either localhost or the docker ip in <code>/etc/mongod.conf</code><br>\n";
+	echo "Occuring error:<br>\n";
 	echo $e;
 	exit(1);
 }

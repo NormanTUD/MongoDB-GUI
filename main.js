@@ -1,5 +1,4 @@
 "use strict";
-
 var s = null;
 var focus_log = {};
 var performance_log = {};

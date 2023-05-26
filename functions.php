@@ -14,7 +14,7 @@ set_error_handler("exception_error_handler");
 ini_set('display_errors', '1');
 
 if (!class_exists('MongoDB\Driver\Manager')) {
-	echo "MongoDB driver not found.";
+	echo "MongoDB driver not found. Use: pecl mongodb";
 	return;
 }
 
@@ -26,14 +26,9 @@ $GLOBALS["collectionName"] = getEnvOrDie('DB_COLLECTION', 'dbcollection');
 $GLOBALS["namespace"] = $GLOBALS["databaseName"].".".$GLOBALS['collectionName'];
 
 // Connect to MongoDB
-$GLOBALS["mongoClient"] = new MongoDB\Driver\Manager("mongodb://".$GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]);
-
-if (!isset($GLOBALS["mongoClient"]) || !isset($GLOBALS["databaseName"]) || !isset($GLOBALS["collectionName"]) || !isset($GLOBALS["namespace"])) {
-	echo "Incomplete or missing $GLOBALS variables.";
-	return;
-}
-
 require_once 'MongoDBHelper.php';
+$GLOBALS["mdh"] = new MongoDBHelper($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $GLOBALS["databaseName"], $GLOBALS["collectionName"]);
+
 
 try {
 	$connection = fsockopen($GLOBALS["mongodbHost"], $GLOBALS["mongodbPort"], $errno, $errstr, 5);
@@ -47,6 +42,105 @@ try {
 	echo "Is a mongodb instance running?";
 	echo $e;
 	exit(1);
+}
+
+// Handle form submission for updating an entry
+if(isset($_SERVER['REQUEST_METHOD'])) {
+	if (isset($_GET['filters_and_rules'])) {
+		$filtersAndFilters = generateQueryBuilderFilter();
+		echo json_encode($filtersAndFilters);
+		exit;
+	}
+
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		if (isset($_POST['reset_search'])) {
+			$entries = json_decode(json_encode(getAllEntries()), true);
+			echo json_encode(array('success' => 'Search reset successfully.', 'entries' => $entries));
+			exit;
+		}
+
+		if (isset($_POST['search_query'])) {
+			$searchQuery = json_decode($_POST['search_query'], true);
+			$matchingEntries = $GLOBALS["mdh"]->find($searchQuery);
+			echo json_encode($matchingEntries);
+			exit;
+		}
+
+		// Handle form submission for deleting an entry
+		if (isset($_POST['delete_entry_id'])) {
+			$entryId = $_POST['delete_entry_id'];
+			$response = $GLOBALS["mdh"]->deleteEntry($entryId);
+			echo $response;
+			exit();
+		}
+
+		if(isset($_POST["auto_submit_form"])) {
+			$full = process_autoform($questions);
+
+			$post = json_decode(json_encode($_POST), true);
+			unset($post['auto_submit_form']);
+
+			$response = $GLOBALS["mdh"]->insertDocument($post);
+
+			$full['inserter'] = $response;
+
+			echo json_encode($full);		
+			exit();
+		}
+
+		// Handle form submission for adding a new entry
+		if (isset($_POST['new_entry_data'])) {
+			$newData = json_decode($_POST['new_entry_data'], true);
+			$entryId = (string) new MongoDB\BSON\ObjectID();
+			$response = $GLOBALS["mdh"]->insertDocument($newData);
+			echo $response;
+			exit();
+		}
+
+		if(isset($_POST["entry_id"])) {
+			$entryId = $_POST['entry_id'];
+			$newData = json_decode($_POST['json_data'], true);
+
+			$response = $GLOBALS["mdh"]->replaceDocument($entryId, $newData);
+			echo $response;
+			exit();
+		}
+
+		if (isset($_POST['data'])) {
+			$data = $_POST['data'];
+
+			try {
+				$documents[] = json_decode($_POST["data"]);
+				if (json_last_error() !== JSON_ERROR_NONE) {
+					throw new Exception('Failed to decode JSON: ' . json_last_error_msg());
+				}
+			} catch (\Throwable $e) {
+				// Detect data format
+				$lines = explode(PHP_EOL, $data);
+				$headers = str_getcsv(array_shift($lines));
+
+				$documents = [];
+				foreach ($lines as $line) {
+					$row = str_getcsv($line);
+					$document = [];
+					foreach ($headers as $index => $header) {
+						$document[$header] = isset($row[$index]) ? $row[$index] : '';
+					}
+					$documents[] = $document;
+				}
+			}
+
+			foreach ($documents as $document) {
+				$GLOBALS["mdh"]->insertDocument($document);
+			}
+		}
+	}
+}
+
+
+if (!isset($GLOBALS["mdh"]) || !isset($GLOBALS["databaseName"]) || !isset($GLOBALS["collectionName"]) || !isset($GLOBALS["namespace"])) {
+	echo "Incomplete or missing \$GLOBALS variables.";
+	return;
 }
 
 function dier ($msg) {
@@ -396,98 +490,6 @@ function process_autoform($questions) {
 	return ["html" => $html, "json" => json_encode($response), "errors" => $errors];
 }
 
-// Handle form submission for updating an entry
-if(isset($_SERVER['REQUEST_METHOD'])) {
-	if (isset($_GET['filters_and_rules'])) {
-		$filtersAndFilters = generateQueryBuilderFilter();
-		echo json_encode($filtersAndFilters);
-		exit;
-	}
-
-	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-		if (isset($_POST['reset_search'])) {
-			$entries = json_decode(json_encode(getAllEntries()), true);
-			echo json_encode(array('success' => 'Search reset successfully.', 'entries' => $entries));
-			exit;
-		}
-
-		if (isset($_POST['search_query'])) {
-			$searchQuery = json_decode($_POST['search_query'], true);
-			$matchingEntries = $GLOBALS["mdh"]->find($searchQuery);
-			echo json_encode($matchingEntries);
-			exit;
-		}
-
-		// Handle form submission for deleting an entry
-		if (isset($_POST['delete_entry_id'])) {
-			$entryId = $_POST['delete_entry_id'];
-			$response = $GLOBALS["mdh"]->deleteEntry($entryId);
-			echo $response;
-			exit();
-		}
-
-		if(isset($_POST["auto_submit_form"])) {
-			$full = process_autoform($questions);
-
-			$post = json_decode(json_encode($_POST), true);
-			unset($post['auto_submit_form']);
-
-			$response = $GLOBALS["mdh"]->insertDocument($post);
-
-			$full['inserter'] = $response;
-
-			echo json_encode($full);		
-			exit();
-		}
-
-		// Handle form submission for adding a new entry
-		if (isset($_POST['new_entry_data'])) {
-			$newData = json_decode($_POST['new_entry_data'], true);
-			$entryId = (string) new MongoDB\BSON\ObjectID();
-			$response = $GLOBALS["mdh"]->insertDocument($newData);
-			echo $response;
-			exit();
-		}
-
-		if(isset($_POST["entry_id"])) {
-			$entryId = $_POST['entry_id'];
-			$newData = json_decode($_POST['json_data'], true);
-
-			$response = $GLOBALS["mdh"]->replaceDocument($entryId, $newData);
-			echo $response;
-			exit();
-		}
-
-		if (isset($_POST['data'])) {
-			$data = $_POST['data'];
-
-			try {
-				$documents[] = json_decode($_POST["data"]);
-				if (json_last_error() !== JSON_ERROR_NONE) {
-					throw new Exception('Failed to decode JSON: ' . json_last_error_msg());
-				}
-			} catch (\Throwable $e) {
-				// Detect data format
-				$lines = explode(PHP_EOL, $data);
-				$headers = str_getcsv(array_shift($lines));
-
-				$documents = [];
-				foreach ($lines as $line) {
-					$row = str_getcsv($line);
-					$document = [];
-					foreach ($headers as $index => $header) {
-						$document[$header] = isset($row[$index]) ? $row[$index] : '';
-					}
-					$documents[] = $document;
-				}
-			}
-
-			foreach ($documents as $document) {
-				$GLOBALS["mdh"]->insertDocument($document);
-			}
-		}
-	}
-}
 
 function get_entries_with_geo_coordinates ($entries) {
 	$entries_with_geo_coords = [];

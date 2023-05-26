@@ -1,6 +1,7 @@
 <?php
 // TODO: https://ukrbublik.github.io/react-awesome-query-builder/
 // Evtl besser: https://react-querybuilder.js.org/demo#addRuleToNewGroups=true&autoSelectField=true&autoSelectOperator=true&debugMode=false&disabled=false&enableDragAndDrop=true&independentCombinators=true&justifiedLayout=true&listsAsArrays=true&parseNumbers=true&resetOnFieldChange=true&resetOnOperatorChange=false&showBranches=true&showCloneButtons=false&showCombinatorsBetweenRules=true&showLockButtons=false&showNotToggle=true&validateQuery=true
+// https://www.jsdelivr.com/package/npm/react-awesome-query-builder
 	define('INCLUDED_FROM_INDEX', true);
 	include("functions.php");
 ?>

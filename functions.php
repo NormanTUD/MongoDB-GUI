@@ -510,19 +510,25 @@ function get_entries_with_geo_coordinates ($entries) {
 	return $entries_with_geo_coords;
 }
 
+function find_lat_lon_variables_recursive($entry, $keywords=[]) {
+	$keywords = [
+		["lat", "lon"],
+		["latitude", "longitude"]
+	];
 
-function find_lat_lon_variables_recursive($entry, $original_entry=null) {
+	return find_variables_recursive($entry, $keywords);
+}
+
+function find_variables_recursive($entry, $keywords=[], $original_entry=null) {
+	if(!count($keywords)) {
+		throw new Exception("Missing parameter \$keywords");
+	}
 	if(is_null($original_entry)) {
 		$original_entry = json_decode(json_encode($entry), true);
 	}
 	$entry = json_decode(json_encode($entry), true);
 	$lat_lon_variables = [];
 	$geo_coord_regex = '/^-?\d{1,3}(?:\.\d+)?$/';
-
-	$keywords = [
-		["lat", "lon"],
-		["latitude", "longitude"]
-	];
 
 	if (is_array($entry) || is_object($entry)) {
 		foreach ($entry as $key => $value) {
@@ -533,7 +539,7 @@ function find_lat_lon_variables_recursive($entry, $original_entry=null) {
 				$lon_name = $kw[1];
 
 				if (is_array($value) || is_object($value)) {
-					$nested_variables = find_lat_lon_variables_recursive($value, $original_entry);
+					$nested_variables = find_variables_recursive($value, $keywords, $original_entry);
 					$lat_lon_variables = array_merge($lat_lon_variables, $nested_variables);
 				} elseif ($key === $lat_name && preg_match($geo_coord_regex, $value) && isset($entry[$lon_name]) && preg_match($geo_coord_regex, $value)) {
 					$ll = ['lat' => $value, 'lon' => $entry[$lon_name], 'original_entry' => $original_entry];

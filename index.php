@@ -37,10 +37,6 @@
 <?php
 		include("import.php");
 ?>
-		<script>
-			"use strict";
-			<?php include("initialize_query_builder.php"); ?>
-		</script>
 
 		<div id="performance_log"></div>
 

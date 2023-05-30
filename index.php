@@ -28,11 +28,9 @@
 			</form>
 		</div>
 
-
 		<b><?php print $GLOBALS["databaseName"].".".$GLOBALS["collectionName"]; ?> <span class="TRANSLATEME_on"></span> <?php print $GLOBALS["mongodbHost"].":".$GLOBALS["mongodbPort"]; ?></b><br>
 
-		<div id="entry_list">
-		</div>
+		<div id="entry_list"></div>
 		<button onclick="addNewEntry(event)"><span class='TRANSLATEME_add_new_entry' /></button>
 
 		<div id="countKeysChart"></div>
@@ -40,11 +38,8 @@
 <?php
 		include("import.php");
 ?>
-
 		<div id="performance_log"></div>
-
 		<div id="bottom_filler"></div>
-
 		<div id="status-bar">
 			<p id='l'>Initializing...</p>
 		</div>

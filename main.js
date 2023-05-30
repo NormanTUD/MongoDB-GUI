@@ -33,7 +33,7 @@ function parse_server_response (response, config={success: 1, error: 1, warning:
 			}
 
 			if(Object.keys(config).includes("closeSwal") && config["closeSwal"]) {
-				Swal.close();
+				_swal_close();
 			}
 
 			if(shown_messages) {
@@ -50,40 +50,35 @@ function parse_server_response (response, config={success: 1, error: 1, warning:
 	return {"success": null, "warning": null, "error": null};
 }
 
-function warning (...args) {
-	console.warn(...args);
-	toastr.warn(...args)
+function _swal_close() {
 	try {
 		swal.close();
 	} catch (e) {
 	}
+}
+
+function warning (...args) {
+	console.warn(...args);
+	toastr.warn(...args)
+	_swal_close();
 }
 
 function info (...args) {
 	console.log(...args);
 	toastr.info(...args);
-	try {
-		swal.close();
-	} catch (e) {
-	}
+	_swal_close();
 }
 
 function success (...args) {
 	console.log(...args);
 	toastr.success(...args);
-	try {
-		swal.close();
-	} catch (e) {
-	}
+	_swal_close();
 }
 
 function error (...args) {
 	console.error(...args);
 	toastr.error(...args);
-	try {
-		swal.close();
-	} catch (e) {
-	}
+	_swal_close();
 }
 
 function l (msg, old_ts=null, printer="log") {
@@ -193,7 +188,7 @@ async function visualizations (entries) {
 	var groups = await groupJSONStructures(entries);
 	if(groups) {
 		var old_ts = l("groups: " + groups);
-		Swal.close();
+		_swal_close();
 	}
 }
 

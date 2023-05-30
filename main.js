@@ -560,8 +560,6 @@ function updateMap(entries) {
 
 	// Clear the existing map markers and heatmap layer
 
-
-
 	if(markerCluster === null) {
 		markerCluster = L.markerClusterGroup();
 		map = L.map('map').setView([0, 0], 2); // Set initial center and zoom level

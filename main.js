@@ -889,7 +889,9 @@ function updateEntry(entryId, jsonData) {
 function findLatLonVariablesRecursive(entry, originalEntry = null) {
 	var keywords = [
 		["lat", "lon"],
-		["latitude", "longitude"]
+		["latitude", "longitude"],
+		["breitengrad", "höhengrad"]
+
 	];
 
 	return findVariablesRecursive(entry, keywords, originalEntry);

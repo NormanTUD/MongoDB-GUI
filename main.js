@@ -1023,12 +1023,11 @@ $(document).ready(function () {
 	
 	var urlParams = new URLSearchParams(window.location.search);
 	if (urlParams.has('search')) {
-	$.ajax({
-		url: 'index.php?filters_and_rules=1',
-		dataType: 'json',
-		success: function(data) {
-			var urlParams = new URLSearchParams(window.location.search);
-			if (!urlParams.has('no_search')) {
+		$.ajax({
+			url: 'index.php?filters_and_rules=1',
+			dataType: 'json',
+			success: function(data) {
+				alert("A");
 				var old_t = l("receiving filters and rules");
 				var filters = data.filters;
 				var rules = data.rules;
@@ -1107,6 +1106,10 @@ $(document).ready(function () {
 				alert("ERROR loading site");
 			}
 		});
+	} else {
+		l("no_search defined. Not loading search.");
+		_swal_close();
+	}
 
 	$('#btn-reset').on('click', function() {
 		$('#queryBuilder').queryBuilder('reset');

@@ -910,14 +910,23 @@ function findLatLonVariablesRecursive(entry) {
 
 function keywords_match (key, kw, regex, entry, value) {
 	var return_value = false;
+	if(!key === kw[0]) {
+		return false;
+	}
 	
-	if(
-		key === kw[0] &&
-		(!regex || regex.test(value)) &&
-		Object.keys(entry).includes(kw[1]) &&
-		(!regex || regex.test(entry[kw[1]]))
-	) {
-		return_value = true;
+	if (!(!regex || regex.test(value))) {
+		return false;
+	}
+	
+	for (var i = 1; i < kw.length; i++) {
+		if(
+			Object.keys(entry).includes(kw[i]) &&
+			(!regex || regex.test(entry[kw[i]]))
+		) {
+			return_value = true;
+		} else {
+			return false;
+		}
 	}
 
 	return return_value;

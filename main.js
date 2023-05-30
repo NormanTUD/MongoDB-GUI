@@ -1090,22 +1090,24 @@ $(document).ready(function () {
 		}
 	});
 
+	$('#btn-reset').on('click', function() {
+		$('#builder-basic').queryBuilder('reset');
+	});
+
+	$('#btn-set').on('click', function() {
+		var rules = JSON.parse($('#rules-json').val());
+		$('#builder-basic').queryBuilder('setRules', rules);
+	});
+
+	$('#btn-get').on('click', function() {
+		var result = $('#builder-basic').queryBuilder('getRules');
+
+		if (!$.isEmptyObject(result)) {
+			alert(JSON.stringify(result, null, 2));
+		}
+	});
+
 	l("Loading document.ready", old_t);
 });
 
-$('#btn-reset').on('click', function() {
-	$('#builder-basic').queryBuilder('reset');
-});
 
-$('#btn-set').on('click', function() {
-	var rules = JSON.parse($('#rules-json').val());
-	$('#builder-basic').queryBuilder('setRules', rules);
-});
-
-$('#btn-get').on('click', function() {
-	var result = $('#builder-basic').queryBuilder('getRules');
-
-	if (!$.isEmptyObject(result)) {
-		alert(JSON.stringify(result, null, 2));
-	}
-});

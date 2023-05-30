@@ -143,7 +143,7 @@ function removeDuplicates(r) {
 }
 
 
-function load_all_entries () {
+async function load_all_entries () {
 	var old_ts = l("load_all_entries");
 	$.ajax({
 		url: PHP_SELF,
@@ -165,7 +165,7 @@ function load_all_entries () {
 				});
 
 				var entries = data.entries;
-				visualizations(entries)
+				await visualizations(entries)
 			} else if (data.error) {
 				error(data.error);
 			}
@@ -192,7 +192,7 @@ async function visualizations (entries) {
 	}
 }
 
-function searchEntries() {
+async function searchEntries() {
 	var old_ts = l("searchEntries");
 	var rules = $("#builder-basic").queryBuilder("getRules");
 
@@ -212,7 +212,7 @@ function searchEntries() {
 			data: {
 				search_query: JSON.stringify(query)
 			},
-			success: function(response) {
+			success: async function(response) {
 				var matchingEntries = JSON.parse(response);
 
 				if (matchingEntries.length > 0) {
@@ -230,7 +230,7 @@ function searchEntries() {
 
 
 					// Generate the visualization
-					visualizations(matchingEntries);
+					await visualizations(matchingEntries);
 				} else {
 					info('No matching entries found.');
 				}
@@ -647,7 +647,7 @@ function removeQueryStringParameter(url, key) {
 	l("removeQueryStringParameter", old_ts);
 }
 
-function resetSearch(e=false) {
+async function resetSearch(e=false) {
 	var old_ts = l("resetSearch");
 	if(e) {
 		e.preventDefault();
@@ -664,7 +664,7 @@ function resetSearch(e=false) {
 	$("#current_query").empty();
 
 	// Load all entries
-	load_all_entries();
+	await load_all_entries();
 
 	l("resetSearch", old_ts);
 }
@@ -1066,7 +1066,7 @@ $(document).ready(function () {
 
 						// Trigger the search
 						var tmp_se = l("search entries");
-						searchEntries();
+						await searchEntries();
 						l("search entries", tmp_se);
 					} catch (e) {
 						le("ERROR: Could not parse search string from url");
@@ -1074,7 +1074,7 @@ $(document).ready(function () {
 					}
 				} else {
 					var tmp_sp = l("no search param found, resetting search");
-					resetSearch();
+					await resetSearch();
 					l("no search param found, resetting search", tmp_sp);
 				}
 				l("trying to find search param from url", tmp_sp_t)

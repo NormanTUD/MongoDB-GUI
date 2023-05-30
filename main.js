@@ -7,6 +7,8 @@ var markerCluster = null;
 var map = null;
 var heatLayer = null;
 
+var jsoneditor_mode = 'tree'; // view, form
+
 function log (...args) { console.log(args); }
 
 function parse_server_response (response, config={success: 1, error: 1, warning: 1, closeSwal: 0}) {
@@ -516,7 +518,7 @@ function initJsonEditor(entry) {
 			onFocus: function () {
 				focus_log[entry_id] = true;
 			},
-			mode: 'tree', // view, form
+			mode: jsoneditor_mode
 			onBlur: function () {
 				if (entry_id in focus_log && focus_log[entry_id] == true) {
 					const updatedJson = editor.get();
@@ -843,12 +845,12 @@ function addNewEntry(event) {
 				const newEditor = new JSONEditor(
 					document.getElementById('jsoneditor_' + data.entryId),
 					{
-						mode: 'tree',
-							onBlur: function () {
-								const updatedJson = newEditor.get();
-								const newJsonData = JSON.stringify(updatedJson, null, 2);
-								updateEntry(data.entryId, newJsonData);
-							}
+						mode: jsoneditor_mode,
+						onBlur: function () {
+							const updatedJson = newEditor.get();
+							const newJsonData = JSON.stringify(updatedJson, null, 2);
+							updateEntry(data.entryId, newJsonData);
+						}
 					}
 				);
 				newEditor.set(jsonData);

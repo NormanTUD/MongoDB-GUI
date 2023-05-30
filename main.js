@@ -11,6 +11,10 @@ var jsoneditor_mode = 'tree'; // view, form
 
 function log (...args) { console.log(args); }
 
+function fl (entryId, b) { // focus log (entryId und bool)
+	focus_log[entryId] = !!b;
+}
+
 function parse_server_response (response, config={success: 1, error: 1, warning: 1, closeSwal: 0}) {
 	if(response) {
 		try {
@@ -518,7 +522,7 @@ function initJsonEditor(entry) {
 		container,
 		{
 			onFocus: function () {
-				focus_log[entry_id] = true;
+				fl(entry_id, true);
 			},
 			mode: jsoneditor_mode,
 			onBlur: function () {
@@ -527,7 +531,7 @@ function initJsonEditor(entry) {
 					const jsonData = JSON.stringify(updatedJson, null, 2);
 					const entryId = entry_id;
 					updateEntry(entryId, jsonData);
-					focus_log[entry._id] = false;
+					fl(entry._id, false);
 				}
 			}
 		}
@@ -852,7 +856,7 @@ function addNewEntry(event) {
 							const updatedJson = newEditor.get();
 							const newJsonData = JSON.stringify(updatedJson, null, 2);
 							updateEntry(data.entryId, newJsonData);
-							focus_log[data.entryId] = false;
+							fl(data.entryId, false);
 						}
 					}
 				);
@@ -889,6 +893,7 @@ function updateEntry(entryId, jsonData) {
 }
 
 function findLatLonVariablesRecursive(entry) {
+	var old_ts = l("findLatLonVariablesRecursive");
 	var keywords = [
 		["lat", "lon"],
 		["latitude", "longitude"],
@@ -897,14 +902,18 @@ function findLatLonVariablesRecursive(entry) {
 
 	const geoCoordRegex = /^[-+]?\d{1,3}(?:\.\d+)?$/;
 
-	return findVariablesRecursive(entry, keywords, geoCoordRegex);
+	var r = findVariablesRecursive(entry, keywords, geoCoordRegex);
+
+	l("findLatLonVariablesRecursive", old_ts);
+
+	return r;
 }
 
 function findVariablesRecursive(entry, keywords, regex, originalEntry = null) {
 	var old_ts;
 	if (originalEntry === null) {
 		originalEntry = JSON.parse(JSON.stringify(entry));
-		old_ts = l("findLatLonVariablesRecursive");
+		old_ts = l("findVariablesRecursive");
 	}
 
 	const latLonVariables = [];
@@ -946,7 +955,7 @@ function findVariablesRecursive(entry, keywords, regex, originalEntry = null) {
 	var no_duplicates = removeDuplicatesFromJSON(latLonVariables, !!old_ts);
 
 	if(old_ts) {
-		l("findLatLonVariablesRecursive", old_ts);
+		l("findVariablesRecursive", old_ts);
 	}
 	return no_duplicates;
 }

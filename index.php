@@ -5,7 +5,6 @@
 	define('INCLUDED_FROM_INDEX', true);
 	include("functions.php");
 ?>
-
 <!DOCTYPE html>
 <html>
 	<head>

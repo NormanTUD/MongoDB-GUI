@@ -1023,6 +1023,7 @@ $(document).ready(function () {
 	
 	var urlParams = new URLSearchParams(window.location.search);
 	if (urlParams.has('search')) {
+		$("#search_stuff").show();
 		$.ajax({
 			url: 'index.php?filters_and_rules=1',
 			dataType: 'json',
@@ -1110,6 +1111,7 @@ $(document).ready(function () {
 		l("no_search defined. Not loading search.");
 		load_all_entries();
 		_swal_close();
+		$("#search_stuff").hide();
 	}
 
 	$('#btn-reset').on('click', function() {

@@ -518,7 +518,7 @@ function initJsonEditor(entry) {
 			onFocus: function () {
 				focus_log[entry_id] = true;
 			},
-			mode: jsoneditor_mode
+			mode: jsoneditor_mode,
 			onBlur: function () {
 				if (entry_id in focus_log && focus_log[entry_id] == true) {
 					const updatedJson = editor.get();
@@ -850,6 +850,7 @@ function addNewEntry(event) {
 							const updatedJson = newEditor.get();
 							const newJsonData = JSON.stringify(updatedJson, null, 2);
 							updateEntry(data.entryId, newJsonData);
+							focus_log[entry._id] = false;
 						}
 					}
 				);

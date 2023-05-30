@@ -1110,7 +1110,6 @@ $(document).ready(function () {
 	} else {
 		l("no_search defined. Not loading search.");
 		load_all_entries();
-		_swal_close();
 		$("#search_stuff").hide();
 	}
 

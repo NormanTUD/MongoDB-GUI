@@ -850,7 +850,7 @@ function addNewEntry(event) {
 							const updatedJson = newEditor.get();
 							const newJsonData = JSON.stringify(updatedJson, null, 2);
 							updateEntry(data.entryId, newJsonData);
-							focus_log[entry._id] = false;
+							focus_log[data.entryId] = false;
 						}
 					}
 				);

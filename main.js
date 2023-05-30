@@ -143,7 +143,7 @@ function removeDuplicates(r) {
 }
 
 
-async function load_all_entries () {
+function load_all_entries () {
 	var old_ts = l("load_all_entries");
 	$.ajax({
 		url: PHP_SELF,
@@ -151,7 +151,7 @@ async function load_all_entries () {
 		data: {
 			'reset_search': true
 		},
-		success: function (response) {
+		success: async function (response) {
 			var data = parse_server_response(response); // , {success: 0, error: 1, warning: 1, closeSwal: 1});
 
 			if (data !== null && data.success) {
@@ -192,7 +192,7 @@ async function visualizations (entries) {
 	}
 }
 
-async function searchEntries() {
+function searchEntries() {
 	var old_ts = l("searchEntries");
 	var rules = $("#builder-basic").queryBuilder("getRules");
 
@@ -269,12 +269,12 @@ function countKeys(entries) {
 	var propertyCounts = {};
 	entries.forEach(function(entry) {
 		Object.keys(entry).forEach(function(property) {
-			if(property != "_id") {
+			//if(property != "_id") {
 				if (!propertyCounts.hasOwnProperty(property)) {
 					propertyCounts[property] = 0;
 				}
 				propertyCounts[property]++;
-			}
+			//}
 		});
 	});
 
@@ -647,7 +647,7 @@ function removeQueryStringParameter(url, key) {
 	l("removeQueryStringParameter", old_ts);
 }
 
-async function resetSearch(e=false) {
+function resetSearch(e=false) {
 	var old_ts = l("resetSearch");
 	if(e) {
 		e.preventDefault();
@@ -664,7 +664,7 @@ async function resetSearch(e=false) {
 	$("#current_query").empty();
 
 	// Load all entries
-	await load_all_entries();
+	load_all_entries();
 
 	l("resetSearch", old_ts);
 }
@@ -1009,7 +1009,7 @@ $(document).ready(function () {
 	$.ajax({
 		url: 'index.php?filters_and_rules=1',
 		dataType: 'json',
-		success: async function(data) {
+		success: function(data) {
 			var old_t = l("receiving filters and rules");
 			var filters = data.filters;
 			var rules = data.rules;
@@ -1066,7 +1066,7 @@ $(document).ready(function () {
 
 						// Trigger the search
 						var tmp_se = l("search entries");
-						await searchEntries();
+						searchEntries();
 						l("search entries", tmp_se);
 					} catch (e) {
 						le("ERROR: Could not parse search string from url");
@@ -1074,7 +1074,7 @@ $(document).ready(function () {
 					}
 				} else {
 					var tmp_sp = l("no search param found, resetting search");
-					await resetSearch();
+					resetSearch();
 					l("no search param found, resetting search", tmp_sp);
 				}
 				l("trying to find search param from url", tmp_sp_t)

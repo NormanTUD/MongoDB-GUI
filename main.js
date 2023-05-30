@@ -1020,88 +1020,93 @@ $(document).ready(function () {
 		title: "The site is loading. This may take a minute.",
 		html: 'Please wait'
 	});
+	
+	var urlParams = new URLSearchParams(window.location.search);
+	if (urlParams.has('search')) {
 	$.ajax({
 		url: 'index.php?filters_and_rules=1',
 		dataType: 'json',
 		success: function(data) {
-			var old_t = l("receiving filters and rules");
-			var filters = data.filters;
-			var rules = data.rules;
+			var urlParams = new URLSearchParams(window.location.search);
+			if (!urlParams.has('no_search')) {
+				var old_t = l("receiving filters and rules");
+				var filters = data.filters;
+				var rules = data.rules;
 
-			if(!filters.length) {
-				$("#search_stuff").hide();
-				le("No DB entries found");
-				return;
-			}
-
-			if(!rules.length) {
-				$("#search_stuff").hide();
-				le("No DB entries found");
-				return;
-			}
-
-			var tmp = l("building jqueryquerybuilder")
-
-			$('#queryBuilder').queryBuilder({
-				plugins: ["bt-tooltip-errors"],
-				filters: filters,
-				rules: rules
-			});
-
-			l("building jqueryquerybuilder", tmp);
-
-			tmp = l("showing search")
-			$("#search_stuff").show();
-			l("showing search", tmp);
-
-
-			try {
-				var tmp_sp_t = l("trying to find search param from url")
-				var urlParams = new URLSearchParams(window.location.search);
-				if (urlParams.has('search')) {
-					var searchParam = urlParams.get('search');
-					l("found search param from url: " + searchParam)
-					log("searchParam:", searchParam);
-					if(searchParam == "undefined" || searchParam === undefined || !searchParam) {
-						searchParam = "{}";
-					}
-
-					try {
-						var tmp_bq = l("trying to build query");
-						var query = JSON.parse(decodeURIComponent(searchParam));
-						l("trying to build query", tmp_bq);
-
-						// Set the query rules in the query builder
-						var tmp_sr = l("setRules");
-						console.log("QUERY:", query);
-						$("#queryBuilder").queryBuilder("setRules", query);
-						l("setRules", tmp_sr);
-
-						// Trigger the search
-						var tmp_se = l("search entries");
-						searchEntries();
-						l("search entries", tmp_se);
-					} catch (e) {
-						le("ERROR: Could not parse search string from url");
-						console.error(e);
-					}
-				} else {
-					var tmp_sp = l("no search param found, resetting search");
-					resetSearch();
-					l("no search param found, resetting search", tmp_sp);
+				if(!filters.length) {
+					$("#search_stuff").hide();
+					le("No DB entries found");
+					return;
 				}
-				l("trying to find search param from url", tmp_sp_t)
-			} catch (e) {
-				console.error("ERROR in trying to receive filters and rules:", e);
-			}
+	
+				if(!rules.length) {
+					$("#search_stuff").hide();
+					le("No DB entries found");
+					return;
+				}
+	
+				var tmp = l("building jqueryquerybuilder")
+	
+				$('#queryBuilder').queryBuilder({
+					plugins: ["bt-tooltip-errors"],
+					filters: filters,
+					rules: rules
+				});
+	
+				l("building jqueryquerybuilder", tmp);
 
-			l("receiving filters and rules", old_t);
-		},
-		error: function (e) {
-			console.error(e);
-			alert("ERROR loading site");
-		}
-	});
+				tmp = l("showing search")
+				$("#search_stuff").show();
+				l("showing search", tmp);
+
+
+				try {
+					var tmp_sp_t = l("trying to find search param from url")
+					var urlParams = new URLSearchParams(window.location.search);
+					if (urlParams.has('search')) {
+						var searchParam = urlParams.get('search');
+						l("found search param from url: " + searchParam)
+						log("searchParam:", searchParam);
+						if(searchParam == "undefined" || searchParam === undefined || !searchParam) {
+							searchParam = "{}";
+						}
+	
+						try {
+							var tmp_bq = l("trying to build query");
+							var query = JSON.parse(decodeURIComponent(searchParam));
+							l("trying to build query", tmp_bq);
+	
+							// Set the query rules in the query builder
+							var tmp_sr = l("setRules");
+							console.log("QUERY:", query);
+							$("#queryBuilder").queryBuilder("setRules", query);
+							l("setRules", tmp_sr);
+	
+							// Trigger the search
+							var tmp_se = l("search entries");
+							searchEntries();
+							l("search entries", tmp_se);
+						} catch (e) {
+							le("ERROR: Could not parse search string from url");
+							console.error(e);
+						}
+					} else {
+						var tmp_sp = l("no search param found, resetting search");
+						resetSearch();
+						l("no search param found, resetting search", tmp_sp);
+					}
+					l("trying to find search param from url", tmp_sp_t)
+				} catch (e) {
+					console.error("ERROR in trying to receive filters and rules:", e);
+				}
+	
+				l("receiving filters and rules", old_t);
+			},
+			error: function (e) {
+				console.error(e);
+				alert("ERROR loading site");
+			}
+		});
 
 	$('#btn-reset').on('click', function() {
 		$('#queryBuilder').queryBuilder('reset');

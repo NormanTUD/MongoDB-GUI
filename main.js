@@ -899,25 +899,20 @@ function findLatLonVariablesRecursive(entry) {
 		["breitengrad", "höhengrad"]
 	];
 
-	const geoCoordRegex = /^[-+]?\d{1,3}(?:\.\d+)?$/;
+	var names = ["lat", "lon"];
 
-	var r = findVariablesRecursive(entry, keywords, geoCoordRegex);
+	var geoCoordRegex = /^[-+]?\d{1,3}(?:\.\d+)?$/;
+
+	var r = findVariablesRecursive(entry, keywords, geoCoordRegex, names);
 
 	l("findLatLonVariablesRecursive", old_ts);
 
 	return r;
 }
 
-function keywords_match (key, kw, regex, entry, value) {
+function keywords_match (kw, regex, entry) {
 	var return_value = false;
-	if(!key === kw[0]) {
-		return false;
-	}
-	
-	if (!(!regex || regex.test(value))) {
-		return false;
-	}
-	
+
 	for (var i = 1; i < kw.length; i++) {
 		if(
 			Object.keys(entry).includes(kw[i]) &&
@@ -932,7 +927,7 @@ function keywords_match (key, kw, regex, entry, value) {
 	return return_value;
 }
 
-function findVariablesRecursive(entry, keywords, regex, originalEntry = null) {
+function findVariablesRecursive(entry, keywords, regex, names, parseFunction=parseFloat, originalEntry = null) {
 	var old_ts;
 	if (originalEntry === null) {
 		originalEntry = JSON.parse(JSON.stringify(entry));
@@ -948,16 +943,25 @@ function findVariablesRecursive(entry, keywords, regex, originalEntry = null) {
 				let latLon = {};
 
 				if (Array.isArray(value) || typeof value === "object") {
-					const nestedVariables = findVariablesRecursive(value, keywords, regex, originalEntry);
+					const nestedVariables = findVariablesRecursive(value, keywords, regex, names, parseFunction, originalEntry);
 					latLonVariables.push(...nestedVariables);
 				} else if (
-					keywords_match(key, kw, regex, entry, value)
+					key === kw[0] &&
+					(!regex || regex.test(value)) &&
+					keywords_match(kw, regex, entry)
 				) {
-					latLon = {
-						lat: parseFloat(value),
-						lon: parseFloat(entry[kw[1]]),
+					var code = `{
+						${names[0]}: parseFloat(value),
+						${names[1]}: parseFloat(entry[kw[1]]),
 						originalEntry: originalEntry
-					};
+					}`;
+
+					for (var k = 1; k < kw.length; k++) {
+						latLon[kw[k]] = parseFunction(entry[kw[k]]);
+
+					}
+
+					latLon["originalEntry"] = originalEntry;
 				}
 
 				if (Object.keys(latLon).length !== 0) {

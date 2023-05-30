@@ -870,11 +870,11 @@ function updateEntry(entryId, jsonData) {
 	var old_ts = l("updateEntry");
 	$.ajax({
 		url: PHP_SELF,
-			type: 'POST',
-			data: {
-				entry_id: entryId,
-				json_data: jsonData
-			},
+		type: 'POST',
+		data: {
+			entry_id: entryId,
+			json_data: jsonData
+		},
 		success: function (response) {
 			parse_server_response(response);
 		},
@@ -891,7 +891,6 @@ function findLatLonVariablesRecursive(entry, originalEntry = null) {
 		["lat", "lon"],
 		["latitude", "longitude"],
 		["breitengrad", "höhengrad"]
-
 	];
 
 	return findVariablesRecursive(entry, keywords, originalEntry);
@@ -913,16 +912,16 @@ function findVariablesRecursive(entry, keywords, originalEntry = null) {
 			for (const kw of keywords) {
 				let latLon = {};
 
-				const latName = kw[0];
-				const lonName = kw[1];
+				const first_keyword = kw[0];
+				const second_keyword = kw[1];
 
 				if (Array.isArray(value) || typeof value === "object") {
 					const nestedVariables = findLatLonVariablesRecursive(value, originalEntry);
 					latLonVariables.push(...nestedVariables);
-				} else if (key === latName && geoCoordRegex.test(value) && Object.keys(entry).includes(lonName) && geoCoordRegex.test(entry[lonName])) {
+				} else if (key === first_keyword && geoCoordRegex.test(value) && Object.keys(entry).includes(second_keyword) && geoCoordRegex.test(entry[second_keyword])) {
 					latLon = {
 						lat: parseFloat(value),
-						lon: parseFloat(entry[lonName]),
+						lon: parseFloat(entry[second_keyword]),
 						originalEntry: originalEntry
 					};
 				}

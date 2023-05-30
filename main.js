@@ -341,7 +341,7 @@ async function groupJSONStructures(entries) {
 				keyValuePairs.push(subKey);
 			});
 		} else {
-			keyValuePairs.push(path + '=' + data);
+			keyValuePairs.push(path); // + '=' + data);
 		}
 
 		return keyValuePairs.join('-');
@@ -358,6 +358,8 @@ async function groupJSONStructures(entries) {
 
 	// Count the number of different groups
 	var groupCount = Object.keys(groups).length;
+
+	//log(groups);
 
 	l("groupJSONStructures", old_ts);
 	return groupCount;

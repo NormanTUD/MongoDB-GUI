@@ -194,7 +194,7 @@ async function visualizations (entries) {
 
 function searchEntries() {
 	var old_ts = l("searchEntries");
-	var rules = $("#builder-basic").queryBuilder("getRules");
+	var rules = $("#queryBuilder").queryBuilder("getRules");
 
 	if (rules !== null) {
 		// Convert the query object to a URL parameter string
@@ -658,7 +658,7 @@ function resetSearch(e=false) {
 	history.pushState({ path: newUrl }, '', newUrl);
 
 	// Reset the query builder
-	$('#builder-basic').queryBuilder('reset');
+	$('#queryBuilder').queryBuilder('reset');
 
 	// Clear the current query display
 	$("#current_query").empty();
@@ -715,7 +715,7 @@ function update_current_query(e=null) {
 		e.stopPropagation();
 	}
 
-	var rules = $("#builder-basic").queryBuilder("getRules");
+	var rules = $("#queryBuilder").queryBuilder("getRules");
 
 	if (rules !== null) {
 		var query = convertRulesToMongoQuery(rules);
@@ -1014,7 +1014,6 @@ $(document).ready(function () {
 			var filters = data.filters;
 			var rules = data.rules;
 
-
 			if(!filters.length) {
 				$("#search_stuff").hide();
 				le("No DB entries found");
@@ -1029,7 +1028,7 @@ $(document).ready(function () {
 
 			var tmp = l("building jqueryquerybuilder")
 
-			$('#builder-basic').queryBuilder({
+			$('#queryBuilder').queryBuilder({
 				plugins: ["bt-tooltip-errors"],
 				filters: filters,
 				rules: rules
@@ -1061,7 +1060,7 @@ $(document).ready(function () {
 						// Set the query rules in the query builder
 						var tmp_sr = l("setRules");
 						console.log("QUERY:", query);
-						$("#builder-basic").queryBuilder("setRules", query);
+						$("#queryBuilder").queryBuilder("setRules", query);
 						l("setRules", tmp_sr);
 
 						// Trigger the search
@@ -1091,16 +1090,16 @@ $(document).ready(function () {
 	});
 
 	$('#btn-reset').on('click', function() {
-		$('#builder-basic').queryBuilder('reset');
+		$('#queryBuilder').queryBuilder('reset');
 	});
 
 	$('#btn-set').on('click', function() {
 		var rules = JSON.parse($('#rules-json').val());
-		$('#builder-basic').queryBuilder('setRules', rules);
+		$('#queryBuilder').queryBuilder('setRules', rules);
 	});
 
 	$('#btn-get').on('click', function() {
-		var result = $('#builder-basic').queryBuilder('getRules');
+		var result = $('#queryBuilder').queryBuilder('getRules');
 
 		if (!$.isEmptyObject(result)) {
 			alert(JSON.stringify(result, null, 2));

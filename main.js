@@ -15,6 +15,16 @@ function fl (entryId, b) { // focus log (entryId und bool)
 	focus_log[entryId] = !!b;
 }
 
+function assert (cond, msg) {
+	if(!cond) {
+		error(msg);
+	}
+}
+
+function assert_type(should, is) {
+	assert(typeof(should) != is, `Should be ${typeof(should)}, is ${is}`);
+}
+
 function parse_server_response (response, config={success: 1, error: 1, warning: 1, closeSwal: 0}) {
 	if(response) {
 		try {
@@ -94,7 +104,6 @@ function l (msg, old_ts=null, printer="log") {
 		var delta_t = (ct - old_ts) / 1000;
 		var original_msg = msg;
 		msg = msg + ` (took ${delta_t} s)`
-		$("#l").html(msg);
 
 		if(!Object.keys(performance_log).includes(original_msg)) {
 			performance_log[original_msg] = [];
@@ -105,6 +114,7 @@ function l (msg, old_ts=null, printer="log") {
 	}
 
 	$("#l").html(msg);
+
 	if(printer == "log") {
 		log(msg);
 	} else if (printer == "error") {
@@ -928,6 +938,7 @@ function keywords_match (kw, regex, entry) {
 }
 
 function findVariablesRecursive(entry, keywords, regex, names, parseFunction=parseFloat, originalEntry = null) {
+	//assert_type(parseFunction, "function");
 	var old_ts;
 	if (originalEntry === null) {
 		originalEntry = JSON.parse(JSON.stringify(entry));
@@ -940,7 +951,7 @@ function findVariablesRecursive(entry, keywords, regex, names, parseFunction=par
 		for (const key in entry) {
 			const value = entry[key];
 			for (const kw of keywords) {
-				let latLon = {};
+				let found = {};
 
 				if (Array.isArray(value) || typeof value === "object") {
 					const nestedVariables = findVariablesRecursive(value, keywords, regex, names, parseFunction, originalEntry);
@@ -950,22 +961,15 @@ function findVariablesRecursive(entry, keywords, regex, names, parseFunction=par
 					(!regex || regex.test(value)) &&
 					keywords_match(kw, regex, entry)
 				) {
-					var code = `{
-						${names[0]}: parseFloat(value),
-						${names[1]}: parseFloat(entry[kw[1]]),
-						originalEntry: originalEntry
-					}`;
-
 					for (var k = 1; k < kw.length; k++) {
-						latLon[kw[k]] = parseFunction(entry[kw[k]]);
-
+						found[kw[k]] = parseFunction(entry[kw[k]]);
 					}
 
-					latLon["originalEntry"] = originalEntry;
+					found["originalEntry"] = originalEntry;
 				}
 
-				if (Object.keys(latLon).length !== 0) {
-					latLonVariables.push(latLon);
+				if (Object.keys(found).length !== 0) {
+					latLonVariables.push(found);
 				}
 			}
 		}

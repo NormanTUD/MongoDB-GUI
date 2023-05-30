@@ -186,10 +186,12 @@ async function visualizations (entries) {
 	generalizedVisualization(entries);
 	countKeys(entries);
 	var groups = await groupJSONStructures(entries);
+
 	if(groups) {
-		var old_ts = l("groups: " + groups);
-		_swal_close();
+		l("groups: " + groups);
 	}
+
+	_swal_close();
 }
 
 function searchEntries() {

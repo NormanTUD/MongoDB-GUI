@@ -545,75 +545,76 @@ function initJsonEditor(entry) {
 
 function updateMap(entries) {
 	var old_ts = l("updateMap");
-	// Create an array to store heatmap data
-	var heatmapData = [];
+    try {
+        // Create an array to store heatmap data
+        var heatmapData = [];
 
-	// Iterate through the entries
-	for (var i = 0; i < entries.length; i++) {
-		var entry = entries[i];
-		var lat = parseFloat(entry.lat);
-		var lon = parseFloat(entry.lon);
+        // Iterate through the entries
+        for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            var lat = parseFloat(entry.lat);
+            var lon = parseFloat(entry.lon);
 
-		// Add the coordinates to the heatmap data
-		heatmapData.push([lat, lon]);
-	}
+            // Add the coordinates to the heatmap data
+            heatmapData.push([lat, lon]);
+        }
 
-	// Clear the existing map markers and heatmap layer
+        // Clear the existing map markers and heatmap layer
 
-	if(markerCluster === null) {
-		markerCluster = L.markerClusterGroup();
-		map = L.map('map').setView([0, 0], 2); // Set initial center and zoom level
-		heatLayer = L.heatLayer(heatmapData, {
-			radius: 25, // Adjust the radius as per your preference
-			blur: 15, // Adjust the blur as per your preference
-			gradient: {
-				0.4: 'blue', // Define the colors and positions in the gradient
-				0.6: 'cyan',
-				0.7: 'lime',
-				0.8: 'yellow',
-				1.0: 'red'
-			}
-		});
-		// Add OpenStreetMap tile layer
-		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-			maxZoom: 18
-		}).addTo(map);
-	}
+        if(markerCluster === null) {
+            markerCluster = L.markerClusterGroup();
+            map = L.map('map').setView([0, 0], 2); // Set initial center and zoom level
+            heatLayer = L.heatLayer(heatmapData, {
+                radius: 25, // Adjust the radius as per your preference
+                blur: 15, // Adjust the blur as per your preference
+                gradient: {
+                    0.4: 'blue', // Define the colors and positions in the gradient
+                    0.6: 'cyan',
+                    0.7: 'lime',
+                    0.8: 'yellow',
+                    1.0: 'red'
+                }
+            });
+            // Add OpenStreetMap tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+                maxZoom: 18
+            }).addTo(map);
+        }
 
-	markerCluster.clearLayers();
-	map.removeLayer(heatLayer);
+        markerCluster.clearLayers();
+        map.removeLayer(heatLayer);
 
-	// Add the new markers and heatmap layer to the map
-	for (var i = 0; i < entries.length; i++) {
-		var entry = entries[i];
-		var lat = entry.lat;
-		var lon = entry.lon;
+        // Add the new markers and heatmap layer to the map
+        for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            var lat = entry.lat;
+            var lon = entry.lon;
 
-		// Create a marker and add it to the marker cluster group
-		var marker = L.marker([lat, lon]);
-		markerCluster.addLayer(marker);
-	}
+            // Create a marker and add it to the marker cluster group
+            var marker = L.marker([lat, lon]);
+            markerCluster.addLayer(marker);
+        }
 
-	// Create a new heatmap layer with the updated heatmap data
-	heatLayer = L.heatLayer(heatmapData, {
-		radius: 25, // Adjust the radius as per your preference
-		blur: 15, // Adjust the blur as per your preference
-		gradient: {
-			0.4: 'blue', // Define the colors and positions in the gradient
-			0.6: 'cyan',
-			0.7: 'lime',
-			0.8: 'yellow',
-			1.0: 'red'
-		}
-	});
+        // Create a new heatmap layer with the updated heatmap data
+        heatLayer = L.heatLayer(heatmapData, {
+            radius: 25, // Adjust the radius as per your preference
+            blur: 15, // Adjust the blur as per your preference
+            gradient: {
+                0.4: 'blue', // Define the colors and positions in the gradient
+                0.6: 'cyan',
+                0.7: 'lime',
+                0.8: 'yellow',
+                1.0: 'red'
+            }
+        });
 
-	// Add the marker cluster group and the new heatmap layer to the map
-	markerCluster.addTo(map);
-	heatLayer.addTo(map);
+        // Add the marker cluster group and the new heatmap layer to the map
+        markerCluster.addTo(map);
+        heatLayer.addTo(map);
 
-	// Fit the map bounds to include both markers and heatmap layer
-	try {
+        // Fit the map bounds to include both markers and heatmap layer
+	
 		map.fitBounds(markerCluster.getBounds());
 		$("#map").show();
 	} catch (e) {

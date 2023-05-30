@@ -886,17 +886,19 @@ function updateEntry(entryId, jsonData) {
 	l("updateEntry", old_ts);
 }
 
-function findLatLonVariablesRecursive(entry, originalEntry = null) {
+function findLatLonVariablesRecursive(entry) {
 	var keywords = [
 		["lat", "lon"],
 		["latitude", "longitude"],
 		["breitengrad", "höhengrad"]
 	];
 
-	return findVariablesRecursive(entry, keywords, originalEntry);
+	const geoCoordRegex = /^[-+]?\d{1,3}(?:\.\d+)?$/;
+
+	return findVariablesRecursive(entry, keywords, geoCoordRegex);
 }
 
-function findVariablesRecursive(entry, keywords, originalEntry = null) {
+function findVariablesRecursive(entry, keywords, regex, originalEntry = null) {
 	var old_ts;
 	if (originalEntry === null) {
 		originalEntry = JSON.parse(JSON.stringify(entry));
@@ -904,7 +906,6 @@ function findVariablesRecursive(entry, keywords, originalEntry = null) {
 	}
 
 	const latLonVariables = [];
-	const geoCoordRegex = /^[-+]?\d{1,3}(?:\.\d+)?$/;
 
 	if (Array.isArray(entry) || typeof entry === "object") {
 		for (const key in entry) {
@@ -916,9 +917,14 @@ function findVariablesRecursive(entry, keywords, originalEntry = null) {
 				const second_keyword = kw[1];
 
 				if (Array.isArray(value) || typeof value === "object") {
-					const nestedVariables = findLatLonVariablesRecursive(value, originalEntry);
+					const nestedVariables = findVariablesRecursive(value, keywords, regex, originalEntry);
 					latLonVariables.push(...nestedVariables);
-				} else if (key === first_keyword && geoCoordRegex.test(value) && Object.keys(entry).includes(second_keyword) && geoCoordRegex.test(entry[second_keyword])) {
+				} else if (
+					key === first_keyword &&
+					(!regex || regex.test(value)) &&
+					Object.keys(entry).includes(second_keyword) &&
+					(!regex || regex.test(entry[second_keyword]))
+				) {
 					latLon = {
 						lat: parseFloat(value),
 						lon: parseFloat(entry[second_keyword]),

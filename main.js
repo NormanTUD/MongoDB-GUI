@@ -304,7 +304,7 @@ function countKeys(entries) {
 	}];
 
 	var layout = {
-		title: 'Occurency of keys',
+		title: 'Occurency of keys (first level only)',
 		xaxis: {
 			title: 'Fields'
 		},

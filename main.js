@@ -213,27 +213,27 @@ function searchEntries() {
 				search_query: JSON.stringify(query)
 			},
 			success: async function(response) {
-				var matchingEntries = JSON.parse(response);
-
-				if (matchingEntries.length > 0) {
-					// Clear the existing entry list
-					$('#entry_list').empty();
-
-					// Update JSON editors for matching entries
-					matchingEntries.forEach(function(entry) {
-						// Append the updated entry to the container
-						var entry_id = entry._id;
-
-						// Initialize JSON Editor for the updated entry
-						initJsonEditor(entry);
-					});
-
-
-					// Generate the visualization
-					await visualizations(matchingEntries);
-				} else {
-					info('No matching entries found.');
-				}
+				try {
+					var matchingEntries = JSON.parse(response);
+	
+					if (matchingEntries.length > 0) {
+						// Clear the existing entry list
+						$('#entry_list').empty();
+	
+						// Update JSON editors for matching entries
+						matchingEntries.forEach(function(entry) {
+							// Initialize JSON Editor for the updated entry
+							initJsonEditor(entry);
+						});
+	
+						// Generate the visualization
+						await visualizations(matchingEntries);
+					} else {
+						info('No matching entries found.');
+					}
+				 } catch (e) {
+					error(e);
+				 }
 			},
 			error: function() {
 				error('Error searching entries.');

@@ -908,6 +908,21 @@ function findLatLonVariablesRecursive(entry) {
 	return r;
 }
 
+function keywords_match (key, kw, regex, entry, value) {
+	var return_value = false;
+	
+	if(
+		key === kw[0] &&
+		(!regex || regex.test(value)) &&
+		Object.keys(entry).includes(kw[1]) &&
+		(!regex || regex.test(entry[kw[1]]))
+	) {
+		return_value = true;
+	}
+
+	return return_value;
+}
+
 function findVariablesRecursive(entry, keywords, regex, originalEntry = null) {
 	var old_ts;
 	if (originalEntry === null) {
@@ -923,21 +938,15 @@ function findVariablesRecursive(entry, keywords, regex, originalEntry = null) {
 			for (const kw of keywords) {
 				let latLon = {};
 
-				const first_keyword = kw[0];
-				const second_keyword = kw[1];
-
 				if (Array.isArray(value) || typeof value === "object") {
 					const nestedVariables = findVariablesRecursive(value, keywords, regex, originalEntry);
 					latLonVariables.push(...nestedVariables);
 				} else if (
-					key === first_keyword &&
-					(!regex || regex.test(value)) &&
-					Object.keys(entry).includes(second_keyword) &&
-					(!regex || regex.test(entry[second_keyword]))
+					keywords_match(key, kw, regex, entry, value)
 				) {
 					latLon = {
 						lat: parseFloat(value),
-						lon: parseFloat(entry[second_keyword]),
+						lon: parseFloat(entry[kw[1]]),
 						originalEntry: originalEntry
 					};
 				}

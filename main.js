@@ -196,8 +196,11 @@ function load_all_entries () {
 
 async function visualizations (entries) {
 	// Update the map with the new matching entries
-	var entries_with_geo_coords = findLatLonVariablesRecursive(entries);
-	updateMap(entries_with_geo_coords);
+	var urlParams = new URLSearchParams(window.location.search);
+	if (!urlParams.has('no_map')) {
+		var entries_with_geo_coords = findLatLonVariablesRecursive(entries);
+		updateMap(entries_with_geo_coords);
+	}
 
 	generalizedVisualization(entries);
 	countKeys(entries);
@@ -1056,7 +1059,7 @@ $(document).ready(function () {
 	});
 	
 	var urlParams = new URLSearchParams(window.location.search);
-	if (urlParams.has('search')) {
+	if (!urlParams.has('no_search')) {
 		$("#search_stuff").show();
 		$.ajax({
 			url: 'index.php?filters_and_rules=1',

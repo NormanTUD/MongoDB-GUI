@@ -920,7 +920,7 @@ function findLatLonVariablesRecursive(entry) {
 
   var r = findVariablesRecursive(entry, keywords, geoCoordRegex, names);
 
-  return r;
+  return removeDuplicates(r);
 }
 
 function keywords_match(kw, regex, entry) {

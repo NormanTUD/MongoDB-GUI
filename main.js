@@ -923,97 +923,74 @@ function findLatLonVariablesRecursive(entry) {
 	return removeDuplicates(r);
 }
 
-function keywords_match(kw, regex, entry) {
-	for (var i = 1; i < kw.length; i++) {
-		if (
-			Object.keys(entry).includes(kw[i]) &&
-			(!regex || regex.test(entry[kw[i]]))
-		) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
 function findVariablesRecursive(
-	entry,
-	keywords,
-	regex,
-	names,
-	parseFunction = parseFloat,
-	originalEntry = null
+  entry,
+  keywords,
+  regex,
+  names,
+  parseFunction = parseFloat,
+  originalEntry = entry
 ) {
-	if (originalEntry === null) {
-		originalEntry = JSON.parse(JSON.stringify(entry));
-	}
+  const latLonVariables = [];
+  const stack = [{ entry, originalEntry }];
 
-	const latLonVariables = [];
+  while (stack.length > 0) {
+    const { entry, originalEntry } = stack.pop();
 
-	if (Array.isArray(entry) || typeof entry === "object") {
-		for (const key in entry) {
-			const value = entry[key];
-			for (const kw of keywords) {
-				if (
-					kw.includes(key) &&
-					(!regex || regex.test(value)) &&
-					keywords_match(kw, regex, entry)
-				) {
-					let found = {};
+    for (const key in entry) {
+      const value = entry[key];
 
-					for (var k = 0; k < names.length; k++) {
-						const name = names[k];
-						found[name] = parseFunction(entry[kw[k]]);
-					}
+      for (const kw of keywords) {
+        if (
+          kw.includes(key) &&
+          (!regex || regex.test(value)) &&
+          keywords_match(kw, regex, entry)
+        ) {
+          const found = {};
+          for (let k = 0; k < names.length; k++) {
+            const name = names[k];
+            found[name] = parseFunction(entry[kw[k]]);
+          }
+          found["originalEntry"] = originalEntry;
+          latLonVariables.push(found);
+        }
 
-					found["originalEntry"] = originalEntry;
-					latLonVariables.push(found);
-				}
+        if (Array.isArray(value) || typeof value === "object") {
+          stack.push({ entry: value, originalEntry });
+        }
+      }
+    }
+  }
 
-				if (Array.isArray(value) || typeof value === "object") {
-					const nestedVariables = findVariablesRecursive(
-						value,
-						keywords,
-						regex,
-						names,
-						parseFunction,
-						originalEntry
-					);
-					latLonVariables.push(...nestedVariables);
-				}
-			}
-		}
-	} else {
-		console.error("Entry is not an array/object");
-	}
-
-	return latLonVariables;
+  return latLonVariables;
 }
 
+function removeDuplicatesFromJSON(arr, enable_log = 0) {
+  const uniqueEntries = [];
+  const seenIds = new Set();
 
-function removeDuplicatesFromJSON(arr, enable_log=0) {
-	var old_ts;
-	if(enable_log) {
-		old_ts = l("removeDuplicatesFromJSON");
-	}
-	const uniqueEntries = [];
-	const seenIds = new Set();
+  for (const entry of arr) {
+    const id = JSON.stringify(entry);
 
-	for (const entry of arr) {
-		const id = JSON.stringify(entry);
+    if (!seenIds.has(id)) {
+      uniqueEntries.push(entry);
+      seenIds.add(id);
+    }
+  }
 
-		if (!seenIds.has(id)) {
-			uniqueEntries.push(entry);
-			seenIds.add(id);
-		}
-	}
-
-	if(enable_log) {
-		l("removeDuplicatesFromJSON", old_ts);
-	}
-
-	return uniqueEntries;
+  return uniqueEntries;
 }
+
+function keywords_match(kw, regex, entry) {
+  const entryKeys = Object.keys(entry);
+  for (let i = 1; i < kw.length; i++) {
+    if (entryKeys.includes(kw[i]) && (!regex || regex.test(entry[kw[i]]))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 
 function t(oldTimestamp) {
 	var currentTimestamp = Date.now();

@@ -1179,7 +1179,7 @@ if (typeof window !== 'undefined') {
 	log("Using node");
 	function testSuite() {
 		function is_equal(actual, expected, testName) {
-			if (actual === expected) {
+			if (JSON.stringify(actual) === JSON.stringify(expected)) {
 				console.log(`PASS: ${testName}`);
 			} else {
 				console.log(`FAIL: ${testName}`);

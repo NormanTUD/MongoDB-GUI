@@ -908,86 +908,86 @@ function updateEntry(entryId, jsonData) {
 }
 
 function findLatLonVariablesRecursive(entry) {
-  var keywords = [
-    ["lat", "lon"],
-    ["latitude", "longitude"],
-    ["breitengrad", "höhengrad"]
-  ];
+	var keywords = [
+		["lat", "lon"],
+		["latitude", "longitude"],
+		["breitengrad", "höhengrad"]
+	];
 
-  var names = ["lat", "lon"];
+	var names = ["lat", "lon"];
 
-  var geoCoordRegex = /^[-+]?\d{1,3}(?:\.\d+)?$/;
+	var geoCoordRegex = /^[-+]?\d{1,3}(?:\.\d+)?$/;
 
-  var r = findVariablesRecursive(entry, keywords, geoCoordRegex, names);
+	var r = findVariablesRecursive(entry, keywords, geoCoordRegex, names);
 
-  return removeDuplicates(r);
+	return removeDuplicates(r);
 }
 
 function keywords_match(kw, regex, entry) {
-  for (var i = 1; i < kw.length; i++) {
-    if (
-      Object.keys(entry).includes(kw[i]) &&
-      (!regex || regex.test(entry[kw[i]]))
-    ) {
-      return true;
-    }
-  }
+	for (var i = 1; i < kw.length; i++) {
+		if (
+			Object.keys(entry).includes(kw[i]) &&
+			(!regex || regex.test(entry[kw[i]]))
+		) {
+			return true;
+		}
+	}
 
-  return false;
+	return false;
 }
 
 function findVariablesRecursive(
-  entry,
-  keywords,
-  regex,
-  names,
-  parseFunction = parseFloat,
-  originalEntry = null
+	entry,
+	keywords,
+	regex,
+	names,
+	parseFunction = parseFloat,
+	originalEntry = null
 ) {
-  if (originalEntry === null) {
-    originalEntry = JSON.parse(JSON.stringify(entry));
-  }
+	if (originalEntry === null) {
+		originalEntry = JSON.parse(JSON.stringify(entry));
+	}
 
-  const latLonVariables = [];
+	const latLonVariables = [];
 
-  if (Array.isArray(entry) || typeof entry === "object") {
-    for (const key in entry) {
-      const value = entry[key];
-      for (const kw of keywords) {
-        if (
-          kw.includes(key) &&
-          (!regex || regex.test(value)) &&
-          keywords_match(kw, regex, entry)
-        ) {
-          let found = {};
+	if (Array.isArray(entry) || typeof entry === "object") {
+		for (const key in entry) {
+			const value = entry[key];
+			for (const kw of keywords) {
+				if (
+					kw.includes(key) &&
+					(!regex || regex.test(value)) &&
+					keywords_match(kw, regex, entry)
+				) {
+					let found = {};
 
-          for (var k = 0; k < names.length; k++) {
-            const name = names[k];
-            found[name] = parseFunction(entry[kw[k]]);
-          }
+					for (var k = 0; k < names.length; k++) {
+						const name = names[k];
+						found[name] = parseFunction(entry[kw[k]]);
+					}
 
-          found["originalEntry"] = originalEntry;
-          latLonVariables.push(found);
-        }
+					found["originalEntry"] = originalEntry;
+					latLonVariables.push(found);
+				}
 
-        if (Array.isArray(value) || typeof value === "object") {
-          const nestedVariables = findVariablesRecursive(
-            value,
-            keywords,
-            regex,
-            names,
-            parseFunction,
-            originalEntry
-          );
-          latLonVariables.push(...nestedVariables);
-        }
-      }
-    }
-  } else {
-    console.error("Entry is not an array/object");
-  }
+				if (Array.isArray(value) || typeof value === "object") {
+					const nestedVariables = findVariablesRecursive(
+						value,
+						keywords,
+						regex,
+						names,
+						parseFunction,
+						originalEntry
+					);
+					latLonVariables.push(...nestedVariables);
+				}
+			}
+		}
+	} else {
+		console.error("Entry is not an array/object");
+	}
 
-  return latLonVariables;
+	return latLonVariables;
 }
 
 

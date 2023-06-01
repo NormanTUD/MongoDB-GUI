@@ -931,54 +931,62 @@ function findVariablesRecursive(
   parseFunction = parseFloat,
   originalEntry = entry
 ) {
-  const latLonVariables = [];
-  const stack = [{ entry, originalEntry }];
+	var old_ts = null;
+	if(!originalEntry) {
+		old_ts = log("findVariablesRecursive");
+	}
+	const latLonVariables = [];
+	const stack = [{ entry, originalEntry }];
 
-  while (stack.length > 0) {
-    const { entry, originalEntry } = stack.pop();
+	while (stack.length > 0) {
+		const { entry, originalEntry } = stack.pop();
 
-    for (const key in entry) {
-      const value = entry[key];
+		for (const key in entry) {
+			const value = entry[key];
 
-      for (const kw of keywords) {
-        if (
-          kw.includes(key) &&
-          (!regex || regex.test(value)) &&
-          keywords_match(kw, regex, entry)
-        ) {
-          const found = {};
-          for (let k = 0; k < names.length; k++) {
-            const name = names[k];
-            found[name] = parseFunction(entry[kw[k]]);
-          }
-          found["originalEntry"] = originalEntry;
-          latLonVariables.push(found);
-        }
+			for (const kw of keywords) {
+				if (
+					kw.includes(key) &&
+					(!regex || regex.test(value)) &&
+					keywords_match(kw, regex, entry)
+				) {
+					const found = {};
+					for (let k = 0; k < names.length; k++) {
+						const name = names[k];
+						found[name] = parseFunction(entry[kw[k]]);
+					}
+					found["originalEntry"] = originalEntry;
+					latLonVariables.push(found);
+				}
 
-        if (Array.isArray(value) || typeof value === "object") {
-          stack.push({ entry: value, originalEntry });
-        }
-      }
-    }
-  }
+				if (Array.isArray(value) || typeof value === "object") {
+					stack.push({ entry: value, originalEntry });
+				}
+			}
+		}
+	}
 
-  return latLonVariables;
+	if(old_ts) {
+		log("findVariablesRecursive", old_ts);
+	}
+
+	return latLonVariables;
 }
 
 function removeDuplicatesFromJSON(arr, enable_log = 0) {
-  const uniqueEntries = [];
-  const seenIds = new Set();
+	const uniqueEntries = [];
+	const seenIds = new Set();
 
-  for (const entry of arr) {
-    const id = JSON.stringify(entry);
+	for (const entry of arr) {
+		const id = JSON.stringify(entry);
 
-    if (!seenIds.has(id)) {
-      uniqueEntries.push(entry);
-      seenIds.add(id);
-    }
-  }
+		if (!seenIds.has(id)) {
+			uniqueEntries.push(entry);
+			seenIds.add(id);
+		}
+	}
 
-  return uniqueEntries;
+	return uniqueEntries;
 }
 
 function keywords_match(kw, regex, entry) {

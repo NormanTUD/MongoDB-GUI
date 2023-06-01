@@ -1065,7 +1065,6 @@ $(document).ready(function () {
 			url: 'index.php?filters_and_rules=1',
 			dataType: 'json',
 			success: function(data) {
-				alert("A");
 				var old_t = l("receiving filters and rules");
 				var filters = data.filters;
 				var rules = data.rules;

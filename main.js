@@ -113,15 +113,18 @@ function l (msg, old_ts=null, printer="log") {
 		performance_log_table();
 	}
 
-	$("#l").html(msg);
 
-	if(printer == "log") {
-		log(msg);
-	} else if (printer == "error") {
-		error(msg);
-	} else {
-		error("Unknown printer");
-		log(msg);
+	if (typeof window !== 'undefined') {
+		$("#l").html(msg);
+
+		if(printer == "log") {
+			log(msg);
+		} else if (printer == "error") {
+			error(msg);
+		} else {
+			error("Unknown printer");
+			log(msg);
+		}
 	}
 
 	return ct;
@@ -1024,6 +1027,9 @@ function t(oldTimestamp) {
 }
 
 function performance_log_table () {
+	if (!typeof window !== 'undefined') {
+		return;
+	}
 	// Convert the data into an array of objects
 	var dataArray = Object.entries(performance_log).map(([key, value]) => ({ key, value }));
 
@@ -1177,8 +1183,8 @@ if (typeof window !== 'undefined') {
 				console.log(`PASS: ${testName}`);
 			} else {
 				console.log(`FAIL: ${testName}`);
-				console.log(`Expected: ${expected}`);
-				console.log(`Actual: ${actual}`);
+				console.log(`Expected: `, expected);
+				console.log(`Actual: `, actual);
 			}
 		}
 
@@ -1187,8 +1193,8 @@ if (typeof window !== 'undefined') {
 				console.log(`PASS: ${testName}`);
 			} else {
 				console.log(`FAIL: ${testName}`);
-				console.log(`Expected: ${expected}`);
-				console.log(`Actual: ${actual}`);
+				console.log(`Expected: `, expected);
+				console.log(`Actual: `, actual);
 			}
 		}
 
@@ -1237,6 +1243,54 @@ if (typeof window !== 'undefined') {
 		is_not_regex('hello', /world/, 'Should not match regular expression');
 		is_true(5 > 2, 'Comparison should be true');
 		is_false(2 < 1, 'Comparison should be false');
+
+		// Test Suite for findLatLonVariablesRecursive function
+		function test_findLatLonVariablesRecursive() {
+			// Test case 1
+			const entry1 = {
+				lat: 40.7128,
+				lon: -74.0060,
+			};
+			const expected1 = [
+				{
+					lat: 40.7128,
+					lon: -74.0060,
+					originalEntry: entry1,
+				},
+			];
+			is_equal(findLatLonVariablesRecursive(entry1), expected1, 'Should find latitude and longitude variables');
+
+			// Test case 2
+			const entry2 = {
+				latitude: 51.5074,
+				longitude: -0.1278,
+			};
+			const expected2 = [
+				{
+					lat: 51.5074,
+					lon: -0.1278,
+					originalEntry: entry2,
+				},
+			];
+			is_equal(findLatLonVariablesRecursive(entry2), expected2, 'Should find latitude and longitude variables with different names');
+
+			// Test case 3
+			const entry3 = {
+				breitengrad: 48.8566,
+				höhengrad: 2.3522,
+			};
+			const expected3 = [
+				{
+					lat: 48.8566,
+					lon: 2.3522,
+					originalEntry: entry3,
+				},
+			];
+			is_equal(findLatLonVariablesRecursive(entry3), expected3, 'Should find latitude and longitude variables with different languages');
+		}
+
+		// Run the test suite
+		test_findLatLonVariablesRecursive();
 	}
 
 	// Run the test suite

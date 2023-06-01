@@ -1048,127 +1048,198 @@ function performance_log_table () {
 }
 
 if (typeof window !== 'undefined') {
-    // Load filters and rules from a file via AJAX
-    $(document).ready(function () {
-        var old_t = l("Loading document.ready");
-        Swal.fire({
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            showCancelButton: false,
-            title: "The site is loading. This may take a minute.",
-            html: 'Please wait'
-        });
-        
-        var urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.has('no_search')) {
-            $("#search_stuff").show();
-            $.ajax({
-                url: 'index.php?filters_and_rules=1',
-                dataType: 'json',
-                success: function(data) {
-                    var old_t = l("receiving filters and rules");
-                    var filters = data.filters;
-                    var rules = data.rules;
+	// Load filters and rules from a file via AJAX
+	$(document).ready(function () {
+		var old_t = l("Loading document.ready");
+		Swal.fire({
+			allowOutsideClick: false,
+			showConfirmButton: false,
+			showCancelButton: false,
+			title: "The site is loading. This may take a minute.",
+			html: 'Please wait'
+		});
 
-                    if(!filters.length) {
-                        $("#search_stuff").hide();
-                        le("No DB entries found");
-                        return;
-                    }
-        
-                    if(!rules.length) {
-                        $("#search_stuff").hide();
-                        le("No DB entries found");
-                        return;
-                    }
-        
-                    var tmp = l("building jqueryquerybuilder")
-        
-                    $('#queryBuilder').queryBuilder({
-                        plugins: ["bt-tooltip-errors"],
-                        filters: filters,
-                        rules: rules
-                    });
-        
-                    l("building jqueryquerybuilder", tmp);
+		var urlParams = new URLSearchParams(window.location.search);
+		if (!urlParams.has('no_search')) {
+			$("#search_stuff").show();
+			$.ajax({
+				url: 'index.php?filters_and_rules=1',
+				dataType: 'json',
+				success: function(data) {
+					var old_t = l("receiving filters and rules");
+					var filters = data.filters;
+					var rules = data.rules;
 
-                    tmp = l("showing search")
-                    $("#search_stuff").show();
-                    l("showing search", tmp);
+					if(!filters.length) {
+						$("#search_stuff").hide();
+						le("No DB entries found");
+						return;
+					}
+
+					if(!rules.length) {
+						$("#search_stuff").hide();
+						le("No DB entries found");
+						return;
+					}
+
+					var tmp = l("building jqueryquerybuilder")
+
+					$('#queryBuilder').queryBuilder({
+						plugins: ["bt-tooltip-errors"],
+						filters: filters,
+						rules: rules
+					});
+
+					l("building jqueryquerybuilder", tmp);
+
+					tmp = l("showing search")
+					$("#search_stuff").show();
+					l("showing search", tmp);
 
 
-                    try {
-                        var tmp_sp_t = l("trying to find search param from url")
-                        var urlParams = new URLSearchParams(window.location.search);
-                        if (urlParams.has('search')) {
-                            var searchParam = urlParams.get('search');
-                            l("found search param from url: " + searchParam)
-                            log("searchParam:", searchParam);
-                            if(searchParam == "undefined" || searchParam === undefined || !searchParam) {
-                                searchParam = "{}";
-                            }
-        
-                            try {
-                                var tmp_bq = l("trying to build query");
-                                var query = JSON.parse(decodeURIComponent(searchParam));
-                                l("trying to build query", tmp_bq);
-        
-                                // Set the query rules in the query builder
-                                var tmp_sr = l("setRules");
-                                console.log("QUERY:", query);
-                                $("#queryBuilder").queryBuilder("setRules", query);
-                                l("setRules", tmp_sr);
-        
-                                // Trigger the search
-                                var tmp_se = l("search entries");
-                                searchEntries();
-                                l("search entries", tmp_se);
-                            } catch (e) {
-                                le("ERROR: Could not parse search string from url");
-                                console.error(e);
-                            }
-                        } else {
-                            var tmp_sp = l("no search param found, resetting search");
-                            resetSearch();
-                            l("no search param found, resetting search", tmp_sp);
-                        }
-                        l("trying to find search param from url", tmp_sp_t)
-                    } catch (e) {
-                        console.error("ERROR in trying to receive filters and rules:", e);
-                    }
-        
-                    l("receiving filters and rules", old_t);
-                },
-                error: function (e) {
-                    console.error(e);
-                    alert("ERROR loading site");
-                }
-            });
-        } else {
-            l("no_search defined. Not loading search.");
-            load_all_entries();
-            $("#search_stuff").hide();
-        }
+					try {
+						var tmp_sp_t = l("trying to find search param from url")
+						var urlParams = new URLSearchParams(window.location.search);
+						if (urlParams.has('search')) {
+							var searchParam = urlParams.get('search');
+							l("found search param from url: " + searchParam)
+							log("searchParam:", searchParam);
+							if(searchParam == "undefined" || searchParam === undefined || !searchParam) {
+								searchParam = "{}";
+							}
 
-        $('#btn-reset').on('click', function() {
-            $('#queryBuilder').queryBuilder('reset');
-        });
+							try {
+								var tmp_bq = l("trying to build query");
+								var query = JSON.parse(decodeURIComponent(searchParam));
+								l("trying to build query", tmp_bq);
 
-        $('#btn-set').on('click', function() {
-            var rules = JSON.parse($('#rules-json').val());
-            $('#queryBuilder').queryBuilder('setRules', rules);
-        });
+								// Set the query rules in the query builder
+								var tmp_sr = l("setRules");
+								console.log("QUERY:", query);
+								$("#queryBuilder").queryBuilder("setRules", query);
+								l("setRules", tmp_sr);
 
-        $('#btn-get').on('click', function() {
-            var result = $('#queryBuilder').queryBuilder('getRules');
+								// Trigger the search
+								var tmp_se = l("search entries");
+								searchEntries();
+								l("search entries", tmp_se);
+							} catch (e) {
+								le("ERROR: Could not parse search string from url");
+								console.error(e);
+							}
+						} else {
+							var tmp_sp = l("no search param found, resetting search");
+							resetSearch();
+							l("no search param found, resetting search", tmp_sp);
+						}
+						l("trying to find search param from url", tmp_sp_t)
+					} catch (e) {
+						console.error("ERROR in trying to receive filters and rules:", e);
+					}
 
-            if (!$.isEmptyObject(result)) {
-                alert(JSON.stringify(result, null, 2));
-            }
-        });
+					l("receiving filters and rules", old_t);
+				},
+				error: function (e) {
+					console.error(e);
+					alert("ERROR loading site");
+				}
+			});
+		} else {
+			l("no_search defined. Not loading search.");
+			load_all_entries();
+			$("#search_stuff").hide();
+		}
 
-        l("Loading document.ready", old_t);
-    });
+		$('#btn-reset').on('click', function() {
+			$('#queryBuilder').queryBuilder('reset');
+		});
+
+		$('#btn-set').on('click', function() {
+			var rules = JSON.parse($('#rules-json').val());
+			$('#queryBuilder').queryBuilder('setRules', rules);
+		});
+
+		$('#btn-get').on('click', function() {
+			var result = $('#queryBuilder').queryBuilder('getRules');
+
+			if (!$.isEmptyObject(result)) {
+				alert(JSON.stringify(result, null, 2));
+			}
+		});
+
+		l("Loading document.ready", old_t);
+	});
 } else {
-    log("Using node");
+	log("Using node");
+	function testSuite() {
+		function is_equal(actual, expected, testName) {
+			if (actual === expected) {
+				console.log(`PASS: ${testName}`);
+			} else {
+				console.log(`FAIL: ${testName}`);
+				console.log(`Expected: ${expected}`);
+				console.log(`Actual: ${actual}`);
+			}
+		}
+
+		function is_unequal(actual, expected, testName) {
+			if (actual !== expected) {
+				console.log(`PASS: ${testName}`);
+			} else {
+				console.log(`FAIL: ${testName}`);
+				console.log(`Expected: ${expected}`);
+				console.log(`Actual: ${actual}`);
+			}
+		}
+
+		function is_regex(value, regex, testName) {
+			if (regex.test(value)) {
+				console.log(`PASS: ${testName}`);
+			} else {
+				console.log(`FAIL: ${testName}`);
+				console.log(`Value: ${value}`);
+				console.log(`Regex: ${regex}`);
+			}
+		}
+
+		function is_not_regex(value, regex, testName) {
+			if (!regex.test(value)) {
+				console.log(`PASS: ${testName}`);
+			} else {
+				console.log(`FAIL: ${testName}`);
+				console.log(`Value: ${value}`);
+				console.log(`Regex: ${regex}`);
+			}
+		}
+
+		function is_true(value, testName) {
+			if (value === true) {
+				console.log(`PASS: ${testName}`);
+			} else {
+				console.log(`FAIL: ${testName}`);
+				console.log(`Value: ${value}`);
+			}
+		}
+
+		function is_false(value, testName) {
+			if (value === false) {
+				console.log(`PASS: ${testName}`);
+			} else {
+				console.log(`FAIL: ${testName}`);
+				console.log(`Value: ${value}`);
+			}
+		}
+
+		// Example usage
+		is_equal(2 + 2, 4, 'Addition should work');
+		is_unequal('hello', 'world', 'Strings should be different');
+		is_regex('hello', /hello/, 'Should match regular expression');
+		is_not_regex('hello', /world/, 'Should not match regular expression');
+		is_true(5 > 2, 'Comparison should be true');
+		is_false(2 < 1, 'Comparison should be false');
+	}
+
+	// Run the test suite
+	testSuite();
+
 }
